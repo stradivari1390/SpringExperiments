@@ -8,7 +8,7 @@
   <version>1.0-SNAPSHOT</version>
 
   <name>simple_mvc Maven Webapp</name>
-  <url>http://maven.apache.org</url>
+  <url>http://org.example.com</url>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
