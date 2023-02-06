@@ -5,6 +5,7 @@ import org.example.web.dto.Book;
 import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -40,22 +41,26 @@ public class BookRepository implements ProjectRepository<Book> {
     @Override
     public boolean removeItemsByRegex(String field, String regex) {
         Pattern pattern = Pattern.compile(regex);
-        List<Book> booksToRemove = new ArrayList<>();
-        for (Book book : retrieveAll()) {
+        int count = 0;
+        for (Iterator<Book> iterator = repo.iterator(); iterator.hasNext();) {
+            Book book = iterator.next();
             switch (field) {
-                case "author":
+                case "Author":
                     if (pattern.matcher(book.getAuthor()).matches()) {
-                        booksToRemove.add(book);
+                        iterator.remove();
+                        count++;
                     }
                     break;
-                case "title":
+                case "Title":
                     if (pattern.matcher(book.getTitle()).matches()) {
-                        booksToRemove.add(book);
+                        iterator.remove();
+                        count++;
                     }
                     break;
-                case "size":
+                case "Size":
                     if (pattern.matcher(String.valueOf(book.getSize())).matches()) {
-                        booksToRemove.add(book);
+                        iterator.remove();
+                        count++;
                     }
                     break;
                 default:
@@ -63,8 +68,7 @@ public class BookRepository implements ProjectRepository<Book> {
                     break;
             }
         }
-        repo.removeAll(booksToRemove);
-        logger.info("remove books completed: " + booksToRemove);
-        return true;
+        logger.info("remove books completed: " + count);
+        return count > 0;
     }
 }

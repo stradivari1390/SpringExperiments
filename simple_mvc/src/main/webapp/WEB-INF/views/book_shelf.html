@@ -74,10 +74,14 @@
 
             <tr>
                 <td>
-                    <input type="text" placeholder="field" th:name="field">
+                    <select name="field" th:name="field">
+                        <option value="Author">Author</option>
+                        <option value="Title">Title</option>
+                        <option value="Size">Size</option>
+                    </select>
                 </td>
                 <td>
-                    <input type="text" placeholder="regex" th:name="queryRegex">
+                    <input type="text" placeholder="regex" th:name="regex">
                 </td>
                 <td>
                     <input type="submit" value="remove by regex">

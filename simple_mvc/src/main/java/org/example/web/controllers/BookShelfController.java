@@ -34,7 +34,7 @@ public class BookShelfController {
 
     @PostMapping("/save")
     public String saveBook(Book book) {
-        if (book.getAuthor() != null || book.getTitle() != null || book.getSize() != null) {
+        if (book.getAuthor() != null && book.getTitle() != null && book.getSize() != null) {
             bookService.saveBook(book);
             logger.info("current repository size: " + bookService.getAllBooks().size());
         }
@@ -42,7 +42,7 @@ public class BookShelfController {
     }
 
     @PostMapping("/remove")
-    public String removeBook(@RequestParam(value = "bookIdToRemove") Integer bookIdToRemove, Model model) {
+    public String removeBook(@RequestParam(value = "bookIdToRemove", required = false, defaultValue = "") Integer bookIdToRemove, Model model) {
         if (!bookService.removeBookById(bookIdToRemove)) {
             model.addAttribute("errorMessage", "Could not find book with id " + bookIdToRemove);
         }
@@ -50,8 +50,8 @@ public class BookShelfController {
     }
 
     @PostMapping("/removeByRegex")
-    public String removeBookByRegex(@RequestParam(value = "field") String field,
-                                    @RequestParam(value = "regex") String regex,
+    public String removeBookByRegex(@RequestParam(value = "field", required = false, defaultValue = "") String field,
+                                    @RequestParam(value = "regex", required = false, defaultValue = "") String regex,
                                     Model model) {
         if (!bookService.removeItemsByRegex(field, regex)) {
             model.addAttribute("errorMessage", "Could not find any books with specified parameters.");
