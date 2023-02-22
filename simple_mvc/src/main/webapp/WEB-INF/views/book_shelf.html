@@ -4,74 +4,104 @@
     <meta charset="UTF-8">
     <title>My book shelf</title>
     <style>
+        /* Set default font family and size */
+        body {
+            font-family: Arial, sans-serif;
+            font-size: 14px;
+        }
+
+        /* Center the forms and tables on the page */
         #root_container {
-            position: absolute;
-            left: 50%;
-            top: 50%;
-            transform: translate(-50%, -50%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
 
-        #books {
-            width: 50%;
-            border-collapse: collapse;
+        /* Style the forms */
+        form {
+            width: 600px;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            margin-bottom: 20px;
         }
 
+        /* Style the input fields */
+        input[type="text"], select {
+            width: 80%;
+            padding: 10px;
+            margin-bottom: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        /* Style the submit buttons */
+        input[type="submit"] {
+            width: 90%;
+            padding: 10px;
+            background-color: #282828;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        /* Style the error messages */
+        p {
+            color: red;
+            margin-bottom: 0;
+        }
+
+        /* Style the table */
         table {
-            margin: 25px;
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
         }
 
+        /* Style the table headers */
         th {
-            text-align: left;
+            background-color: #ccc;
+            padding: 10px;
+            border: 1px solid #333;
         }
 
-        th, td {
-            border-bottom: 1px solid #ddd;
+        /* Style the table cells */
+        td {
+            padding: 10px;
+            border: 1px solid #333;
         }
     </style>
 </head>
 <body>
 <div id="root_container">
     <form method="post" th:action="@{/books/save}" th:object="${book}">
-        <table>
-            <caption>Book data for adding</caption>
-
-            <tr>
-                <td>
-                    <input type="text" placeholder="author" th:field="*{author}">
-                </td>
-                <td>
-                    <input type="text" placeholder="book_title" th:field="*{title}">
-                </td>
-                <td>
-                    <input type="text" placeholder="size (pages)" th:field="*{size}">
-                </td>
-                <td>
-                    <input type="submit" value="save">
-                </td>
-            </tr>
-        </table>
+        <p th:if="${#fields.hasErrors('author')}">Value must have letters</p>
+        <input type="text" placeholder="author" th:field="*{author}">
+        <p th:if="${#fields.hasErrors('title')}">Value must have letters</p>
+        <input type="text" placeholder="book_title" th:field="*{title}">
+        <p th:if="${#fields.hasErrors('size')}">Value must be digit and less than 4 signs</p>
+        <input type="text" placeholder="size (pages)" th:field="*{size}">
+        <input type="submit" value="save">
     </form>
 
-    <form method="post" th:action="@{/books/remove}">
+    <form method="post" th:action="@{/books/remove}" th:object="${bookIdToRemove}">
         <table>
-            <caption>Book data for removing</caption>
-
             <tr>
                 <td>
-                    <input type="text" placeholder="id number" th:name="bookIdToRemove">
+                    <input type="text" placeholder="id number" th:field="*{id}">
                 </td>
                 <td>
                     <input type="submit" value="remove">
                 </td>
+                <td th:if="${#fields.hasErrors()}">
+                    <p>Wrong id or not found</p>
+                </td>
             </tr>
         </table>
     </form>
-    <div th:if="${errorMessage}" th:text="${errorMessage}"></div>
 
-    <form method="post" th:action="@{/books/removeByRegex}">
+    <form method="post" th:action="@{/books/removeByRegex}" id="removeByRegex">
         <table>
-            <caption>Book data for removing via regex</caption>
-
             <tr>
                 <td>
                     <select name="field" th:name="field">
@@ -83,17 +113,36 @@
                 <td>
                     <input type="text" placeholder="regex" th:name="regex">
                 </td>
+                <td th:if="${errorMessage}">
+                    <p th:text="${errorMessage}"></p>
+                </td>
                 <td>
-                    <input type="submit" value="remove by regex">
+                    <input type="submit" value="remove">
                 </td>
             </tr>
         </table>
     </form>
-    <div th:if="${errorMessage}" th:text="${errorMessage}"></div>
+
+    <form method="post" th:action="@{/books/uploadFile}" enctype="multipart/form-data">
+        <table>
+            <tr>
+                <td>
+                    <input type="file" name="file"/>
+                </td>
+                <td>
+                    <input type="submit" value="upload">
+                </td>
+            </tr>
+        </table>
+    </form>
 
     <table id="books">
-        <caption>Books list</caption>
-
+        <tr>
+            <th>id</th>
+            <th>author</th>
+            <th>title</th>
+            <th>size</th>
+        </tr>
         <tr th:each="book : ${bookList}">
             <td th:text="${book.id}"></td>
             <td th:text="${book.author}"></td>

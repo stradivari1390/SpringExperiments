@@ -1,4 +1,3 @@
-<!DOCTYPE html>
 <html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
 <head>
     <title>Book shelf login</title>
@@ -19,7 +18,7 @@
 <body>
 <div id="login_form">
     <form method="post" th:action="@{/login/auth}" th:object="${loginForm}">
-        <img class="login_item" alt="book" th:src="@{/images/book_icon.png}">
+        <img class="login_item" th:src="@{/images/book_icon.png}">
         <br>
         <input class="login_item" type="text" placeholder="enter username" th:field="*{username}">
         <br>
