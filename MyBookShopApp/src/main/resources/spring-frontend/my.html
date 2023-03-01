@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title th:text="#{main.title}">Магазин 📚</title>
+    <meta name="description" content="Описание страницы">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0">
+    <link href="favicon.ico" rel="shortcut icon">
+    <link rel="preload" href="/assets/fonts/Montserrat/Montserrat-SemiBold.woff2" as="font" crossorigin="anonymous">
+    <link rel="preload" href="/assets/fonts/Montserrat/Montserrat-Light.woff2" as="font" crossorigin="anonymous">
+    <link rel="preload" href="/assets/fonts/Montserrat/Montserrat-Medium.woff2" as="font" crossorigin="anonymous">
+    <link rel="preload" href="/assets/fonts/Montserrat/Montserrat-ExtraBold.woff2" as="font" crossorigin="anonymous">
+    <link rel="stylesheet" href="/assets/css/fonts.min.css?v=88436650">
+    <link rel="stylesheet" href="/assets/css/basic.min.css?v=88436650">
+    <link rel="stylesheet" href="/assets/css/extra.min.css?v=88436650">
+    <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <script defer src="/assets/js/scripts.min.js?v=88436650"></script>
+</head>
+<body class="Site">
+<header class="Header"
+        th:replace="~{fragments/common_header_fragment :: head(status='authorized')}"></header>
+<div class="Middle">
+    <div class="wrap">
+        <main class="Middle-main">
+            <ul class="breadcrumbs"
+                th:replace="~{fragments/breadcrumb_fragment :: breadcrumps(category='Мои книги')}"></ul>
+            <div class="Section">
+                <div class="Section-header">
+                    <h1 class="Section-title">Мои книги
+                    </h1>
+                    <div class="Section-header-links"><span class="Section-header-link Section-header-link_ACTIVE">Непрочитанные</span><a
+                            class="Section-header-link" th:href="@{/myarchive}" href="/myarchive.html">Архив</a>
+                    </div>
+                </div>
+                <div class="Cards">
+                    <div class="Card">
+                        <div class="Card-picture"><a href="#"><img src="/assets/img/content/main/card.jpg"
+                                                                   alt="card.jpg"/></a>
+                        </div>
+                        <div class="Card-content">
+                            <strong class="Card-title"><a href="#">Техника</a>
+                            </strong>
+                            <div class="Card-description">Кондратенко Александр Петрович
+                            </div>
+                            <div class="Card-cost"><span class="Card-priceOld">₽300.00</span><span class="Card-price">₽190.00</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="Card">
+                        <div class="Card-picture"><a href="#"><img src="/assets/img/content/main/card.jpg"
+                                                                   alt="card.jpg"/></a>
+                            <div class="Card-sale">30% скидка
+                            </div>
+                        </div>
+                        <div class="Card-content">
+                            <strong class="Card-title"><a href="#">Английский язык. 5 класс. Английский в фокусе.
+                                Рабочая тетрадь. ФГОС</a>
+                            </strong>
+                            <div class="Card-description">Ваулина, Дули, Подоляко
+                            </div>
+                            <div class="Card-cost"><span class="Card-priceOld">₽250.00</span><span class="Card-price">₽210.00</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="Card">
+                        <div class="Card-picture"><a href="#"><img src="/assets/img/content/main/card.jpg"
+                                                                   alt="card.jpg"/></a>
+                        </div>
+                        <div class="Card-content">
+                            <strong class="Card-title"><a href="#">Английский язык. 4 класс. Английский в фокусе.
+                                Рабочая тетрадь</a>
+                            </strong>
+                            <div class="Card-description">Быкова, Дули, Эванс
+                            </div>
+                            <div class="Card-cost"><span class="Card-price">₽190.00</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="Card">
+                        <div class="Card-picture"><a href="#"><img src="/assets/img/content/main/card.jpg"
+                                                                   alt="card.jpg"/></a>
+                            <div class="Card-sale">30% скидка
+                            </div>
+                            <div class="Card-ribbon"><span class="Card-ribbonText">Бестселлер</span>
+                            </div>
+                            <a class="Card-status" title="Куплена"><img src="/assets/img/icons/check.svg"
+                                                                        alt="check.svg"/></a>
+                        </div>
+                        <div class="Card-content">
+                            <strong class="Card-title"><a href="#">Великая Отечественная война. 1941-1945</a>
+                            </strong>
+                            <div class="Card-description">Солопенко Алла, Меркулов Дмитрий
+                            </div>
+                            <div class="Card-cost"><span class="Card-price">₽50.00</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="Card">
+                        <div class="Card-picture"><a href="#"><img src="/assets/img/content/main/card.jpg"
+                                                                   alt="card.jpg"/></a>
+                        </div>
+                        <div class="Card-content">
+                            <strong class="Card-title"><a href="#">Большое путешествие по телу человека</a>
+                            </strong>
+                            <div class="Card-description">Джон Фарндон
+                            </div>
+                            <div class="Card-cost"><span class="Card-price">₽900.00</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="Card">
+                        <div class="Card-picture"><a href="#"><img src="/assets/img/content/main/card.jpg"
+                                                                   alt="card.jpg"/></a><a class="Card-status"
+                                                                                          title="В корзине"><img
+                                src="/assets/img/icons/shopping-basket.svg" alt="shopping-basket.svg"/></a>
+                        </div>
+                        <div class="Card-content">
+                            <strong class="Card-title"><a href="#">Великая Отечественная война. 1941-1945</a>
+                            </strong>
+                            <div class="Card-description">Солопенко Алла, Меркулов Дмитрий
+                            </div>
+                            <div class="Card-cost"><span class="Card-price">₽50.00</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="Card">
+                        <div class="Card-picture"><a href="#"><img src="/assets/img/content/main/card.jpg"
+                                                                   alt="card.jpg"/></a>
+                            <div class="Card-ribbon"><span class="Card-ribbonText">Бестселлер</span>
+                            </div>
+                        </div>
+                        <div class="Card-content">
+                            <strong class="Card-title"><a href="#">Большое путешествие по телу человека</a>
+                            </strong>
+                            <div class="Card-description">Джон Фарндон
+                            </div>
+                            <div class="Card-cost"><span class="Card-price">₽900.00</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="Card">
+                        <div class="Card-picture"><a href="#"><img src="/assets/img/content/main/card.jpg"
+                                                                   alt="card.jpg"/></a>
+                        </div>
+                        <div class="Card-content">
+                            <strong class="Card-title"><a href="#">Английский язык. 4 класс. Английский в фокусе.
+                                Рабочая тетрадь</a>
+                            </strong>
+                            <div class="Card-description">Быкова, Дули, Эванс
+                            </div>
+                            <div class="Card-cost"><span class="Card-price">₽190.00</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="Card">
+                        <div class="Card-picture"><a href="#"><img src="/assets/img/content/main/card.jpg"
+                                                                   alt="card.jpg"/></a>
+                        </div>
+                        <div class="Card-content">
+                            <strong class="Card-title"><a href="#">Великая Отечественная война. 1941-1945</a>
+                            </strong>
+                            <div class="Card-description">Солопенко Алла, Меркулов Дмитрий
+                            </div>
+                            <div class="Card-cost"><span class="Card-price">₽50.00</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="Card">
+                        <div class="Card-picture"><a href="#"><img src="/assets/img/content/main/card.jpg"
+                                                                   alt="card.jpg"/></a><a class="Card-status"
+                                                                                          title="Отложена"><img
+                                src="/assets/img/icons/heart.svg" alt="heart.svg"/></a>
+                        </div>
+                        <div class="Card-content">
+                            <strong class="Card-title"><a href="#">Большое путешествие по телу человека</a>
+                            </strong>
+                            <div class="Card-description">Джон Фарндон
+                            </div>
+                            <div class="Card-cost"><span class="Card-price">₽900.00</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="Card">
+                        <div class="Card-picture"><a href="#"><img src="/assets/img/content/main/card.jpg"
+                                                                   alt="card.jpg"/></a>
+                        </div>
+                        <div class="Card-content">
+                            <strong class="Card-title"><a href="#">Техника</a>
+                            </strong>
+                            <div class="Card-description">Кондратенко Александр Петрович
+                            </div>
+                            <div class="Card-cost"><span class="Card-priceOld">₽300.00</span><span class="Card-price">₽190.00</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="Card">
+                        <div class="Card-picture"><a href="#"><img src="/assets/img/content/main/card.jpg"
+                                                                   alt="card.jpg"/></a>
+                            <div class="Card-sale">30% скидка
+                            </div>
+                        </div>
+                        <div class="Card-content">
+                            <strong class="Card-title"><a href="#">Английский язык. 5 класс. Английский в фокусе.
+                                Рабочая тетрадь. ФГОС</a>
+                            </strong>
+                            <div class="Card-description">Ваулина, Дули, Подоляко
+                            </div>
+                            <div class="Card-cost"><span class="Card-priceOld">₽250.00</span><span class="Card-price">₽210.00</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="Card">
+                        <div class="Card-picture"><a href="#"><img src="/assets/img/content/main/card.jpg"
+                                                                   alt="card.jpg"/></a>
+                        </div>
+                        <div class="Card-content">
+                            <strong class="Card-title"><a href="#">Английский язык. 4 класс. Английский в фокусе.
+                                Рабочая тетрадь</a>
+                            </strong>
+                            <div class="Card-description">Быкова, Дули, Эванс
+                            </div>
+                            <div class="Card-cost"><span class="Card-price">₽190.00</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="Card">
+                        <div class="Card-picture"><a href="#"><img src="/assets/img/content/main/card.jpg"
+                                                                   alt="card.jpg"/></a>
+                            <div class="Card-sale">30% скидка
+                            </div>
+                            <div class="Card-ribbon"><span class="Card-ribbonText">Бестселлер</span>
+                            </div>
+                            <a class="Card-status" title="Куплена"><img src="/assets/img/icons/check.svg"
+                                                                        alt="check.svg"/></a>
+                        </div>
+                        <div class="Card-content">
+                            <strong class="Card-title"><a href="#">Великая Отечественная война. 1941-1945</a>
+                            </strong>
+                            <div class="Card-description">Солопенко Алла, Меркулов Дмитрий
+                            </div>
+                            <div class="Card-cost"><span class="Card-price">₽50.00</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="Card">
+                        <div class="Card-picture"><a href="#"><img src="/assets/img/content/main/card.jpg"
+                                                                   alt="card.jpg"/></a>
+                        </div>
+                        <div class="Card-content">
+                            <strong class="Card-title"><a href="#">Большое путешествие по телу человека</a>
+                            </strong>
+                            <div class="Card-description">Джон Фарндон
+                            </div>
+                            <div class="Card-cost"><span class="Card-price">₽900.00</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="Card">
+                        <div class="Card-picture"><a href="#"><img src="/assets/img/content/main/card.jpg"
+                                                                   alt="card.jpg"/></a><a class="Card-status"
+                                                                                          title="В корзине"><img
+                                src="/assets/img/icons/shopping-basket.svg" alt="shopping-basket.svg"/></a>
+                        </div>
+                        <div class="Card-content">
+                            <strong class="Card-title"><a href="#">Великая Отечественная война. 1941-1945</a>
+                            </strong>
+                            <div class="Card-description">Солопенко Алла, Меркулов Дмитрий
+                            </div>
+                            <div class="Card-cost"><span class="Card-price">₽50.00</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="Card">
+                        <div class="Card-picture"><a href="#"><img src="/assets/img/content/main/card.jpg"
+                                                                   alt="card.jpg"/></a>
+                            <div class="Card-ribbon"><span class="Card-ribbonText">Бестселлер</span>
+                            </div>
+                        </div>
+                        <div class="Card-content">
+                            <strong class="Card-title"><a href="#">Большое путешествие по телу человека</a>
+                            </strong>
+                            <div class="Card-description">Джон Фарндон
+                            </div>
+                            <div class="Card-cost"><span class="Card-price">₽900.00</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="Card">
+                        <div class="Card-picture"><a href="#"><img src="/assets/img/content/main/card.jpg"
+                                                                   alt="card.jpg"/></a>
+                        </div>
+                        <div class="Card-content">
+                            <strong class="Card-title"><a href="#">Английский язык. 4 класс. Английский в фокусе.
+                                Рабочая тетрадь</a>
+                            </strong>
+                            <div class="Card-description">Быкова, Дули, Эванс
+                            </div>
+                            <div class="Card-cost"><span class="Card-price">₽190.00</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="Card">
+                        <div class="Card-picture"><a href="#"><img src="/assets/img/content/main/card.jpg"
+                                                                   alt="card.jpg"/></a>
+                        </div>
+                        <div class="Card-content">
+                            <strong class="Card-title"><a href="#">Великая Отечественная война. 1941-1945</a>
+                            </strong>
+                            <div class="Card-description">Солопенко Алла, Меркулов Дмитрий
+                            </div>
+                            <div class="Card-cost"><span class="Card-price">₽50.00</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="Card">
+                        <div class="Card-picture"><a href="#"><img src="/assets/img/content/main/card.jpg"
+                                                                   alt="card.jpg"/></a><a class="Card-status"
+                                                                                          title="Отложена"><img
+                                src="/assets/img/icons/heart.svg" alt="heart.svg"/></a>
+                        </div>
+                        <div class="Card-content">
+                            <strong class="Card-title"><a href="#">Большое путешествие по телу человека</a>
+                            </strong>
+                            <div class="Card-description">Джон Фарндон
+                            </div>
+                            <div class="Card-cost"><span class="Card-price">₽900.00</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+<footer class="Footer" th:replace="~{fragments/common_footer_fragment :: footer}"></footer>
+<script src="/assets/plg/jQuery/jquery-3.5.1.min.js"></script>
+</body>
+</html>

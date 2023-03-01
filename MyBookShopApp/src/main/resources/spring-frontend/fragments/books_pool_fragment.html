@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<div class="Cards Cards_refresh" th:fragment="pool">
+    <div class="Cards">
+        <div class="Card" th:each="book: ${booksList}">
+            <div class="Card-picture">
+                <a th:href="@{/books/{id}(id=${book.id})}">
+                    <img th:src="@{/assets/img/content/main/card.jpg}" alt="card.jpg"/>
+                </a>
+            </div>
+            <div class="card-content">
+                <strong class="Card-title">
+                    <a th:href="@{/books/{id}(id=${book.id})}" th:text="${book.title}"></a>
+                </strong>
+                <div class="Card-description" th:text="${book.author}"></div>
+                <div class="card cost">
+                    <span class="Card-priceOld" th:if="${book.price != book.priceOld}" th:text="${book.priceOld}"></span>
+                    <span class="Card-price" th:text="${book.price}"></span>
+                    <span class="Cart-sale" th:if="${book.price != book.priceOld}" th:text="${book.discount}">-30%</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="Cards-footer Cards-footer_center"><a class="btn btn_primary" href="#" th:attr="data-refreshshow = ${category}" data-refreshshow="recent"
+                                                     data-refreshoffset="20" data-refreshlimit="20" th:text="#{menu.show_more}">Показать еще</a>
+    </div>
+</div>
+</html>
