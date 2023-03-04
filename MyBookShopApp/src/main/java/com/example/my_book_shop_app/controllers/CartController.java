@@ -1,7 +1,7 @@
 package com.example.my_book_shop_app.controllers;
 
-import com.example.my_book_shop_app.data.Book;
-import com.example.my_book_shop_app.data.CartService;
+import com.example.my_book_shop_app.data.services.CartService;
+import com.example.my_book_shop_app.dto.BookDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,7 +20,7 @@ public class CartController {
     }
 
     @ModelAttribute("cartBooks")
-    public List<Book> cartBooks(){
+    public List<BookDto> cartBooks(){
         return cartService.cartBooks();
     }
 

@@ -1,7 +1,7 @@
 package com.example.my_book_shop_app.controllers;
 
-import com.example.my_book_shop_app.data.Book;
-import com.example.my_book_shop_app.data.BookService;
+import com.example.my_book_shop_app.data.services.BookService;
+import com.example.my_book_shop_app.dto.BookDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -23,14 +23,14 @@ public class BooksController {
 
     @GetMapping("/recent")
     public String recentBooksPage(Model model) {
-        List<Book> recentBooks = bookService.getRecentBooks();
+        List<BookDto> recentBooks = bookService.getRecentBooks();
         model.addAttribute("recentBooks", recentBooks);
         return "books/recent";
     }
 
     @GetMapping("/popular")
     public String popularBooksPage(Model model) {
-        List<Book> popularBooks = bookService.getPopularBooks();
+        List<BookDto> popularBooks = bookService.getPopularBooks();
         model.addAttribute("popularBooks", popularBooks);
         return "books/popular";
     }

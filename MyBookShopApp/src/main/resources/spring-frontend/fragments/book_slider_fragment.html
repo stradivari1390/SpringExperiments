@@ -10,19 +10,19 @@
                 <div class="Slider-content">
                     <div class="Card">
                         <a class="Card-picture" th:href="@{/books/{id}(id=${book.id})}">
-                            <img th:src="@{/assets/img/content/main/card.jpg}" alt="card.jpg"/>
-                            <div class="Card-sale" th:if="${book.price != book.priceOld}"
-                                 th:text="${book.discount}"></div>
+                            <img th:src="${book.image}" alt="card.jpg"/>
+                            <div class="Card-sale" th:if="${book.discount != 0}"
+                                 th:text="'-' + ${#strings.toString(book.discount)} + '%'"></div>
                         </a>
                         <div class="Card-content">
                             <strong class="Card-title">
                                 <a th:href="@{/books/{id}(id=${book.id})}" th:text="${book.title}"></a>
                             </strong>
-                            <div class="Card-description" th:text="${book.author}"></div>
+                            <div class="Card-description" th:text="${book.authorFirstName} + ' ' + ${book.authorLastName}"></div>
                             <div class="Card-cost">
-                                <span class="Card-priceOld" th:if="${book.price != book.priceOld}"
-                                      th:text="${book.priceOld}"></span>
-                                <span class="Card-price" th:text="${book.price}"></span>
+                                <span class="Card-priceOld" th:if="${book.discount != 0}"
+                                  th:text="${#numbers.formatDecimal(book.price, 1, 2)}"></span>
+                                <span class="Card-price" th:text="${#numbers.formatDecimal(book.price * (100 - book.discount) / 100, 1, 2)}"></span>
                             </div>
                         </div>
                     </div>

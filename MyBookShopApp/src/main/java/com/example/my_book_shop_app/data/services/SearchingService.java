@@ -1,6 +1,6 @@
-package com.example.my_book_shop_app.data;
+package com.example.my_book_shop_app.data.services;
 
-import com.example.my_book_shop_app.dto.ResponseData;
+import com.example.my_book_shop_app.dto.SearchResponseData;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -14,7 +14,7 @@ public class SearchingService {
         this.bookService = bookService;
     }
 
-    public ResponseData search(String query, int offset, int limit) {
-        return new ResponseData(bookService.getBooksData().subList(0, 4));
+    public SearchResponseData search(String query, int offset, int limit) {
+        return new SearchResponseData(bookService.getBooks().subList(0, 4));
     }
 }

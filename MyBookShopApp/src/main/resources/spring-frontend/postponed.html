@@ -29,13 +29,13 @@
                     <div class="Cart-block Cart-block_row">
                         <div class="Cart-block Cart-block_pict">
                             <a class="Cart-pict" href="#">
-                                <img class="Cart-img" th:src="@{/assets/img/content/main/card.jpg}" alt="card.jpg"/>
+                                <img class="Cart-img" th:src="${book.image}" alt="card.jpg"/>
                             </a>
                         </div>
                         <div class="Cart-block Cart-block_row">
                             <div class="Cart-block Cart-block_info">
                                 <div class="Cart-author">
-                                    <a href="#" th:text="${book.author}"></a>
+                                    <a href="#" th:text="${book.authorFirstName} + ' ' + ${book.authorLastName}"></a>
                                 </div>
                                 <div class="Cart-title">
                                     <a href="#" th:text="${book.title}"></a>
@@ -66,9 +66,13 @@
                             </div>
                             <div class="Cart-block Cart-block_price">
                                 <div class="Cart-priceTitle"  th:text="#{cart.price}">Цена:</div>
-                                <div class="Cart-price Cart-price_old" th:text="${book.priceOld}"></div>
-                                <div class="Cart-price" th:text="${book.price}"></div>
-                                <div class="Cart-sale">-30%</div>
+                                <div class="Cart-price Cart-price_old" th:if="${book.discount != 0}"
+                                     th:text="${#numbers.formatDecimal(book.price, 1, 2)}">
+                                </div>
+                                <div class="Cart-price" th:text="${#numbers.formatDecimal(book.price * (100 - book.discount) / 100, 1, 2)}"></div>
+                                <div class="Cart-sale" th:if="${book.discount != 0}"
+                                     th:text="'-' + ${#strings.toString(book.discount)} + '%'">-30%
+                                </div>
                             </div>
                         </div>
                     </div>
