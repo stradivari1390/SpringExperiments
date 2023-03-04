@@ -15,11 +15,15 @@ Also, nothing additional is necessary to configure at this moment.
 This application uses:
 
 * Spring Boot
-* Thymeleaf
-* H2 Database
-* Spring JDBC
+* Spring RestApi
+* Spring MVC
+* Spring Security
+* Spring Data ~~JDBC~~ JPA
 * Spring Boot Test
+* Thymeleaf
+* ~~H2 Database~~ PostgreSQL
 * Lombok
+* Liquibase
 
 to be continued
 
