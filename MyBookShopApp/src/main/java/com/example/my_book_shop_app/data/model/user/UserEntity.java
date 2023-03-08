@@ -18,8 +18,9 @@ import java.util.Objects;
 public class UserEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
-    private int id;
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "user_id_seq")
+    @SequenceGenerator(name = "user_id_seq", sequenceName = "user_id_seq", allocationSize = 1)
+    private Long id;
 
     @Column(columnDefinition = "VARCHAR(255) NOT NULL")
     private String hash;
@@ -38,7 +39,7 @@ public class UserEntity {
         if (this == o) return true;
         if (!(o instanceof UserEntity)) return false;
         UserEntity that = (UserEntity) o;
-        return getId() == that.getId() &&
+        return getId().equals(that.getId()) &&
                 getBalance() == that.getBalance() &&
                 getHash().equals(that.getHash()) &&
                 getRegTime().equals(that.getRegTime()) &&

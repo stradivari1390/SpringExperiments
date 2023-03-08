@@ -17,7 +17,8 @@ import java.util.Objects;
 public class BookFileEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "book_file_id_seq")
+    @SequenceGenerator(name = "book_file_id_seq", sequenceName = "book_file_id_seq", allocationSize = 1)
     private Long id;
 
     @Column(name = "hash", nullable = false)

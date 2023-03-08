@@ -37,7 +37,7 @@ public class MainPageController {
     @GetMapping("/")
     public String mainPage() {
 //        if(!check) {
-//            authorService.generateRandomAuthors(250);
+//            authorService.generateRandomAuthors(200);
 //            bookService.generateRandomBooks(1000);
 //            check = true;
 //            book2AuthorService.generateRandomBook2AuthorEntities();

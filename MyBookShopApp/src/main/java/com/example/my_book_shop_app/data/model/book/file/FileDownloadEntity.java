@@ -17,8 +17,9 @@ import java.util.Objects;
 public class FileDownloadEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
-    private int id;
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "file_download_id_seq")
+    @SequenceGenerator(name = "file_download_id_seq", sequenceName = "file_download_id_seq", allocationSize = 1)
+    private Long id;
 
     @Column(columnDefinition = "INT NOT NULL")
     private int userId;
@@ -34,7 +35,7 @@ public class FileDownloadEntity {
         if (this == o) return true;
         if (!(o instanceof FileDownloadEntity)) return false;
         FileDownloadEntity that = (FileDownloadEntity) o;
-        return getId() == that.getId() &&
+        return getId().equals(that.getId()) &&
                 getUserId() == that.getUserId() &&
                 getBookId() == that.getBookId() &&
                 getCount() == that.getCount();

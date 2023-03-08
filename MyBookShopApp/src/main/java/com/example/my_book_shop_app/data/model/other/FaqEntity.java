@@ -17,8 +17,9 @@ import java.util.Objects;
 public class FaqEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
-    private int id;
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "faq_id_seq")
+    @SequenceGenerator(name = "faq_id_seq", sequenceName = "faq_id_seq", allocationSize = 1)
+    private Long id;
 
     @Column(columnDefinition = "INT NOT NULL  DEFAULT 0")
     private int sortIndex;
@@ -34,7 +35,7 @@ public class FaqEntity {
         if (this == o) return true;
         if (!(o instanceof FaqEntity)) return false;
         FaqEntity faqEntity = (FaqEntity) o;
-        return getId() == faqEntity.getId() &&
+        return getId().equals(faqEntity.getId()) &&
                 getSortIndex() == faqEntity.getSortIndex() &&
                 getQuestion().equals(faqEntity.getQuestion()) &&
                 getAnswer().equals(faqEntity.getAnswer());

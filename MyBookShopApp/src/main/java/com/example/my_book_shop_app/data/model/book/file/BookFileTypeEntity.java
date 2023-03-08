@@ -17,8 +17,9 @@ import java.util.Objects;
 public class BookFileTypeEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
-    private int id;
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "book_file_type_id_seq")
+    @SequenceGenerator(name = "book_file_type_id_seq", sequenceName = "book_file_type_id_seq", allocationSize = 1)
+    private Long id;
 
     @Column(columnDefinition = "VARCHAR(255) NOT NULL")
     private String name;
@@ -31,7 +32,7 @@ public class BookFileTypeEntity {
         if (this == o) return true;
         if (!(o instanceof BookFileTypeEntity)) return false;
         BookFileTypeEntity that = (BookFileTypeEntity) o;
-        return getId() == that.getId() &&
+        return getId().equals(that.getId()) &&
                 getName().equals(that.getName()) &&
                 Objects.equals(getDescription(), that.getDescription());
     }

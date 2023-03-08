@@ -18,8 +18,9 @@ import java.util.Objects;
 public class MessageEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
-    private int id;
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "message_id_seq")
+    @SequenceGenerator(name = "message_id_seq", sequenceName = "message_id_seq", allocationSize = 1)
+    private Long id;
 
     @Column(columnDefinition = "TIMESTAMP NOT NULL")
     private LocalDateTime time;
@@ -44,7 +45,7 @@ public class MessageEntity {
         if (this == o) return true;
         if (!(o instanceof MessageEntity)) return false;
         MessageEntity that = (MessageEntity) o;
-        return getId() == that.getId() &&
+        return getId().equals(that.getId()) &&
                 getUserId() == that.getUserId() &&
                 getTime().equals(that.getTime()) &&
                 getText().equals(that.getText());
