@@ -10,7 +10,10 @@ import java.util.Objects;
 @ToString
 @NoArgsConstructor
 @Entity
-@Table(name = "authors")
+@Table(name = "authors", indexes = {
+        @Index(name = "idx_author_first_name", columnList = "first_name"),
+        @Index(name = "idx_author_last_name", columnList = "last_name")
+})
 public class Author {
 
     @Id

@@ -21,7 +21,7 @@ public class GenreEntity {
     private int id;
 
     @Column(columnDefinition = "INT")
-    private int parentId;
+    private Integer parentId;
 
     @Column(columnDefinition = "VARCHAR(255) NOT NULL")
     private String slug;
@@ -35,7 +35,7 @@ public class GenreEntity {
         if (!(o instanceof GenreEntity)) return false;
         GenreEntity that = (GenreEntity) o;
         return getId() == that.getId() &&
-                getParentId() == that.getParentId() &&
+                getParentId().equals(that.getParentId()) &&
                 getSlug().equals(that.getSlug()) &&
                 getName().equals(that.getName());
     }

@@ -30,6 +30,9 @@ public class BookFileEntity {
     @Column(name = "path", nullable = false)
     private String path;
 
+    @Column(name = "book_id", nullable = false)
+    private Long bookId;
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

@@ -22,8 +22,8 @@ public class UserContactEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @Column(columnDefinition = "INT NOT NULL")
-    private int userId;
+    @Column(columnDefinition = "BIGINT NOT NULL")
+    private Long userId;
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
@@ -50,7 +50,7 @@ public class UserContactEntity {
         if (!(o instanceof UserContactEntity)) return false;
         UserContactEntity that = (UserContactEntity) o;
         return getId() == that.getId() &&
-                getUserId() == that.getUserId() &&
+                getUserId().equals(that.getUserId()) &&
                 getApproved() == that.getApproved() &&
                 getCodeTrails() == that.getCodeTrails() &&
                 getType() == that.getType() &&

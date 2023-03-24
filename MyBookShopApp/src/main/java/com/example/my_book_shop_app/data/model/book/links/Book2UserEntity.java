@@ -14,7 +14,9 @@ import java.util.Objects;
 @ToString
 @NoArgsConstructor
 @Entity
-@Table(name = "book2user")
+@Table(name = "book2user", indexes = {
+        @Index(name = "idx_book2userentity_bookid", columnList = "bookId, userId, typeId")
+})
 public class Book2UserEntity {
 
     @Id
@@ -27,11 +29,11 @@ public class Book2UserEntity {
     @Column(columnDefinition = "INT NOT NULL")
     private int typeId;
 
-    @Column(columnDefinition = "INT NOT NULL")
-    private int bookId;
+    @Column(columnDefinition = "BIGINT NOT NULL")
+    private Long bookId;
 
     @Column(columnDefinition = "INT NOT NULL")
-    private int userId;
+    private Long userId;
 
     @Override
     public boolean equals(Object o) {
@@ -40,8 +42,8 @@ public class Book2UserEntity {
         Book2UserEntity that = (Book2UserEntity) o;
         return getId() == that.getId() &&
                 getTypeId() == that.getTypeId() &&
-                getBookId() == that.getBookId() &&
-                getUserId() == that.getUserId() &&
+                getBookId().equals(that.getBookId()) &&
+                getUserId().equals(that.getUserId()) &&
                 Objects.equals(getTime(), that.getTime());
     }
 

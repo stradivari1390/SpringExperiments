@@ -4245,6 +4245,9 @@ img {
 
 .Tags {
   visibility: visible;
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
   font-size: 16px;
   margin-top: 20px;
 }

@@ -13,15 +13,17 @@ import java.util.Objects;
 @ToString
 @NoArgsConstructor
 @Entity
-@Table(name = "book2genre")
+@Table(name = "book2genre", indexes = {
+        @Index(name = "idx_book2genreentity_unq", columnList = "bookId, genreId", unique = true)
+})
 public class Book2GenreEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @Column(columnDefinition = "INT NOT NULL")
-    private int bookId;
+    @Column(columnDefinition = "BIGINT NOT NULL")
+    private Long bookId;
 
     @Column(columnDefinition = "INT NOT NULL")
     private int genreId;

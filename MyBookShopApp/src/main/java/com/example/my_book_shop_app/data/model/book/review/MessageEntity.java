@@ -25,8 +25,8 @@ public class MessageEntity {
     @Column(columnDefinition = "TIMESTAMP NOT NULL")
     private LocalDateTime time;
 
-    @Column(columnDefinition = "INT")
-    private int userId;
+    @Column(columnDefinition = "BIGINT")
+    private Long userId;
 
     @Column(columnDefinition = "VARCHAR(255)")
     private String email;
@@ -46,7 +46,7 @@ public class MessageEntity {
         if (!(o instanceof MessageEntity)) return false;
         MessageEntity that = (MessageEntity) o;
         return getId().equals(that.getId()) &&
-                getUserId() == that.getUserId() &&
+                getUserId().equals(that.getUserId()) &&
                 getTime().equals(that.getTime()) &&
                 getText().equals(that.getText());
     }

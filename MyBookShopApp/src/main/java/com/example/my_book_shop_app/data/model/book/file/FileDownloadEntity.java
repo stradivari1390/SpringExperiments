@@ -21,11 +21,11 @@ public class FileDownloadEntity {
     @SequenceGenerator(name = "file_download_id_seq", sequenceName = "file_download_id_seq", allocationSize = 1)
     private Long id;
 
-    @Column(columnDefinition = "INT NOT NULL")
-    private int userId;
+    @Column(columnDefinition = "BIGINT NOT NULL")
+    private Long userId;
 
-    @Column(columnDefinition = "INT NOT NULL")
-    private int bookId;
+    @Column(columnDefinition = "BIGINT NOT NULL")
+    private Long bookId;
 
     @Column(columnDefinition = "INT NOT NULL DEFAULT 1")
     private int count;
@@ -35,10 +35,8 @@ public class FileDownloadEntity {
         if (this == o) return true;
         if (!(o instanceof FileDownloadEntity)) return false;
         FileDownloadEntity that = (FileDownloadEntity) o;
-        return getId().equals(that.getId()) &&
-                getUserId() == that.getUserId() &&
-                getBookId() == that.getBookId() &&
-                getCount() == that.getCount();
+        return getUserId().equals(that.getUserId()) &&
+                getBookId().equals(that.getBookId());
     }
 
     @Override

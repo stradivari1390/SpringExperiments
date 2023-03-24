@@ -30,25 +30,28 @@
                     </h1>
                     <form class="form form_inline Section-header-form" action="#" method="post">
                         <div class="form-group">
-                            <label class="form-label" th:text="#{menu.from}">с
+                            <label class="form-label" th:text="#{menu.from}">
+                                с
                             </label>
                             <input class="form-input form-input_date form-input_date_uninit" id="fromdaterecent"
-                                   name="fromdaterecent" type="text" th:placeholder="#{menu.date}" data-refreshoffset="20"
-                                   data-refreshlimit="20" data-refreshshow="changedate" data-refreshfrom="0"
+                                   name="fromdaterecent" type="text" th:placeholder="#{menu.date}" data-refreshoffset="10"
+                                   data-refreshlimit="10" data-refreshshow="changedate" data-refreshfrom="0"
                                    autocomplete="off"/>
                         </div>
                         <div class="form-group">
-                            <label class="form-label" th:text="#{menu.to}">по
+                            <label class="form-label" th:text="#{menu.to}">
+                                по
                             </label>
                             <input class="form-input form-input_date form-input_date_uninit" id="enddaterecent"
-                                   name="enddaterecent" type="text" th:placeholder="#{menu.date}" data-refreshoffset="20"
-                                   data-refreshlimit="20" data-refreshshow="changedate" data-refreshto="0"
+                                   name="enddaterecent" type="text" th:placeholder="#{menu.date}" data-refreshoffset="10"
+                                   data-refreshlimit="10" data-refreshshow="changedate" data-refreshto="0"
                                    autocomplete="off"/>
                         </div>
                     </form>
                 </div>
                 <div class="Cards Cards_refresh"
-                     th:replace="~{fragments/books_pool_fragment :: pool(category=#{menu.recent}, booksList=${recentBooks})}"></div>
+                     th:replace="~{fragments/books_pool_fragment :: pool(category=#{menu.recent}, booksList=${recentBooks})}">
+                </div>
             </div>
         </main>
     </div>

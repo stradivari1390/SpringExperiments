@@ -14,7 +14,9 @@ import java.util.Objects;
 @ToString
 @NoArgsConstructor
 @Entity
-@Table(name = "book_review_like")
+@Table(name = "book_review_like", indexes = {
+        @Index(name = "idx_bookreviewlikeentity", columnList = "reviewId")
+})
 public class BookReviewLikeEntity {
 
     @Id
@@ -24,8 +26,8 @@ public class BookReviewLikeEntity {
     @Column(columnDefinition = "INT NOT NULL")
     private int reviewId;
 
-    @Column(columnDefinition = "INT NOT NULL")
-    private int userId;
+    @Column(columnDefinition = "BIGINT NOT NULL")
+    private Long userId;
 
     @Column(columnDefinition = "TIMESTAMP NOT NULL")
     private LocalDateTime time;
@@ -40,7 +42,7 @@ public class BookReviewLikeEntity {
         BookReviewLikeEntity that = (BookReviewLikeEntity) o;
         return getId() == that.getId() &&
                 getReviewId() == that.getReviewId() &&
-                getUserId() == that.getUserId() &&
+                getUserId().equals(that.getUserId()) &&
                 getValue() == that.getValue() &&
                 getTime().equals(that.getTime());
     }

@@ -14,18 +14,20 @@ import java.util.Objects;
 @ToString
 @NoArgsConstructor
 @Entity
-@Table(name = "book_review")
+@Table(name = "book_review", indexes = {
+        @Index(name = "idx_bookreviewentity_bookid", columnList = "bookId")
+})
 public class BookReviewEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @Column(columnDefinition = "INT NOT NULL")
-    private int bookId;
+    @Column(columnDefinition = "BIGINT NOT NULL")
+    private Long bookId;
 
-    @Column(columnDefinition = "INT NOT NULL")
-    private int userId;
+    @Column(columnDefinition = "BIGINT NOT NULL")
+    private Long userId;
 
     @Column(columnDefinition = "TIMESTAMP NOT NULL")
     private LocalDateTime time;
@@ -39,8 +41,8 @@ public class BookReviewEntity {
         if (!(o instanceof BookReviewEntity)) return false;
         BookReviewEntity that = (BookReviewEntity) o;
         return getId() == that.getId() &&
-                getBookId() == that.getBookId() &&
-                getUserId() == that.getUserId() &&
+                getBookId().equals(that.getBookId()) &&
+                getUserId().equals(that.getUserId()) &&
                 getTime().equals(that.getTime()) &&
                 getText().equals(that.getText());
     }

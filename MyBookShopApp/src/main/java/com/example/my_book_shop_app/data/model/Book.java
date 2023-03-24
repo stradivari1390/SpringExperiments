@@ -12,7 +12,12 @@ import java.util.Objects;
 @ToString
 @NoArgsConstructor
 @Entity
-@Table(name = "books")
+@Table(name = "books", indexes = {
+        @Index(name = "idx_book_price_discount", columnList = "price, discount"),
+        @Index(name = "idx_book_is_bestseller", columnList = "is_bestseller"),
+        @Index(name = "idx_book_pub_date", columnList = "pub_date"),
+        @Index(name = "idx_book_title", columnList = "title")
+})
 public class Book {
 
     @Id

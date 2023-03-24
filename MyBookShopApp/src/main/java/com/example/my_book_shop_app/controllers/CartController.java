@@ -1,13 +1,11 @@
 package com.example.my_book_shop_app.controllers;
 
-import com.example.my_book_shop_app.data.services.CartService;
-import com.example.my_book_shop_app.dto.BookDto;
+import com.example.my_book_shop_app.services.CartService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-
-import java.util.List;
+import org.springframework.web.bind.annotation.RequestParam;
 
 @Controller
 public class CartController {
@@ -19,23 +17,11 @@ public class CartController {
         this.cartService = cartService;
     }
 
-    @ModelAttribute("cartBooks")
-    public List<BookDto> cartBooks(){
-        return cartService.cartBooks();
-    }
-
-    @ModelAttribute("totalPrice")
-    public String totalPrice() {
-        return cartService.totalPrice();
-    }
-
-    @ModelAttribute("totalPriceOld")
-    public String totalPriceOld() {
-        return cartService.totalPriceOld();
-    }
-
-    @GetMapping("/cart")
-    public String cartPage() {
+    @GetMapping("/books/cart")
+    public String postponedPage(@RequestParam(value = "offset", defaultValue = "0") Integer offset,
+                                @RequestParam(value = "limit", defaultValue = "10") Integer limit,
+                                Model model) {
+        model.addAttribute("cartBooks", cartService.getPageOfCartBooks(3L, offset, limit).getContent());
         return "cart";
     }
 }

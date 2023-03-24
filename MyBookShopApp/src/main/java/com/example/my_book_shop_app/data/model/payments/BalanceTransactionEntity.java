@@ -14,15 +14,17 @@ import java.util.Objects;
 @ToString
 @NoArgsConstructor
 @Entity
-@Table(name = "balance_transaction")
+@Table(name = "balance_transaction", indexes = {
+        @Index(name = "idx_balancetransactionentity", columnList = "bookId")
+})
 public class BalanceTransactionEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @Column(columnDefinition = "INT NOT NULL")
-    private int userId;
+    @Column(columnDefinition = "BIGINT NOT NULL")
+    private Long userId;
 
     @Column(columnDefinition = "TIMESTAMP NOT NULL")
     private LocalDateTime time;
@@ -30,8 +32,8 @@ public class BalanceTransactionEntity {
     @Column(columnDefinition = "INT NOT NULL  DEFAULT 0")
     private int value;
 
-    @Column(columnDefinition = "INT NOT NULL")
-    private int bookId;
+    @Column(columnDefinition = "BIGINT NOT NULL")
+    private Long bookId;
 
     @Column(columnDefinition = "TEXT NOT NULL")
     private String description;
@@ -42,9 +44,9 @@ public class BalanceTransactionEntity {
         if (!(o instanceof BalanceTransactionEntity)) return false;
         BalanceTransactionEntity that = (BalanceTransactionEntity) o;
         return getId() == that.getId() &&
-                getUserId() == that.getUserId() &&
+                getUserId().equals(that.getUserId()) &&
                 getValue() == that.getValue() &&
-                getBookId() == that.getBookId() &&
+                getBookId().equals(that.getBookId()) &&
                 getTime().equals(that.getTime()) &&
                 getDescription().equals(that.getDescription());
     }
