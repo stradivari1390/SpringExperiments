@@ -4,13 +4,13 @@
     <div class="Cards">
         <div class="Card" th:each="book: ${booksList}">
             <div class="Card-picture">
-                <a th:href="@{/books/{id}(id=${book.id})}">
+                <a th:href="@{/books/{slug}(slug=${book.slug})}">
                     <img th:src="${book.image}" alt="card.jpg"/>
                 </a>
             </div>
             <div class="card-content">
                 <strong class="Card-title">
-                    <a th:href="@{/books/{id}(id=${book.id})}" th:text="${book.title}"></a>
+                    <a th:href="@{/books/{slug}(slug=${book.slug})}" th:text="${book.title}"></a>
                 </strong>
                 <div class="Card-description" th:text="${book.authorFirstName} + ' ' + ${book.authorLastName}"></div>
                 <div class="card cost">
@@ -28,21 +28,25 @@
     </div>
     <div class="Cards-footer Cards-footer_center">
         <a class="btn btn_primary" href="#"
-           th:if="${(category != 'Books by tags') && (category != 'Книги по тегам')}"
+           th:if="${(category != 'Books by tags') && (category != 'Книги по тегам') && (category != 'Genres') && (category != 'Жанры')}"
            th:attr="data-refreshshow=${(category == 'New Releases' || category == 'Новинки') ? 'recent'
                               : (category == 'Popular' || category == 'Популярное') ? 'popular'
                               : (category == 'Author' || category == 'Автор') ? 'author'
-                              : (category == 'Genres' || category == 'Жанры') ? 'genre'
                               : ''},
            data-refreshoffset='10', data-refreshlimit='10'"
            th:text="#{menu.show_more}">
             Показать еще
         </a>
-
         <a class="btn btn_primary" href="#"
            th:if="${(category == 'Books by tags') || (category == 'Книги по тегам')}"
            th:attr="data-refreshshow='tag',
            data-refreshoffset='10', data-refreshlimit='10', data-refreshid=${tagQuery}"
+           th:text="#{menu.show_more}">
+        </a>
+        <a class="btn btn_primary" href="#"
+           th:if="${(category == 'Genres' || category == 'Жанры')}"
+           th:attr="data-refreshshow='genre',
+           data-refreshoffset='10', data-refreshlimit='10', data-refreshid=${genreQuery}"
            th:text="#{menu.show_more}">
         </a>
     </div>

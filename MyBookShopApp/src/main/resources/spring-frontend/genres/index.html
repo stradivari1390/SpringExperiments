@@ -28,22 +28,7 @@
             </h1>
             <div class="Section">
                 <div class="Tags Tags_genres">
-                    <div class="Tags Tags_embed">
-                        <div class="Tag"><a href="/genres/slug.html" th:text="#{genre.fantasy}">Фэнтези
-                            <span class="undefined-amount">(14338)</span></a>
-                        </div>
-                    </div>
-                    <div class="Tags">
-                        <div class="Tags-title">
-                            <div class="Tag"><a href="/genres/slug.html" th:text="#{genre.serious_reading}">Серьёзное чтение<span class="undefined-amount">(18)</span></a>
-                            </div>
-                        </div>
-                        <div class="Tag">
-                            <a href="/genres/slug.html" th:text="#{genre.biography}">Биографии
-                                <span class="undefined-amount">(18)</span>
-                            </a>
-                        </div>
-                    </div>
+                    <div th:replace="~{fragments/genre_tree_fragment :: genre_tree(${genres}, null, 18)}"></div>
                 </div>
             </div>
         </main>

@@ -19,7 +19,6 @@ import java.util.*;
 public class BookService {
 
     private final BookRepository bookRepository;
-
     private final TagEntityRepository tagEntityRepository;
 
     @Autowired
@@ -117,5 +116,10 @@ public class BookService {
 
     public TagEntity getTagByName(String name) {
         return tagEntityRepository.findByName(name);
+    }
+
+    public Page<BookDto> getPageOfBooksByGenre(String slug, Integer offset, Integer limit) {
+        Pageable nextPage = PageRequest.of(offset, limit);
+        return bookRepository.getPageOfBooksByGenreSlug(slug, nextPage);
     }
 }

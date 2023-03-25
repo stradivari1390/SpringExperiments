@@ -25,6 +25,7 @@ import org.springframework.stereotype.Component;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Component
 public class FakeDataFiller {
@@ -133,9 +134,22 @@ public class FakeDataFiller {
 
     private void generateRandomGenres(int amount) {
         List<GenreEntity> genres = new ArrayList<>();
-        Set<String> genreNames = new HashSet<>();
-        for (int i = 0; i < amount; i++) {
-            genreNames.add(faker.book().genre());
+        String[] initGenreNames = {"Light Reading","Fiction","Fighter","Securities / Investments","Accounting / Taxation / Audit",
+                "Russian practice","Success Stories","Internet Marketing","Leadership","Project Management","Quality Management",
+                "Financial Management","Personnel Management","Business Processes","Business Management","Detectives","Thriller",
+                "Tough Detective","Ironic Detective","About Maniacs","Spy Detective","Crime Detective","Classic Detective",
+                "Political Detective","Novels","Horror","Adventure","Serious Reading","Biographies","Business Literature",
+                "Economic Management","Career","Marketing","PR","Advertising","Finance","Business References","Personal finance",
+                "Management","Foreign business literature","Personal Effectiveness","Time Management","Small Business","Sales",
+                "Startups and Business Creation","Corporate culture","Banking","Logistics","Real Estate","Internet Business",
+                "Oratory / Rhetoric","Customer Attraction & Loyalty","Paperwork","Negotiations",
+                "State and municipal government political management","Business Popular","Dramaturgy","Ancient Drama",
+                "Comedy","Screenplay","Drama play","Fantasy"};
+        Set<String> genreNames = Arrays.stream(initGenreNames).collect(Collectors.toSet());
+        if(amount > genreNames.size()) {
+            for (int i = 0; i < amount - genreNames.size(); i++) {
+                genreNames.add(faker.book().genre());
+            }
         }
         for (String genreName : genreNames) {
             GenreEntity genre = new GenreEntity();
