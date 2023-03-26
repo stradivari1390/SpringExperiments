@@ -13,6 +13,9 @@ import java.util.Objects;
 @Getter
 @Setter
 @Entity
+@Table(name = "tag_entity", indexes = {
+        @Index(name = "idx_tagentity_name_unq", columnList = "name", unique = true)
+})
 public class TagEntity {
 
     @Id

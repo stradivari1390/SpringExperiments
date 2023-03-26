@@ -12,7 +12,8 @@ import java.util.Objects;
 @Entity
 @Table(name = "authors", indexes = {
         @Index(name = "idx_author_first_name", columnList = "first_name"),
-        @Index(name = "idx_author_last_name", columnList = "last_name")
+        @Index(name = "idx_author_last_name", columnList = "last_name"),
+        @Index(name = "idx_author_slug", columnList = "slug", unique = true)
 })
 public class Author {
 

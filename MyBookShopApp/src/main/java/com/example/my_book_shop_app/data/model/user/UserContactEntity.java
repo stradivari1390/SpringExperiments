@@ -15,7 +15,9 @@ import java.util.Objects;
 @ToString
 @NoArgsConstructor
 @Entity
-@Table(name = "user_contact")
+@Table(name = "user_contact", indexes = {
+        @Index(name = "idx_usercontactentity_userid", columnList = "userId, type")
+})
 public class UserContactEntity {
 
     @Id

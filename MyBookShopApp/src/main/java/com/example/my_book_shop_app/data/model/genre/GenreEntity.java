@@ -13,7 +13,9 @@ import java.util.Objects;
 @ToString
 @NoArgsConstructor
 @Entity
-@Table(name = "genre")
+@Table(name = "genre", indexes = {
+        @Index(name = "idx_genreentity_slug_unq", columnList = "slug", unique = true)
+})
 public class GenreEntity {
 
     @Id

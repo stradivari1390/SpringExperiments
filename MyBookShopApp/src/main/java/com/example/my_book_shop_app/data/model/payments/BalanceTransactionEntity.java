@@ -15,7 +15,7 @@ import java.util.Objects;
 @NoArgsConstructor
 @Entity
 @Table(name = "balance_transaction", indexes = {
-        @Index(name = "idx_balancetransactionentity", columnList = "bookId")
+        @Index(name = "idx_balancetransactionentity", columnList = "userId, bookId")
 })
 public class BalanceTransactionEntity {
 

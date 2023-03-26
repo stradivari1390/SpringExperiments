@@ -90,11 +90,12 @@ public class FakeDataFiller {
         List<Author> authors = new ArrayList<>();
         for (int i = 0; i < amount; i++) {
             Author author = new Author();
-            author.setPhoto("/spring-frontend/assets/img/content/main/card2.jpg");
+            author.setPhoto("/assets/img/content/main/card2.jpg");
             author.setSlug(UUID.randomUUID().toString());
             author.setFirstName(faker.name().firstName());
             author.setLastName(faker.name().lastName());
-            author.setDescription(faker.lorem().sentence());
+            String description = String.join("\n", faker.lorem().paragraphs(random.nextInt(5) + 5));
+            author.setDescription(description);
             authors.add(author);
         }
         authorRepository.saveAll(authors);

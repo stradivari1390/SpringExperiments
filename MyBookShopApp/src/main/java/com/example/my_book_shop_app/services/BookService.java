@@ -36,9 +36,9 @@ public class BookService {
         return bookRepository.getPageOfPostponedBooks(userId, nextPage);
     }
 
-    public Page<BookDto> getPageOfBooksByAuthor(String authorName, Integer offset, Integer limit) {
+    public Page<BookDto> getPageOfBooksByAuthor(String slug, Integer offset, Integer limit) {
         Pageable nextPage = PageRequest.of(offset, limit);
-        return bookRepository.getPageOfBooksByAuthorFirstNameContaining(authorName, nextPage);
+        return bookRepository.getPageOfBooksByAuthorSlug(slug, nextPage);
     }
 
     public Page<BookDto> getPageOfBooksByTitle(String title, Integer offset, Integer limit) {

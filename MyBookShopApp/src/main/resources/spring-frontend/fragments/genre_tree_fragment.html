@@ -4,11 +4,17 @@
   <title>Genre Tree Fragment</title>
 </head>
 <body>
-<div th:fragment="genre_tree(genres, parentId, fontSize)">
+<div th:fragment="genre_tree(genres, parentId, fontSize, deep)">
   <ul>
     <li th:each="genre : ${genres}" th:if="${#strings.equals(genre.parentId, parentId)}">
-      <a th:href="@{'/genres/' + ${genre.slug}}" th:text="${genre.name}" th:style="'font-size: ' + ${fontSize} + 'px;'"></a>
-      <div th:replace="~{:: genre_tree(${genres}, ${genre.id}, ${fontSize} - 2)}"></div>
+      <th:block th:inline="text">
+        [(${#strings.repeat('&emsp;', deep)})]
+      </th:block>
+      <a th:href="@{'/genres/' + ${genre.slug}}" th:text="${genre.name}"
+         th:style="'font-size: ' + ${fontSize} + 'px;'"
+         th:styleappend="${parentId == null} ? 'font-weight: bold;' : ''">
+      </a>
+      <div th:replace="~{:: genre_tree(${genres}, ${genre.id}, ${fontSize} - 2, ${deep} + 1)}"></div>
     </li>
   </ul>
 </div>

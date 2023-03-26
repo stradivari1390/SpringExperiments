@@ -27,4 +27,12 @@ public class AuthorService {
     public List<Author> getAuthors() {
         return authorRepository.findAll();
     }
+
+    public Author getAuthorBySlug(String slug) {
+        return authorRepository.findBySlug(slug);
+    }
+
+    public int countAuthorsBooks(String slug) {
+        return authorRepository.countBooksByAuthorSlug(slug);
+    }
 }

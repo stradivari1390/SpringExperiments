@@ -5,7 +5,7 @@
     <meta name="description" content="Описание страницы">
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0">
-    <link href="favicon.ico" rel="shortcut icon">
+    <link href="/favicon.ico" rel="shortcut icon">
     <link rel="preload" href="/assets/fonts/Montserrat/Montserrat-SemiBold.woff2" as="font" crossorigin="anonymous">
     <link rel="preload" href="/assets/fonts/Montserrat/Montserrat-Light.woff2" as="font" crossorigin="anonymous">
     <link rel="preload" href="/assets/fonts/Montserrat/Montserrat-Medium.woff2" as="font" crossorigin="anonymous">
@@ -123,9 +123,9 @@
                     <div class="Cart-block Cart-block_total">
                         <strong class="Cart-title" th:text="#{cart.total}">Итого:
                         </strong>
-                        <span class="Cart-price" th:text="${totalPrice}">534 р.
+                        <span class="Cart-price" th:text="'₽' + ${#numbers.formatDecimal(totalDiscountPrice, 1, 2)}">534 р.
                         </span>
-                        <span class="Cart-price_old" th:if="${totalPrice != totalPriceOld}" th:text="${totalPriceOld}">658 р.
+                        <span class="Cart-price_old" th:if="${totalPrice != totalDiscountPrice}" th:text="'₽' + ${#numbers.formatDecimal(totalPrice, 1, 2)}">658 р.
                         </span>
                     </div>
                     <div class="Cart-block"><a class="btn btn_success btn_md" href="/order.html"

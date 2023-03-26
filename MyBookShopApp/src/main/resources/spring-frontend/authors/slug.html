@@ -1,11 +1,11 @@
 <!DOCTYPE html>
 <html lang="ru" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>Тут название страницы написать</title>
+    <title th:text="${author.firstName} + ' ' + ${author.lastName}">Тут название страницы написать</title>
     <meta name="description" content="Описание страницы">
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0">
-    <link href="favicon.ico" rel="shortcut icon">
+    <link href="/favicon.ico" rel="shortcut icon">
     <link rel="preload" href="/assets/fonts/Montserrat/Montserrat-SemiBold.woff2" as="font" crossorigin="anonymous">
     <link rel="preload" href="/assets/fonts/Montserrat/Montserrat-Light.woff2" as="font" crossorigin="anonymous">
     <link rel="preload" href="/assets/fonts/Montserrat/Montserrat-Medium.woff2" as="font" crossorigin="anonymous">
@@ -18,18 +18,20 @@
 </head>
 <body class="Site">
 <header class="Header"
-        th:replace="~{fragments/common_header_fragment :: head(main='menu-item menu-item_ACTIVE', status='unauthorized')}"></header>
+        th:replace="~{fragments/common_header_fragment :: head(authors='menu-item menu-item_ACTIVE', status='unauthorized')}"></header>
 <div class="Middle">
     <div class="wrap">
         <main class="Middle-main">
             <ul class="breadcrumbs"
-                th:replace="~{fragments/breadcrumb_fragment :: breadcrumps(category='Борис Васильевич Бедный')}"></ul>
-            <div th:replace="~{fragments/author_article_fragment :: article(author='Борис Васильевич Бедный')}"></div>
+                th:replace="~{fragments/breadcrumb_fragment :: breadcrumps(category=${author.firstName} + ' ' + ${author.lastName})}"></ul>
+            <div th:replace="~{fragments/author_article_fragment :: article(author=${author})}"></div>
             <div class="Section"
-                 th:replace="~{fragments/book_slider_fragment :: bookSlider(title='Книги автора')}"></div>
-            <footer class="Section-footer"><a class="Author-books" th:href="@{/books/author}" href="/books/author.html">Все
-                книги автора<span
-                        class="Author-amount">(55)</span></a>
+                 th:replace="~{fragments/book_slider_fragment :: bookSlider(title=#{menu.authorsbooks}, booksList=${booksPageByAuthor}, dataLoad='author', authorSlug=${author.slug})}">
+            </div>
+            <footer class="Section-footer">
+                <a class="Author-books" th:href="@{/books/author(authorSlug=${author.slug})}" href="/books/author.html" th:text="#{menu.all_authors_books} + ' (' + ${booksAmount} + ')'">
+                    Все книги автора
+                </a>
             </footer>
         </main>
     </div>

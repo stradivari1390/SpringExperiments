@@ -5,7 +5,7 @@
     <meta name="description" content="Описание страницы">
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0">
-    <link href="favicon.ico" rel="shortcut icon">
+    <link href="/favicon.ico" rel="shortcut icon">
     <link rel="preload" href="/assets/fonts/Montserrat/Montserrat-SemiBold.woff2" as="font" crossorigin="anonymous">
     <link rel="preload" href="/assets/fonts/Montserrat/Montserrat-Light.woff2" as="font" crossorigin="anonymous">
     <link rel="preload" href="/assets/fonts/Montserrat/Montserrat-Medium.woff2" as="font" crossorigin="anonymous">
@@ -39,9 +39,12 @@
     <div class="wrap">
         <main class="Middle-main">
             <div class="Section">
-                <div th:replace="~{fragments/book_slider_fragment :: bookSlider(title=#{menu.title.recommended}, booksList=${recommendedBooks})}"></div>
-                <div th:replace="~{fragments/book_slider_fragment :: bookSlider(title=#{menu.title.recent}, booksList=${recentBooks})}"></div>
-                <div th:replace="~{fragments/book_slider_fragment :: bookSlider(title=#{menu.title.popular}, booksList=${popularBooks})}"></div>
+                <div th:replace="~{fragments/book_slider_fragment :: bookSlider(title=#{menu.title.recommended}, booksList=${recommendedBooks}, dataLoad='recommended', userId=${userId})}">
+                </div>
+                <div th:replace="~{fragments/book_slider_fragment :: bookSlider(title=#{menu.title.recent}, booksList=${recentBooks}, dataLoad='recent', fromDate=${fromDate}, toDate=${toDate})}">
+                </div>
+                <div th:replace="~{fragments/book_slider_fragment :: bookSlider(title=#{menu.title.popular}, booksList=${popularBooks}, dataLoad='popular')}">
+                </div>
             </div>
             <h2 class="Middle-title" th:text="#{menu.booksByTags}">Книги по тегам
             </h2>

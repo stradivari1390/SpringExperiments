@@ -22,4 +22,12 @@ public class CartService {
         Pageable nextPage = PageRequest.of(offset, limit);
         return bookRepository.getPageOfBooksInCart(userId, nextPage);
     }
+
+    public Double getTotalPrice(long userId) {
+        return bookRepository.getTotalCartBooksPrice(userId);
+    }
+
+    public Double getTotalDiscountPrice(long userId) {
+        return bookRepository.getTotalCartBooksDiscountPrice(userId);
+    }
 }

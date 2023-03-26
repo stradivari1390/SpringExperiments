@@ -25,8 +25,8 @@ public interface BookRepository extends JpaRepository<Book, Long> {
             "FROM Book b " +
             "JOIN Book2AuthorEntity ba ON b.id = ba.bookId " +
             "JOIN Author a ON ba.authorId = a.id " +
-            "WHERE a.firstName LIKE %:authorFirstName%")
-    Page<BookDto> getPageOfBooksByAuthorFirstNameContaining(@Param("authorFirstName") String authorFirstName, Pageable pageable);
+            "WHERE a.slug = :slug")
+    Page<BookDto> getPageOfBooksByAuthorSlug(@Param("slug") String slug, Pageable pageable);
 
     @Query(value = "SELECT new com.example.my_book_shop_app.dto.BookDto(b.id, b.slug, b.title, b.image, " +
             "b.description, b.price, b.discount, a.firstName, a.lastName) " +
@@ -175,4 +175,18 @@ public interface BookRepository extends JpaRepository<Book, Long> {
             "JOIN Author a ON ba.authorId = a.id " +
             "WHERE g.slug = :slug")
     Page<BookDto> getPageOfBooksByGenreSlug(@Param("slug") String genreSlug, Pageable nextPage);
+
+    @Query(value = "SELECT SUM(b.price) " +
+            "FROM Book b " +
+            "JOIN Book2UserEntity b2u ON b.id = b2u.bookId " +
+            "JOIN Book2UserTypeEntity bt ON b2u.typeId = bt.id " +
+            "WHERE bt.name = 'in_cart' AND b2u.userId = :userId")
+    Double getTotalCartBooksPrice(@Param("userId") long userId);
+
+    @Query(value = "SELECT SUM(b.price * (1 - b.discount / 100.0)) " +
+            "FROM Book b " +
+            "JOIN Book2UserEntity b2u ON b.id = b2u.bookId " +
+            "JOIN Book2UserTypeEntity bt ON b2u.typeId = bt.id " +
+            "WHERE bt.name = 'in_cart' AND b2u.userId = :userId")
+    Double getTotalCartBooksDiscountPrice(@Param("userId") long userId);
 }

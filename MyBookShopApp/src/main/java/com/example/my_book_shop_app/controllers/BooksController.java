@@ -29,9 +29,10 @@ public class BooksController {
 
     @GetMapping("/books/recommended")
     @ApiOperation("operation to get recommended books list")
-    public ResponseEntity<BooksPageDto> getRecommendedBooksPage(@ApiParam(value = "The offset index for pagination", required = true) @RequestParam("offset") Integer offset,
+    public ResponseEntity<BooksPageDto> getRecommendedBooksPage(@ApiParam(value = "User's ID", required = true) @RequestParam("userId") Long userId,
+                                                                @ApiParam(value = "The offset index for pagination", required = true) @RequestParam("offset") Integer offset,
                                                                 @ApiParam(value = "The limit of items per page for pagination", required = true) @RequestParam("limit") Integer limit) {
-        BooksPageDto recommendedBookPageDto = new BooksPageDto(bookService.getPageOfRecommendedBooks(440L, offset, limit).getContent());
+        BooksPageDto recommendedBookPageDto = new BooksPageDto(bookService.getPageOfRecommendedBooks(userId, offset, limit).getContent());
         return ResponseEntity.ok(recommendedBookPageDto);
     }
 
@@ -54,13 +55,14 @@ public class BooksController {
         return ResponseEntity.ok(popularBookPageDto);
     }
 
-    @GetMapping("/books/by-author")
-    @ApiOperation("Get a list of books by the author's first name")
-    public ResponseEntity<List<BookDto>> booksByAuthor(
-            @ApiParam(value = "Author's first name", required = true) @RequestParam("author") String authorName,
+    @GetMapping("/books/author")
+    @ApiOperation("Get a list of books by the author's slug")
+    public ResponseEntity<BooksPageDto> booksByAuthor(
+            @ApiParam(value = "Author's slug", required = true) @RequestParam("authorSlug") String slug,
             @ApiParam(value = "The offset index for pagination", required = true) @RequestParam("offset") Integer offset,
             @ApiParam(value = "The limit of items per page for pagination", required = true) @RequestParam("limit") Integer limit) {
-        return ResponseEntity.ok(bookService.getPageOfBooksByAuthor(authorName, offset, limit).getContent());
+        BooksPageDto authorBookPageDto = new BooksPageDto(bookService.getPageOfBooksByAuthor(slug, offset, limit).getContent());
+        return ResponseEntity.ok(authorBookPageDto);
     }
 
     @GetMapping("/books/by-title")

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
 <div class="Tags" id="tags" th:fragment="cloud" style="display: flex; justify-content: space-between; flex-wrap: wrap;">
     <div th:each="tag : ${tagCloud}" class="Tag">
         <a th:href="@{/tags/index?tag=${tag.tagName}}" th:style="'font-size:' + ${tag.fontSize} + 'px'" th:text="${tag.tagName}">Tag name</a>

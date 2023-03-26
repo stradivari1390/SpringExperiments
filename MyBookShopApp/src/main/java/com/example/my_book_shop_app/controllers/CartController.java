@@ -21,7 +21,9 @@ public class CartController {
     public String postponedPage(@RequestParam(value = "offset", defaultValue = "0") Integer offset,
                                 @RequestParam(value = "limit", defaultValue = "10") Integer limit,
                                 Model model) {
-        model.addAttribute("cartBooks", cartService.getPageOfCartBooks(3L, offset, limit).getContent());
+        model.addAttribute("cartBooks", cartService.getPageOfCartBooks(7L, offset, limit).getContent());
+        model.addAttribute("totalPrice", cartService.getTotalPrice(7L));
+        model.addAttribute("totalDiscountPrice", cartService.getTotalDiscountPrice(7L));
         return "cart";
     }
 }

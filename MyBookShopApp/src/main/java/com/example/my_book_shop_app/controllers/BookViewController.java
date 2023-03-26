@@ -1,6 +1,7 @@
 package com.example.my_book_shop_app.controllers;
 
 import com.example.my_book_shop_app.dto.BookDto;
+import com.example.my_book_shop_app.services.AuthorService;
 import com.example.my_book_shop_app.services.BookService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -17,10 +18,12 @@ import java.time.LocalDate;
 public class BookViewController {
 
     private final BookService bookService;
+    private final AuthorService authorService;
 
     @Autowired
-    public BookViewController(BookService bookService) {
+    public BookViewController(BookService bookService, AuthorService authorService) {
         this.bookService = bookService;
+        this.authorService = authorService;
     }
 
     @GetMapping("/books/recent")
@@ -67,5 +70,14 @@ public class BookViewController {
         model.addAttribute("tag", bookService.getTagByName(tag));
         model.addAttribute("taggedBookPage", bookService.getPageOfBooksByTag(tag, offset, limit).getContent());
         return "tags/index";
+    }
+
+    @GetMapping("/books/author")
+    public String authorBooksPage(@RequestParam(value = "offset", defaultValue = "0") Integer offset,
+                                  @RequestParam(value = "limit", defaultValue = "10") Integer limit,
+                                  @RequestParam("authorSlug") String slug, Model model) {
+        model.addAttribute("author", authorService.getAuthorBySlug(slug));
+        model.addAttribute("booksPageByAuthor", bookService.getPageOfBooksByAuthor(slug, offset, limit).getContent());
+        return "books/author";
     }
 }
