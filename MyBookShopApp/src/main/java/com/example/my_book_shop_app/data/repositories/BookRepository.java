@@ -121,17 +121,7 @@ public interface BookRepository extends JpaRepository<Book, Long> {
             "FROM Book b " +
             "JOIN Book2AuthorEntity ba ON b.id = ba.bookId " +
             "JOIN Author a ON ba.authorId = a.id " +
-            "JOIN BalanceTransactionEntity t ON b.id = t.bookId " +
-            "JOIN Book2UserEntity b2u ON b.id = b2u.bookId " +
-            "JOIN Book2UserTypeEntity bt ON b2u.typeId = bt.id " +
-            "LEFT JOIN BookReviewEntity br ON b.id = br.bookId " +
-            "LEFT JOIN BookReviewLikeEntity brl ON br.id = brl.reviewId " +
-            "WHERE bt.name IN ('postponed', 'purchased', 'in_cart') " +
-            "GROUP BY b.id, a.firstName, a.lastName " +
-            "ORDER BY (SUM(CASE WHEN bt.name = 'purchased' THEN 1 ELSE 0 END) + " +
-            "0.7 * SUM(CASE WHEN bt.name = 'in_cart' THEN 1 ELSE 0 END) + " +
-            "0.4 * SUM(CASE WHEN bt.name = 'postponed' THEN 1 ELSE 0 END)) DESC, " +
-            "b.isBestseller DESC, SUM(COALESCE(brl.value, 0)) DESC")
+            "ORDER BY b.popularity DESC")
     Page<BookDto> getPageOfPopularBooksDto(Pageable pageable);
 
     @Query(value = "SELECT new com.example.my_book_shop_app.dto.BookDto(b.id, b.slug, b.title, b.image, " +
@@ -189,4 +179,25 @@ public interface BookRepository extends JpaRepository<Book, Long> {
             "JOIN Book2UserTypeEntity bt ON b2u.typeId = bt.id " +
             "WHERE bt.name = 'in_cart' AND b2u.userId = :userId")
     Double getTotalCartBooksDiscountPrice(@Param("userId") long userId);
+
+    @Query(value = "SELECT COUNT(b) " +
+            "FROM Book b " +
+            "JOIN Book2UserEntity b2u ON b.id = b2u.bookId " +
+            "JOIN Book2UserTypeEntity bt ON b2u.typeId = bt.id " +
+            "WHERE bt.name = 'purchased' AND b.id = :bookId")
+    int getPurchasesCount(@Param("bookId") long id);
+
+    @Query(value = "SELECT COUNT(b) " +
+            "FROM Book b " +
+            "JOIN Book2UserEntity b2u ON b.id = b2u.bookId " +
+            "JOIN Book2UserTypeEntity bt ON b2u.typeId = bt.id " +
+            "WHERE bt.name = 'in_cart' AND b.id = :bookId")
+    int getInCartCount(@Param("bookId") long id);
+
+    @Query(value = "SELECT COUNT(b) " +
+            "FROM Book b " +
+            "JOIN Book2UserEntity b2u ON b.id = b2u.bookId " +
+            "JOIN Book2UserTypeEntity bt ON b2u.typeId = bt.id " +
+            "WHERE bt.name = 'postponed' AND b.id = :bookId")
+    int getPostponesCount(@Param("bookId") long id);
 }

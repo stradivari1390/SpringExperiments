@@ -19,15 +19,13 @@ import com.example.my_book_shop_app.data.model.user.UserContactEntity;
 import com.example.my_book_shop_app.data.model.user.UserEntity;
 import com.example.my_book_shop_app.data.repositories.*;
 import com.github.javafaker.Faker;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
+import javax.annotation.PostConstruct;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
-@Component
 public class FakeDataFiller {
 
     private final AuthorRepository authorRepository;
@@ -53,7 +51,6 @@ public class FakeDataFiller {
     private final Random random = new Random();
     private final Faker faker = new Faker(new Locale("en"));
 
-    @Autowired
     public FakeDataFiller(AuthorRepository authorRepository, BookRepository bookRepository,
                           Book2AuthorEntityRepository book2AuthorRepository, BookFileEntityRepository bookFileEntityRepository,
                           BookFileTypeEntityRepository bookFileTypeEntityRepository, GenreEntityRepository genreRepository,
@@ -106,7 +103,7 @@ public class FakeDataFiller {
         for (int i = 0; i < amount; i++) {
             Book book = new Book();
             book.setPublicationDate(LocalDate.now().minusDays(random.nextInt(365 * 10)));
-            book.setIsBestseller(random.nextBoolean());
+            book.setBestseller(random.nextBoolean());
             book.setSlug(UUID.randomUUID().toString());
             book.setTitle(faker.book().title());
             book.setImage("/assets/img/content/main/card1.jpg");
@@ -538,28 +535,27 @@ public class FakeDataFiller {
         book2TagEntityRepository.saveAll(book2TagEntities);
     }
 
-    public void superFillUpMethod(int authors, int books, int genres, int tags, int fileTypes,
-                                  int users, int book2user, int transactions, int reviews, int likes,
-                                  int documents, int faqs, int messages) {
-        generateRandomAuthors(authors);
-        generateRandomBooks(books);
+    @PostConstruct
+    public void run() {
+        generateRandomAuthors(10000);
+        generateRandomBooks(200000);
         generateRandomBook2AuthorEntities();
-        generateRandomGenres(genres);
+        generateRandomGenres(200);
         generateRandomBook2GenreEntities();
-        generateRandomTagEntities(tags);
+        generateRandomTagEntities(75);
         generateRandomBook2TagEntities();
-        generateRandomBookFileTypes(fileTypes);
+        generateRandomBookFileTypes(5);
         generateRandomBookFiles();
-        generateRandomUsers(users);
+        generateRandomUsers(25000);
         generateRandomBook2UserTypeEntities();
-        generateRandomBook2UserEntities(book2user);
-        generateRandomBalanceTransactions(transactions);
-        generateRandomBookReviewEntities(reviews);
-        generateRandomBookReviewLikeEntities(likes);
-        generateRandomDocumentEntities(documents);
-        generateRandomFaqEntities(faqs);
+        generateRandomBook2UserEntities(125000);
+        generateRandomBalanceTransactions(50000);
+        generateRandomBookReviewEntities(25000);
+        generateRandomBookReviewLikeEntities(100000);
+        generateRandomDocumentEntities(15);
+        generateRandomFaqEntities(30);
         generateRandomFileDownloadEntities();
         generateRandomUserContactEntities();
-        generateRandomMessageEntities(messages);
+        generateRandomMessageEntities(5000);
     }
 }

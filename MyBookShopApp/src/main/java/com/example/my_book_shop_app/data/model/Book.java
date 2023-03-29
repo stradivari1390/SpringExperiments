@@ -30,7 +30,7 @@ public class Book {
     private LocalDate publicationDate;
 
     @Column(name = "is_bestseller", nullable = false)
-    private Boolean isBestseller;
+    private boolean isBestseller;
 
     @Column(name = "slug", nullable = false, unique = true)
     private String slug;
@@ -45,10 +45,13 @@ public class Book {
     private String description;
 
     @Column(name = "price", nullable = false)
-    private Double price;
+    private double price;
 
     @Column(name = "discount", nullable = false)
-    private Integer discount;
+    private int discount;
+
+    @Column(name = "popularity")
+    private double popularity;
 
     @Override
     public boolean equals(Object o) {
@@ -57,7 +60,7 @@ public class Book {
         Book book = (Book) o;
         return getId().equals(book.getId()) &&
                 getTitle().equals(book.getTitle()) &&
-                getPrice().equals(book.getPrice());
+                getPrice() == book.getPrice();
     }
 
     @Override
