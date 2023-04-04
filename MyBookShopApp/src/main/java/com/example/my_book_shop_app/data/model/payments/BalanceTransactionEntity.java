@@ -29,8 +29,8 @@ public class BalanceTransactionEntity {
     @Column(columnDefinition = "TIMESTAMP NOT NULL")
     private LocalDateTime time;
 
-    @Column(columnDefinition = "INT NOT NULL  DEFAULT 0")
-    private int value;
+    @Column(columnDefinition = "DOUBLE PRECISION NOT NULL DEFAULT 0.0")
+    private double value;
 
     @Column(columnDefinition = "BIGINT NOT NULL")
     private Long bookId;
@@ -40,8 +40,12 @@ public class BalanceTransactionEntity {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof BalanceTransactionEntity)) return false;
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof BalanceTransactionEntity)) {
+            return false;
+        }
         BalanceTransactionEntity that = (BalanceTransactionEntity) o;
         return getId() == that.getId() &&
                 getUserId().equals(that.getUserId()) &&

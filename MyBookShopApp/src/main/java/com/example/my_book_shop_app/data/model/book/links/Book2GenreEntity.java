@@ -30,11 +30,15 @@ public class Book2GenreEntity {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof Book2GenreEntity)) return false;
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof Book2GenreEntity)) {
+            return false;
+        }
         Book2GenreEntity that = (Book2GenreEntity) o;
         return getId() == that.getId() &&
-                getBookId() == that.getBookId() &&
+                getBookId().equals(that.getBookId()) &&
                 getGenreId() == that.getGenreId();
     }
 

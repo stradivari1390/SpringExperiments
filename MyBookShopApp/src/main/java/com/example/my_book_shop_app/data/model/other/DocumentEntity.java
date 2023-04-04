@@ -35,8 +35,12 @@ public class DocumentEntity {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof DocumentEntity)) return false;
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof DocumentEntity)) {
+            return false;
+        }
         DocumentEntity that = (DocumentEntity) o;
         return getId().equals(that.getId()) &&
                 getSortIndex() == that.getSortIndex() &&

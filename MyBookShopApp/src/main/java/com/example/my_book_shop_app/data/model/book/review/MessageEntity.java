@@ -42,8 +42,12 @@ public class MessageEntity {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof MessageEntity)) return false;
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof MessageEntity)) {
+            return false;
+        }
         MessageEntity that = (MessageEntity) o;
         return getId().equals(that.getId()) &&
                 getUserId().equals(that.getUserId()) &&

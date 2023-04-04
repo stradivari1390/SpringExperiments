@@ -22,10 +22,9 @@
                     </div>
                     <div class="Header-search">
                         <div class="search">
-                            <form class="form form_search" action="#" method="post" data-searchlimit="20">
-                                <label for="query"></label><input class="search-input" id="query" name="query" type="text"
-                                                                  th:placeholder="#{search.placeholder}" value=""/>
-                                <button class="search-button" type="submit" name="search" id="search" th:text="#{menu.search}">Поиск</button>
+                            <form class="form form_search" th:action="@{/search}" method="get" data-searchlimit="10">
+                                <input class="search-input" id="query" name="query" type="text" th:placeholder="#{search.placeholder}" value=""/>
+                                <button class="search-button" type="submit" id="search" th:text="#{menu.search}">Поиск</button>
                             </form>
                         </div>
                     </div>

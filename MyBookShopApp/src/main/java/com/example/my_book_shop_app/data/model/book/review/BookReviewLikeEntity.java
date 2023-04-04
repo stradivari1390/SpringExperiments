@@ -15,7 +15,8 @@ import java.util.Objects;
 @NoArgsConstructor
 @Entity
 @Table(name = "book_review_like", indexes = {
-        @Index(name = "idx_bookreviewlikeentity", columnList = "reviewId")
+        @Index(name = "idx_bookreviewlikeentity", columnList = "reviewId"),
+        @Index(name = "idx_bookreviewlikeentity_unq", columnList = "reviewId, userId", unique = true)
 })
 public class BookReviewLikeEntity {
 
@@ -37,8 +38,12 @@ public class BookReviewLikeEntity {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof BookReviewLikeEntity)) return false;
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof BookReviewLikeEntity)) {
+            return false;
+        }
         BookReviewLikeEntity that = (BookReviewLikeEntity) o;
         return getId() == that.getId() &&
                 getReviewId() == that.getReviewId() &&

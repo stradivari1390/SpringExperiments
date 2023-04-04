@@ -53,10 +53,17 @@ public class Book {
     @Column(name = "popularity")
     private double popularity;
 
+    @Column(name = "rating")
+    private short rating;
+
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof Book)) return false;
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof Book)) {
+            return false;
+        }
         Book book = (Book) o;
         return getId().equals(book.getId()) &&
                 getTitle().equals(book.getTitle()) &&

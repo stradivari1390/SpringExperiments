@@ -21,7 +21,7 @@ public class BookReviewEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private Integer id;
 
     @Column(columnDefinition = "BIGINT NOT NULL")
     private Long bookId;
@@ -37,10 +37,14 @@ public class BookReviewEntity {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof BookReviewEntity)) return false;
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof BookReviewEntity)) {
+            return false;
+        }
         BookReviewEntity that = (BookReviewEntity) o;
-        return getId() == that.getId() &&
+        return getId().equals(that.getId()) &&
                 getBookId().equals(that.getBookId()) &&
                 getUserId().equals(that.getUserId()) &&
                 getTime().equals(that.getTime()) &&

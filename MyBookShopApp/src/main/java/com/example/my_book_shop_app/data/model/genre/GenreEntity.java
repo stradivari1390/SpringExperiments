@@ -33,8 +33,12 @@ public class GenreEntity {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof GenreEntity)) return false;
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof GenreEntity)) {
+            return false;
+        }
         GenreEntity that = (GenreEntity) o;
         return getId() == that.getId() &&
                 getParentId().equals(that.getParentId()) &&

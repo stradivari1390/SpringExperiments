@@ -4,8 +4,10 @@ import com.example.my_book_shop_app.services.CartService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
+
+import javax.servlet.http.HttpServletResponse;
+import java.util.Collections;
 
 @Controller
 public class CartController {
@@ -17,13 +19,108 @@ public class CartController {
         this.cartService = cartService;
     }
 
-    @GetMapping("/books/cart")
-    public String postponedPage(@RequestParam(value = "offset", defaultValue = "0") Integer offset,
-                                @RequestParam(value = "limit", defaultValue = "10") Integer limit,
-                                Model model) {
-        model.addAttribute("cartBooks", cartService.getPageOfCartBooks(7L, offset, limit).getContent());
-        model.addAttribute("totalPrice", cartService.getTotalPrice(7L));
-        model.addAttribute("totalDiscountPrice", cartService.getTotalDiscountPrice(7L));
+    @PostMapping("/changeBookStatus/{slug}")
+    public String handleChangeBookStatus(@RequestParam("status") String status,
+                                         @PathVariable("slug") String slug,
+                                         @RequestHeader(value = "referer", required = false) String referer,
+                                         @CookieValue(name = "cartContents", required = false) String cartContents,
+                                         @CookieValue(name = "postponedContents", required = false) String postponedContents,
+                                         @CookieValue(name = "archivedContents", required = false) String archivedContents,
+                                         HttpServletResponse response) {
+        switch (status) {
+            case "CART":
+                cartService.addToCart(slug, 1L, cartContents, postponedContents, response);
+                break;
+            case "MASS_CART":
+                String[] bookIds = slug.split(",");
+                for (String bookId : bookIds) {
+                    cartService.addToCart(bookId, 1L, cartContents, postponedContents, response);
+                }
+                break;
+            case "KEPT":
+                cartService.addToPostponed(slug, 1L, cartContents, postponedContents, response);
+                break;
+            case "ARCHIVED":
+                cartService.addToArchived(slug, 1L, archivedContents, response);
+                break;
+            default:
+                break;
+        }
+        if (referer != null && !referer.isEmpty()) {
+            return "redirect:" + referer;
+        } else {
+            return "redirect:/";
+        }
+    }
+
+    @GetMapping("/cart")
+    public String handleCartRequest(@CookieValue(value = "cartContents", required = false) String cartContents,
+                                    Model model) {
+
+        if (cartContents != null && !cartContents.equals("")) {
+            model.addAttribute("cartBooks", cartService.getBookDtoListByCookie(cartContents));
+            model.addAttribute("totalPrice", cartService.getTotalPrice(cartContents));
+            model.addAttribute("totalDiscountPrice", cartService.getTotalDiscountPrice(cartContents));
+        } else {
+            model.addAttribute("cartBooks", Collections.emptyList());
+            model.addAttribute("totalPrice", 0D);
+            model.addAttribute("totalDiscountPrice", 0D);
+        }
         return "cart";
     }
+
+    @PostMapping("/changeBookStatus/cart/remove/{slug}")
+    public String handleRemoveBookFromCartRequest(@PathVariable("slug") String slug,
+                                                  @CookieValue(name = "cartContents", required = false) String cartContents,
+                                                  HttpServletResponse response, Model model) {
+        if (cartContents != null && !cartContents.equals("")) {
+            cartService.removeSlugFromCookie(slug, cartContents, "cartContents", response);
+            cartService.removeBook2UserRelation(1L, slug);
+        }
+        return handleCartRequest(cartContents, model);
+    }
+
+    @GetMapping("/postponed")
+    public String handlePostponedRequest(@CookieValue(value = "postponedContents", required = false) String postponedContents,
+                                         Model model) {
+        if (postponedContents != null && !postponedContents.equals("")) {
+            model.addAttribute("postponedBooks", cartService.getBookDtoListByCookie(postponedContents));
+            model.addAttribute("postponedBooksSlugs", cartService.getCookieBooksSlugs(postponedContents));
+        } else {
+            model.addAttribute("postponedBooks", Collections.emptyList());
+        }
+        return "postponed";
+    }
+
+    @PostMapping("/changeBookStatus/postponed/remove/{slug}")
+    public String handleRemoveBookFromPostponedRequest(@PathVariable("slug") String slug,
+                                                       @CookieValue(name = "postponedContents", required = false) String postponedContents,
+                                                       HttpServletResponse response, Model model) {
+        if (postponedContents != null && !postponedContents.equals("")) {
+            cartService.removeSlugFromCookie(slug, postponedContents, "postponedContents", response);
+            cartService.removeBook2UserRelation(1L, slug);
+        }
+        return handlePostponedRequest(postponedContents, model);
+    }
+
+    @GetMapping("/archived")
+    public String handleArchivedRequest(@CookieValue(value = "archivedContents", required = false) String archivedContents,
+                                        Model model) {
+        if (archivedContents != null && !archivedContents.equals("")) {
+            model.addAttribute("archivedBooks", cartService.getBookDtoListByCookie(archivedContents));
+        } else {
+            model.addAttribute("archivedBooks", Collections.emptyList());
+        }
+        return "myarchive";
+    }
+
+    /*@PostMapping("/changeBookStatus/archived/remove/{slug}")
+    public String handleRemoveBookFromArchivedRequest(@PathVariable("slug") String slug,
+                                                      @CookieValue(name = "archivedContents", required = false) String archivedContents,
+                                                      HttpServletResponse response, Model model) {
+        if (archivedContents != null && !archivedContents.equals("")) {
+            cartService.removeSlugFromCookie(slug, archivedContents, "archivedContents", response);
+        }
+        return handleArchivedRequest(archivedContents, model);
+    }*/
 }

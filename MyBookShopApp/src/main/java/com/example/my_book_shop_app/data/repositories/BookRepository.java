@@ -12,71 +12,73 @@ import java.time.LocalDate;
 import java.util.List;
 
 public interface BookRepository extends JpaRepository<Book, Long> {
+    Book findBySlug(String slug);
 
-    @Query(value = "SELECT new com.example.my_book_shop_app.dto.BookDto(b.id, b.slug, b.title, b.image, " +
-            "b.description, b.price, b.discount, a.firstName, a.lastName) " +
+    String SELECT_BOOK_DTO = "SELECT new com.example.my_book_shop_app.dto.BookDto" +
+            "(b.id, b.slug, b.title, b.image, b.description, b.price, b.discount, b.rating, a.firstName, a.lastName, a.slug) ";
+
+    @Query(value = SELECT_BOOK_DTO +
+            "FROM Book b " +
+            "JOIN Book2AuthorEntity ba ON b.id = ba.bookId " +
+            "JOIN Author a ON ba.authorId = a.id " +
+            "WHERE b.slug in :slug")
+    List<BookDto> findAllBookDtoBySlug(@Param("slug") String[] slug);
+
+    @Query(value = SELECT_BOOK_DTO +
             "FROM Book b " +
             "JOIN Book2AuthorEntity ba ON b.id = ba.bookId " +
             "JOIN Author a ON ba.authorId = a.id")
     List<BookDto> getBooksDto();
 
-    @Query(value = "SELECT new com.example.my_book_shop_app.dto.BookDto(b.id, b.slug, b.title, b.image, " +
-            "b.description, b.price, b.discount, a.firstName, a.lastName) " +
+    @Query(value = SELECT_BOOK_DTO +
             "FROM Book b " +
             "JOIN Book2AuthorEntity ba ON b.id = ba.bookId " +
             "JOIN Author a ON ba.authorId = a.id " +
             "WHERE a.slug = :slug")
     Page<BookDto> getPageOfBooksByAuthorSlug(@Param("slug") String slug, Pageable pageable);
 
-    @Query(value = "SELECT new com.example.my_book_shop_app.dto.BookDto(b.id, b.slug, b.title, b.image, " +
-            "b.description, b.price, b.discount, a.firstName, a.lastName) " +
+    @Query(value = SELECT_BOOK_DTO +
             "FROM Book b " +
             "JOIN Book2AuthorEntity ba ON b.id = ba.bookId " +
             "JOIN Author a ON ba.authorId = a.id " +
             "WHERE b.price * (1 - b.discount) / 100 between :min and :max")
     Page<BookDto> getPageOfBooksByPriceBetween(@Param("min") Double min, @Param("max") Double max, Pageable pageable);
 
-    @Query(value = "SELECT new com.example.my_book_shop_app.dto.BookDto(b.id, b.slug, b.title, b.image, " +
-            "b.description, b.price, b.discount, a.firstName, a.lastName) " +
+    @Query(value = SELECT_BOOK_DTO +
             "FROM Book b " +
             "JOIN Book2AuthorEntity ba ON b.id = ba.bookId " +
             "JOIN Author a ON ba.authorId = a.id " +
             "WHERE b.price * (1 - b.discount) / 100 between :searchPrice - 0.75 and :searchPrice + 0.75")
     Page<BookDto> getPageOfBooksByPriceIs(@Param("searchPrice") Double price, Pageable pageable);
 
-    @Query(value = "SELECT new com.example.my_book_shop_app.dto.BookDto(b.id, b.slug, b.title, b.image, " +
-            "b.description, b.price, b.discount, a.firstName, a.lastName) " +
+    @Query(value = SELECT_BOOK_DTO +
             "FROM Book b " +
             "JOIN Book2AuthorEntity ba ON b.id = ba.bookId " +
             "JOIN Author a ON ba.authorId = a.id " +
             "where b.isBestseller = true")
     Page<BookDto> getPageOfBestsellers(Pageable pageable);
 
-    @Query(value = "SELECT new com.example.my_book_shop_app.dto.BookDto(b.id, b.slug, b.title, b.image, " +
-            "b.description, b.price, b.discount, a.firstName, a.lastName) " +
+    @Query(value = SELECT_BOOK_DTO +
             "FROM Book b " +
             "JOIN Book2AuthorEntity ba ON b.id = ba.bookId " +
             "JOIN Author a ON ba.authorId = a.id " +
             "WHERE b.discount = (SELECT MAX(discount) FROM Book)")
     Page<BookDto> getPageOfBooksWithMaxDiscount(Pageable pageable);
 
-    @Query(value = "SELECT new com.example.my_book_shop_app.dto.BookDto(b.id, b.slug, b.title, b.image, " +
-            "b.description, b.price, b.discount, a.firstName, a.lastName) " +
+    @Query(value = SELECT_BOOK_DTO +
             "FROM Book b " +
             "JOIN Book2AuthorEntity ba ON b.id = ba.bookId " +
             "JOIN Author a ON ba.authorId = a.id " +
             "WHERE LOWER(b.title) LIKE LOWER(CONCAT('%', :bookTitle, '%'))")
     Page<BookDto> getPageOfBooksByTitleContaining(@Param("bookTitle") String bookTitle, Pageable pageable);
 
-    @Query(value = "SELECT new com.example.my_book_shop_app.dto.BookDto(b.id, b.slug, b.title, b.image, " +
-            "b.description, b.price, b.discount, a.firstName, a.lastName) " +
+    @Query(value = SELECT_BOOK_DTO +
             "FROM Book b " +
             "JOIN Book2AuthorEntity ba ON b.id = ba.bookId " +
             "JOIN Author a ON ba.authorId = a.id")
     Page<BookDto> getPageOfBooksDto(Pageable pageable);
 
-    @Query(value = "SELECT new com.example.my_book_shop_app.dto.BookDto(b.id, b.slug, b.title, b.image, " +
-            "b.description, b.price, b.discount, a.firstName, a.lastName) " +
+    @Query(value = SELECT_BOOK_DTO +
             "FROM Book b " +
             "JOIN Book2AuthorEntity ba ON b.id = ba.bookId " +
             "JOIN Author a ON ba.authorId = a.id " +
@@ -86,17 +88,17 @@ public interface BookRepository extends JpaRepository<Book, Long> {
             "   FROM Book2UserEntity b2u " +
             "   JOIN Book2UserTypeEntity bt ON b2u.typeId = bt.id " +
             "   JOIN Book2GenreEntity bg2 ON b2u.bookId = bg2.bookId " +
-            "   WHERE bt.id IN (2, 3, 4) " +
-            "   AND b2u.userId = :userId" +
+            "   WHERE b2u.userId = :userId" +
             ") " +
             "AND NOT EXISTS (" +
             "   SELECT b2u2 " +
             "   FROM Book2UserEntity b2u2 " +
+            "   JOIN Book2UserTypeEntity bt2 ON b2u2.typeId = bt2.id " +
             "   WHERE b2u2.bookId = b.id " +
             "   AND b2u2.userId = :userId " +
-            "   AND b2u2.typeId = 4" +
+            "   AND bt2.name = 'purchased'" +
             ") " +
-            "GROUP BY b.id, a.firstName, a.lastName " +
+            "GROUP BY b.id, a.firstName, a.lastName, a.slug " +
             "ORDER BY SUM(" +
             "   CASE WHEN EXISTS (" +
             "       SELECT b2u3 " +
@@ -107,8 +109,7 @@ public interface BookRepository extends JpaRepository<Book, Long> {
             ") THEN 1 ELSE 0 END) DESC, b.id DESC")
     Page<BookDto> getPageOfRecommendedBooksDto(@Param("userId") Long userId, Pageable pageable);
 
-    @Query(value = "SELECT new com.example.my_book_shop_app.dto.BookDto(b.id, b.slug, b.title, b.image, " +
-            "b.description, b.price, b.discount, a.firstName, a.lastName) " +
+    @Query(value = SELECT_BOOK_DTO +
             "FROM Book b " +
             "JOIN Book2AuthorEntity ba ON b.id = ba.bookId " +
             "JOIN Author a ON ba.authorId = a.id " +
@@ -116,38 +117,34 @@ public interface BookRepository extends JpaRepository<Book, Long> {
             "ORDER BY b.publicationDate DESC")
     Page<BookDto> getPageOfRecentBooksDto(Pageable pageable, @Param("fromDate") LocalDate fromDate, @Param("toDate") LocalDate toDate);
 
-    @Query(value = "SELECT new com.example.my_book_shop_app.dto.BookDto(b.id, b.slug, b.title, b.image, " +
-            "b.description, b.price, b.discount, a.firstName, a.lastName) " +
+    @Query(value = SELECT_BOOK_DTO +
             "FROM Book b " +
             "JOIN Book2AuthorEntity ba ON b.id = ba.bookId " +
             "JOIN Author a ON ba.authorId = a.id " +
             "ORDER BY b.popularity DESC")
     Page<BookDto> getPageOfPopularBooksDto(Pageable pageable);
 
-    @Query(value = "SELECT new com.example.my_book_shop_app.dto.BookDto(b.id, b.slug, b.title, b.image, " +
-            "b.description, b.price, b.discount, a.firstName, a.lastName) " +
+    @Query(value = SELECT_BOOK_DTO +
             "FROM Book b " +
             "JOIN Book2AuthorEntity ba ON b.id = ba.bookId " +
             "JOIN Author a ON ba.authorId = a.id " +
             "JOIN Book2UserEntity b2u ON b.id = b2u.bookId " +
             "JOIN Book2UserTypeEntity bt ON b2u.typeId = bt.id " +
-            "WHERE bt.id = 2 " +
+            "WHERE bt.name = 'postponed' " +
             "AND b2u.userId = :userId")
     Page<BookDto> getPageOfPostponedBooks(@Param("userId") Long userId, Pageable pageable);
 
-    @Query(value = "SELECT new com.example.my_book_shop_app.dto.BookDto(b.id, b.slug, b.title, b.image, " +
-            "b.description, b.price, b.discount, a.firstName, a.lastName) " +
+    @Query(value = SELECT_BOOK_DTO +
             "FROM Book b " +
             "JOIN Book2AuthorEntity ba ON b.id = ba.bookId " +
             "JOIN Author a ON ba.authorId = a.id " +
             "JOIN Book2UserEntity b2u ON b.id = b2u.bookId " +
             "JOIN Book2UserTypeEntity bt ON b2u.typeId = bt.id " +
-            "WHERE bt.id = 3 " +
+            "WHERE bt.name = 'in_cart' " +
             "AND b2u.userId = :userId")
     Page<BookDto> getPageOfBooksInCart(@Param("userId") Long userId, Pageable pageable);
 
-    @Query(value = "SELECT new com.example.my_book_shop_app.dto.BookDto(b.id, b.slug, b.title, b.image, " +
-            "b.description, b.price, b.discount, a.firstName, a.lastName) " +
+    @Query(value = SELECT_BOOK_DTO +
             "FROM Book b " +
             "JOIN Book2TagEntity bt ON b.id = bt.bookId " +
             "JOIN TagEntity t ON bt.tagId = t.id " +
@@ -156,8 +153,7 @@ public interface BookRepository extends JpaRepository<Book, Long> {
             "WHERE t.name = :tagName")
     Page<BookDto> getPageOfBooksByTagName(@Param("tagName") String tagName, Pageable pageable);
 
-    @Query(value = "SELECT new com.example.my_book_shop_app.dto.BookDto(b.id, b.slug, b.title, b.image, " +
-            "b.description, b.price, b.discount, a.firstName, a.lastName) " +
+    @Query(value = SELECT_BOOK_DTO +
             "FROM Book b " +
             "JOIN Book2GenreEntity bg ON b.id = bg.bookId " +
             "JOIN GenreEntity g ON bg.genreId = g.id " +
@@ -184,20 +180,33 @@ public interface BookRepository extends JpaRepository<Book, Long> {
             "FROM Book b " +
             "JOIN Book2UserEntity b2u ON b.id = b2u.bookId " +
             "JOIN Book2UserTypeEntity bt ON b2u.typeId = bt.id " +
-            "WHERE bt.name = 'purchased' AND b.id = :bookId")
-    int getPurchasesCount(@Param("bookId") long id);
+            "WHERE bt.name = 'purchased' AND b.slug = :bookSlug")
+    int getPurchasesCount(@Param("bookSlug") String bookSlug);
 
     @Query(value = "SELECT COUNT(b) " +
             "FROM Book b " +
             "JOIN Book2UserEntity b2u ON b.id = b2u.bookId " +
             "JOIN Book2UserTypeEntity bt ON b2u.typeId = bt.id " +
-            "WHERE bt.name = 'in_cart' AND b.id = :bookId")
-    int getInCartCount(@Param("bookId") long id);
+            "WHERE bt.name = 'in_cart' AND b.slug = :bookSlug")
+    int getInCartCount(@Param("bookSlug") String bookSlug);
 
     @Query(value = "SELECT COUNT(b) " +
             "FROM Book b " +
             "JOIN Book2UserEntity b2u ON b.id = b2u.bookId " +
             "JOIN Book2UserTypeEntity bt ON b2u.typeId = bt.id " +
-            "WHERE bt.name = 'postponed' AND b.id = :bookId")
-    int getPostponesCount(@Param("bookId") long id);
+            "WHERE bt.name = 'postponed' AND b.slug = :bookSlug")
+    int getPostponesCount(@Param("bookSlug") String bookSlug);
+
+    @Query(value = SELECT_BOOK_DTO +
+            "FROM Book b " +
+            "JOIN Book2AuthorEntity ba ON b.id = ba.bookId " +
+            "JOIN Author a ON ba.authorId = a.id " +
+            "WHERE b.slug = :slug")
+    BookDto findBookDtoBySlug(@Param("slug") String slug);
+
+    @Query(value = "SELECT b " +
+            "FROM Book b " +
+            "JOIN BookReviewEntity br ON b.id = br.bookId " +
+            "WHERE br.id = :reviewId")
+    Book findByReviewId(@Param("reviewId") Integer reviewId);
 }

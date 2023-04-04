@@ -32,8 +32,12 @@ public class FaqEntity {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof FaqEntity)) return false;
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof FaqEntity)) {
+            return false;
+        }
         FaqEntity faqEntity = (FaqEntity) o;
         return getId().equals(faqEntity.getId()) &&
                 getSortIndex() == faqEntity.getSortIndex() &&

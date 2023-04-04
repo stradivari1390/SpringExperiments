@@ -1,23 +1,31 @@
 package com.example.my_book_shop_app.controllers;
 
+import com.example.my_book_shop_app.data.ApiResponse;
 import com.example.my_book_shop_app.dto.BooksPageDto;
 import com.example.my_book_shop_app.dto.TagCloudDto;
+import com.example.my_book_shop_app.errors.BookstoreApiWrongParameterException;
 import com.example.my_book_shop_app.services.BookService;
 import com.example.my_book_shop_app.dto.BookDto;
+
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponses;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
 @RequestMapping("/api")
-@Api(tags = "Books API", description = "API endpoints for managing books data")
+@Api(tags = "Books API")
 public class BooksController {
 
     private final BookService bookService;
@@ -67,11 +75,23 @@ public class BooksController {
 
     @GetMapping("/books/by-title")
     @ApiOperation("Get books by book title")
-    public ResponseEntity<List<BookDto>> booksByTitle(
+    @ApiResponses(value = {
+            @io.swagger.annotations.ApiResponse(code = 200, message = "Successful request"),
+    })
+    public ResponseEntity<ApiResponse<BookDto>> booksByTitle(
             @ApiParam(value = "Book title", required = true) @RequestParam("title") String title,
             @ApiParam(value = "The offset index for pagination", required = true) @RequestParam("offset") Integer offset,
-            @ApiParam(value = "The limit of items per page for pagination", required = true) @RequestParam("limit") Integer limit) {
-        return ResponseEntity.ok(bookService.getPageOfBooksByTitle(title, offset, limit).getContent());
+            @ApiParam(value = "The limit of items per page for pagination", required = true) @RequestParam("limit") Integer limit)
+            throws BookstoreApiWrongParameterException {
+
+        ApiResponse<BookDto> response = new ApiResponse<>();
+        List<BookDto> data = bookService.getPageOfBooksByTitle(title, offset, limit).getContent();
+        response.setDebugMessage("successful request");
+        response.setMessage("data size: " + data.size() + " elements");
+        response.setStatus(HttpStatus.OK);
+        response.setTimeStamp(LocalDateTime.now());
+        response.setData(data);
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/books/by-price-range")
@@ -124,5 +144,17 @@ public class BooksController {
             @ApiParam(value = "The limit of items per page for pagination", required = true) @RequestParam("limit") Integer limit) {
         BooksPageDto booksByGenrePageDto = new BooksPageDto(bookService.getPageOfBooksByGenre(genre, offset, limit).getContent());
         return ResponseEntity.ok(booksByGenrePageDto);
+    }
+
+    @ExceptionHandler(MissingServletRequestParameterException.class)
+    public ResponseEntity<ApiResponse<BookDto>> handleMissingServletRequestParameterException(Exception exception) {
+        return new ResponseEntity<>(new ApiResponse<>(HttpStatus.BAD_REQUEST, "Missing required parameters", exception),
+                HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(BookstoreApiWrongParameterException.class)
+    public ResponseEntity<ApiResponse<BookDto>> handleBookstoreApiWrongParameterException(Exception exception) {
+        return new ResponseEntity<>(new ApiResponse<>(HttpStatus.BAD_REQUEST, "Bad parameter value...", exception)
+                , HttpStatus.BAD_REQUEST);
     }
 }

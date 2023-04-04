@@ -28,8 +28,12 @@ public class Book2UserTypeEntity {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof Book2UserTypeEntity)) return false;
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof Book2UserTypeEntity)) {
+            return false;
+        }
         Book2UserTypeEntity that = (Book2UserTypeEntity) o;
         return getId() == that.getId() &&
                 getCode().equals(that.getCode()) &&

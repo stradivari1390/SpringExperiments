@@ -32,8 +32,12 @@ public class FileDownloadEntity {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof FileDownloadEntity)) return false;
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof FileDownloadEntity)) {
+            return false;
+        }
         FileDownloadEntity that = (FileDownloadEntity) o;
         return getUserId().equals(that.getUserId()) &&
                 getBookId().equals(that.getBookId());

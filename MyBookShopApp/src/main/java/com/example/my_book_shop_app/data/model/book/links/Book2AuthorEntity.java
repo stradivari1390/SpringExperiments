@@ -33,8 +33,12 @@ public class Book2AuthorEntity {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof Book2AuthorEntity)) return false;
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof Book2AuthorEntity)) {
+            return false;
+        }
         Book2AuthorEntity that = (Book2AuthorEntity) o;
         return Objects.equals(getId(), that.getId()) &&
                 Objects.equals(getBookId(), that.getBookId()) &&

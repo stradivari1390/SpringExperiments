@@ -30,78 +30,68 @@
                 <div th:if="${not #lists.isEmpty(cartBooks)}" th:each="book : ${cartBooks}">
                     <div class="Cart-product">
                         <div class="Cart-block Cart-block_row">
-                            <div class="Cart-block Cart-block_pict"><a class="Cart-pict" href="#"><img class="Cart-img"
-                                                                                                       th:src="${book.image}"
-                                                                                                       alt="card.jpg"/></a>
+                            <div class="Cart-block Cart-block_pict">
+                                <a class="Cart-pict" th:href="@{'/books/' + ${book.slug}}">
+                                    <img class="Cart-img" th:src="${book.image}" alt="card.jpg"/>
+                                </a>
                             </div>
                             <div class="Cart-block Cart-block_row">
                                 <div class="Cart-block Cart-block_info">
-                                    <div class="Cart-author"><a href="#" th:text="${book.authorFirstName} + ' ' + ${book.authorLastName}"></a></div>
-                                    <div class="Cart-title"><a href="#" th:text="${book.title}"></a></div>
+                                    <div class="Cart-author">
+                                        <a th:href="@{'/authors/' + ${book.authorSlug}}" th:text="${book.authorFirstName} + ' ' + ${book.authorLastName}">
+                                        </a>
+                                    </div>
+                                    <div class="Cart-title">
+                                        <a th:href="@{'/books/' + ${book.slug}}" th:text="${book.title}">
+                                        </a>
+                                    </div>
                                     <div class="Cart-rating">
-                            <span class="Rating">
-                                <span class="Rating-stars">
-                                    <span class="Rating-star Rating-star_view">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="19" height="18" viewBox="0 0 19 18">
-                                        <g>
-                                            <g>
-                                            <path fill="#ffc000"
-                                                d="M9.5 14.925L3.629 18l1.121-6.512L0 6.875l6.564-.95L9.5 0l2.936 5.925 6.564.95-4.75 4.613L15.371 18z"></path>
-                                            </g>
-                                        </g>
-                                        </svg>
-                                    </span>
-                                    <span class="Rating-star Rating-star_view">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="19" height="18" viewBox="0 0 19 18">
-                                        <g>
-                                            <g>
-                                            <path fill="#ffc000"
-                                                d="M9.5 14.925L3.629 18l1.121-6.512L0 6.875l6.564-.95L9.5 0l2.936 5.925 6.564.95-4.75 4.613L15.371 18z"></path>
-                                            </g>
-                                        </g>
-                                        </svg>
-                                    </span>
-                                    <span class="Rating-star Rating-star_view">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="19" height="18" viewBox="0 0 19 18">
-                                        <g>
-                                            <g>
-                                            <path fill="#ffc000"
-                                                d="M9.5 14.925L3.629 18l1.121-6.512L0 6.875l6.564-.95L9.5 0l2.936 5.925 6.564.95-4.75 4.613L15.371 18z"></path>
-                                            </g>
-                                        </g>
-                                        </svg>
-                                    </span>
-                                    <span class="Rating-star">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="19" height="18" viewBox="0 0 19 18">
-                                            <g>
-                                            <g>
-                                                <path fill="#ffc000"
-                                                    d="M9.5 14.925L3.629 18l1.121-6.512L0 6.875l6.564-.95L9.5 0l2.936 5.925 6.564.95-4.75 4.613L15.371 18z"></path>
-                                            </g>
-                                            </g>
-                                        </svg></span><span class="Rating-star">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="19" height="18" viewBox="0 0 19 18">
-                                            <g>
-                                            <g>
-                                                <path fill="#ffc000"
-                                                    d="M9.5 14.925L3.629 18l1.121-6.512L0 6.875l6.564-.95L9.5 0l2.936 5.925 6.564.95-4.75 4.613L15.371 18z"></path>
-                                            </g>
-                                            </g>
-                                        </svg></span></span></span>
+                                        <span class="Rating">
+                                            <span class="Rating-stars">
+                                                <!-- Yellow stars -->
+                                                <span th:each="star : ${#numbers.sequence(1, book.rating)}" class="Rating-star Rating-star_view">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="19" height="18" viewBox="0 0 19 18">
+                                                        <g>
+                                                            <g>
+                                                                <path fill="#ffc000" d="M9.5 14.925L3.629 18l1.121-6.512L0 6.875l6.564-.95L9.5 0l2.936 5.925 6.564.95-4.75 4.613L15.371 18z"></path>
+                                                            </g>
+                                                        </g>
+                                                    </svg>
+                                                </span>
+                                                <!-- Grey stars -->
+                                                <span th:if="${book.rating < 5}" th:each="star : ${#numbers.sequence(book.rating + 1, 5)}" class="Rating-star">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="19" height="18" viewBox="0 0 19 18">
+                                                        <g>
+                                                            <g>
+                                                                <path fill="#c1c1c1" d="M9.5 14.925L3.629 18l1.121-6.512L0 6.875l6.564-.95L9.5 0l2.936 5.925 6.564.95-4.75 4.613L15.371 18z"></path>
+                                                            </g>
+                                                        </g>
+                                                    </svg>
+                                                </span>
+                                            </span>
+                                        </span>
+                                        <br>
+                                        </span>
                                     </div>
                                     <div class="Cart-buttons">
                                         <div class="Cart-btn">
                                             <button class="btn btn_primary btn_outline" data-sendstatus="KEPT"
-                                                    data-bookid="[1122]"><span class="btn-icon"><img
-                                                    src="/assets/img/icons/heart.svg" alt="heart.svg"/></span><span
-                                                    class="btn-content" th:text="#{cart.postpone}">Отложить</span>
+                                                    th:data-bookid="${book.slug}">
+                                                <span class="btn-icon">
+                                                <img src="/assets/img/icons/heart.svg" alt="heart.svg"/>
+                                                </span>
+                                                <span class="btn-content" th:text="#{cart.postpone}">Отложить
+                                                </span>
                                             </button>
                                         </div>
                                         <div class="Cart-btn">
-                                            <button class="btn btn_danger btn_outline" data-sendstatus="UNLINK"
-                                                    data-bookid="[1122]"><span class="btn-icon"><img
-                                                    src="/assets/img/icons/trash.svg" alt="trash.svg"/></span><span
-                                                    class="btn-content" th:text="#{cart.remove}">Удалить</span>
+                                            <button class="btn btn_danger btn_outline" data-sendstatus="REMOVE_FROM_CART"
+                                                    th:data-bookid="${book.slug}">
+                                                <span class="btn-icon">
+                                                    <img src="/assets/img/icons/trash.svg" alt="trash.svg"/>
+                                                </span>
+                                                <span class="btn-content" th:text="#{cart.remove}">Удалить
+                                                </span>
                                             </button>
                                         </div>
                                     </div>
@@ -109,10 +99,10 @@
                                 <div class="Cart-block Cart-block_price">
                                     <div class="Cart-priceTitle" th:text="#{cart.price}">Цена:
                                     </div>
-                                    <div class="Cart-price" th:text="${#numbers.formatDecimal(book.price * (100 - book.discount) / 100, 1, 2)}">254 р.
+                                    <div class="Cart-price" th:text="'₽' + ${#numbers.formatDecimal(book.price * (100 - book.discount) / 100, 1, 2)}">254 р.
                                     </div>
                                     <div class="Cart-price_old" th:if="${book.discount != 0}"
-                                         th:text="${#numbers.formatDecimal(book.price, 1, 2)}">999 р.
+                                         th:text="'₽' + ${#numbers.formatDecimal(book.price, 1, 2)}">999 р.
                                     </div>
                                 </div>
                             </div>
@@ -128,8 +118,9 @@
                         <span class="Cart-price_old" th:if="${totalPrice != totalDiscountPrice}" th:text="'₽' + ${#numbers.formatDecimal(totalPrice, 1, 2)}">658 р.
                         </span>
                     </div>
-                    <div class="Cart-block"><a class="btn btn_success btn_md" href="/order.html"
-                                               th:text="#{cart.buy}">Купить</a>
+                    <div class="Cart-block">
+                        <a class="btn btn_success btn_md" href="/order.html" th:text="#{cart.buy}">Купить
+                        </a>
                     </div>
                 </div>
             </form>

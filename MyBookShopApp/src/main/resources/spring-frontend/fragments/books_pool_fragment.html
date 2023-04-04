@@ -4,13 +4,13 @@
     <div class="Cards">
         <div class="Card" th:each="book: ${booksList}">
             <div class="Card-picture">
-                <a th:href="@{/books/{slug}(slug=${book.slug})}">
+                <a th:href="@{'/books/' + ${book.slug}}">
                     <img th:src="${book.image}" alt="card.jpg"/>
                 </a>
             </div>
             <div class="card-content">
                 <strong class="Card-title">
-                    <a th:href="@{/books/{slug}(slug=${book.slug})}" th:text="${book.title}"></a>
+                    <a th:href="@{'/books/' + ${book.slug}}" th:text="${book.title}"></a>
                 </strong>
                 <div class="Card-description" th:text="${book.authorFirstName} + ' ' + ${book.authorLastName}"></div>
                 <div class="card cost">

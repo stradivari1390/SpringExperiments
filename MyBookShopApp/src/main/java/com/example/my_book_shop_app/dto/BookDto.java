@@ -31,9 +31,15 @@ public class BookDto {
     @ApiModelProperty("The discount on the book's price")
     private Integer discount;
 
+    @ApiModelProperty("The rating of the book from 1 to 5")
+    private Short rating;
+
     @ApiModelProperty("The first name of the book's author")
     private String authorFirstName;
 
     @ApiModelProperty("The last name of the book's author")
     private String authorLastName;
+
+    @ApiModelProperty("The slug of the book's author")
+    private String authorSlug;
 }

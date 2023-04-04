@@ -35,4 +35,8 @@ public class AuthorService {
     public int countAuthorsBooks(String slug) {
         return authorRepository.countBooksByAuthorSlug(slug);
     }
+
+    public Author getAuthorByBookSlug(String bookSlug) {
+        return authorRepository.findAuthorByBookSlug(bookSlug);
+    }
 }

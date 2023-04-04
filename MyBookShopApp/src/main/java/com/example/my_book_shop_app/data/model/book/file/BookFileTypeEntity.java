@@ -28,8 +28,12 @@ public class BookFileTypeEntity {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof BookFileTypeEntity)) return false;
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof BookFileTypeEntity)) {
+            return false;
+        }
         BookFileTypeEntity that = (BookFileTypeEntity) o;
         return getId() == that.getId() &&
                 getName().equals(that.getName()) &&

@@ -1,29 +1,38 @@
 package com.example.my_book_shop_app.services;
 
 import com.example.my_book_shop_app.data.model.Book;
+import com.example.my_book_shop_app.data.model.book.review.BookRateEntity;
+import com.example.my_book_shop_app.data.repositories.BookRateEntityRepository;
 import com.example.my_book_shop_app.data.repositories.BookRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 public class BooksRatingAndPopularityService {
 
     private final BookRepository bookRepository;
+    private final BookRateEntityRepository bookRateEntityRepository;
 
     @Autowired
-    public BooksRatingAndPopularityService(BookRepository bookRepository) {
+    public BooksRatingAndPopularityService(BookRepository bookRepository,
+                                           BookRateEntityRepository bookRateEntityRepository) {
         this.bookRepository = bookRepository;
+        this.bookRateEntityRepository = bookRateEntityRepository;
     }
 
-    @Scheduled(fixedRate = 3600000)
-    public void updatePopularity() {
+    @Scheduled(fixedRate = 3600000/*, initialDelay = 3600000*/)
+    public void updatePopularityAndRating() {
         List<Book> books = bookRepository.findAll();
         for (Book book : books) {
             double popularity = calculatePopularity(book);
             book.setPopularity(popularity);
+            short rating = calculateRating(book);
+            book.setRating(rating);
         }
         bookRepository.saveAll(books);
     }
@@ -33,8 +42,32 @@ public class BooksRatingAndPopularityService {
         double inCartWeight = 0.7;
         double postponedWeight = 0.4;
 
-        return purchasedWeight * bookRepository.getPurchasesCount(book.getId())
-                + inCartWeight * bookRepository.getInCartCount(book.getId())
-                + postponedWeight * bookRepository.getPostponesCount(book.getId());
+        return purchasedWeight * bookRepository.getPurchasesCount(book.getSlug())
+                + inCartWeight * bookRepository.getInCartCount(book.getSlug())
+                + postponedWeight * bookRepository.getPostponesCount(book.getSlug());
+    }
+
+    public short calculateRating(Book book) {
+        return (short) (Math.round(bookRateEntityRepository.getRatingByBookSlug(book.getSlug())));
+    }
+
+    public Map<Short, Integer> calculateStarRatesByBookSlug(String slug) {
+        List<BookRateEntity> bookRateEntityList = bookRateEntityRepository.findAllByBookSlug(slug);
+        return bookRateEntityList.stream()
+                .collect(Collectors.groupingBy(BookRateEntity::getValue, Collectors.counting()))
+                .entrySet()
+                .stream()
+                .collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().intValue()));
+    }
+
+    public Integer countRatesByBookSlug(String slug) {
+        return bookRateEntityRepository.countByBookSlug(slug);
+    }
+
+    public void addRating(Long bookId, Short value) {
+        BookRateEntity bookRateEntity = new BookRateEntity();
+        bookRateEntity.setBookId(bookId);
+        bookRateEntity.setValue(value);
+        bookRateEntityRepository.save(bookRateEntity);
     }
 }

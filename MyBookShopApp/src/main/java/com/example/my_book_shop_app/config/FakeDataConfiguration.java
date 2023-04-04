@@ -20,11 +20,12 @@ public class FakeDataConfiguration {
                                          BookReviewLikeEntityRepository bookReviewLikeEntityRepository, DocumentEntityRepository documentEntityRepository,
                                          FaqEntityRepository faqEntityRepository, FileDownloadEntityRepository fileDownloadEntityRepository,
                                          MessageEntityRepository messageEntityRepository, UserContactEntityRepository userContactEntityRepository,
-                                         TagEntityRepository tagEntityRepository, Book2TagEntityRepository book2TagEntityRepository) {
+                                         TagEntityRepository tagEntityRepository, Book2TagEntityRepository book2TagEntityRepository,
+                                         BookRateEntityRepository bookRateEntityRepository) {
         return new FakeDataFiller(authorRepository, bookRepository, book2AuthorRepository, bookFileEntityRepository,
                 bookFileTypeEntityRepository, genreRepository, userRepository, balanceTransactionEntityRepository,
                 book2GenreEntityRepository, book2UserEntityRepository, book2UserTypeEntityRepository, bookReviewEntityRepository,
                 bookReviewLikeEntityRepository, documentEntityRepository, faqEntityRepository, fileDownloadEntityRepository,
-                messageEntityRepository, userContactEntityRepository, tagEntityRepository, book2TagEntityRepository);
+                messageEntityRepository, userContactEntityRepository, tagEntityRepository, book2TagEntityRepository, bookRateEntityRepository);
     }
 }

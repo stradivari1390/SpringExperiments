@@ -14,4 +14,11 @@ public interface AuthorRepository extends JpaRepository<Author, Long> {
             "JOIN Author a ON ba.authorId = a.id " +
             "WHERE a.slug = :slug")
     int countBooksByAuthorSlug(@RequestParam("slug") String slug);
+
+    @Query(value = "SELECT a " +
+            "FROM Author a " +
+            "JOIN Book2AuthorEntity ba ON a.id = ba.authorId " +
+            "JOIN Book b ON ba.bookId = b.id " +
+            "WHERE b.slug = :bookSlug")
+    Author findAuthorByBookSlug(@RequestParam("bookSlug") String bookSlug);
 }
