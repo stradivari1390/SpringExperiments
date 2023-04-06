@@ -2,15 +2,11 @@ package com.example.my_book_shop_app.data.model;
 
 import lombok.*;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.time.LocalDate;
-import java.util.Objects;
 
-
-@Getter
-@Setter
-@ToString
 @NoArgsConstructor
+@Data
 @Entity
 @Table(name = "books", indexes = {
         @Index(name = "idx_book_price", columnList = "price"),
@@ -55,23 +51,4 @@ public class Book {
 
     @Column(name = "rating")
     private short rating;
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (!(o instanceof Book)) {
-            return false;
-        }
-        Book book = (Book) o;
-        return getId().equals(book.getId()) &&
-                getTitle().equals(book.getTitle()) &&
-                getPrice() == book.getPrice();
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(getId(), getTitle(), getPrice());
-    }
 }

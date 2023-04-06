@@ -1,17 +1,11 @@
 package com.example.my_book_shop_app.data.model.other;
 
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 
-import javax.persistence.*;
-import java.util.Objects;
+import jakarta.persistence.*;
 
-@Getter
-@Setter
-@ToString
 @NoArgsConstructor
+@Data
 @Entity
 @Table(name = "document")
 public class DocumentEntity {
@@ -32,26 +26,4 @@ public class DocumentEntity {
 
     @Column(columnDefinition = "TEXT NOT NULL")
     private String text;
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (!(o instanceof DocumentEntity)) {
-            return false;
-        }
-        DocumentEntity that = (DocumentEntity) o;
-        return getId().equals(that.getId()) &&
-                getSortIndex() == that.getSortIndex() &&
-                getSlug().equals(that.getSlug()) &&
-                getTitle().equals(that.getTitle()) &&
-                getText().equals(that.getText());
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(getId(), getSortIndex(),
-                getSlug(), getTitle(), getText());
-    }
 }

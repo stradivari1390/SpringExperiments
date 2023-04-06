@@ -1,17 +1,11 @@
 package com.example.my_book_shop_app.data.model.book.file;
 
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 
-import javax.persistence.*;
-import java.util.Objects;
+import jakarta.persistence.*;
 
-@Getter
-@Setter
-@ToString
 @NoArgsConstructor
+@Data
 @Entity
 @Table(name = "file_download")
 public class FileDownloadEntity {
@@ -29,22 +23,4 @@ public class FileDownloadEntity {
 
     @Column(columnDefinition = "INT NOT NULL DEFAULT 1")
     private int count;
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (!(o instanceof FileDownloadEntity)) {
-            return false;
-        }
-        FileDownloadEntity that = (FileDownloadEntity) o;
-        return getUserId().equals(that.getUserId()) &&
-                getBookId().equals(that.getBookId());
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(getId(), getUserId(), getBookId(), getCount());
-    }
 }

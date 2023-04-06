@@ -1,19 +1,13 @@
 package com.example.my_book_shop_app.data.model.user;
 
 import com.example.my_book_shop_app.data.model.enums.ContactType;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.time.LocalDateTime;
-import java.util.Objects;
 
-@Getter
-@Setter
-@ToString
 @NoArgsConstructor
+@Data
 @Entity
 @Table(name = "user_contact", indexes = {
         @Index(name = "idx_usercontactentity_userid", columnList = "userId, type")
@@ -34,7 +28,7 @@ public class UserContactEntity {
     @Column(columnDefinition = "SMALLINT NOT NULL")
     private short approved;
 
-    @Column(columnDefinition = "VARCHAR(255) NOT NULL")
+    @Column(columnDefinition = "VARCHAR(255)")
     private String code;
 
     @Column(columnDefinition = "INT")
@@ -46,28 +40,11 @@ public class UserContactEntity {
     @Column(columnDefinition = "VARCHAR(255) NOT NULL")
     private String contact;
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (!(o instanceof UserContactEntity)) {
-            return false;
-        }
-        UserContactEntity that = (UserContactEntity) o;
-        return getId() == that.getId() &&
-                getUserId().equals(that.getUserId()) &&
-                getApproved() == that.getApproved() &&
-                getCodeTrails() == that.getCodeTrails() &&
-                getType() == that.getType() &&
-                getCode().equals(that.getCode()) &&
-                getCodeTime().equals(that.getCodeTime()) &&
-                getContact().equals(that.getContact());
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(getId(), getUserId(), getType(), getApproved(),
-                getCode(), getCodeTrails(), getCodeTime(), getContact());
+    public UserContactEntity(Long userId, ContactType type,
+                             short approved, String contact) {
+        this.userId = userId;
+        this.type = type;
+        this.approved = approved;
+        this.contact = contact;
     }
 }

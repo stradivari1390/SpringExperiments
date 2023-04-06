@@ -1,17 +1,11 @@
 package com.example.my_book_shop_app.data.model.other;
 
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 
-import javax.persistence.*;
-import java.util.Objects;
+import jakarta.persistence.*;
 
-@Getter
-@Setter
-@ToString
 @NoArgsConstructor
+@Data
 @Entity
 @Table(name = "faq")
 public class FaqEntity {
@@ -29,24 +23,4 @@ public class FaqEntity {
 
     @Column(columnDefinition = "TEXT NOT NULL")
     private String answer;
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (!(o instanceof FaqEntity)) {
-            return false;
-        }
-        FaqEntity faqEntity = (FaqEntity) o;
-        return getId().equals(faqEntity.getId()) &&
-                getSortIndex() == faqEntity.getSortIndex() &&
-                getQuestion().equals(faqEntity.getQuestion()) &&
-                getAnswer().equals(faqEntity.getAnswer());
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(getId(), getSortIndex(), getQuestion(), getAnswer());
-    }
 }

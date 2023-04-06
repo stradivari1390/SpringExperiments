@@ -3,6 +3,8 @@ package com.example.my_book_shop_app.services;
 import com.example.my_book_shop_app.data.repositories.Book2UserEntityRepository;
 import com.example.my_book_shop_app.data.repositories.BookRepository;
 import com.example.my_book_shop_app.dto.BookDto;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -10,8 +12,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;

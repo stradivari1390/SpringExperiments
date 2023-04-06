@@ -2,13 +2,10 @@ package com.example.my_book_shop_app.data.model;
 
 import lombok.*;
 
-import javax.persistence.*;
-import java.util.Objects;
+import jakarta.persistence.*;
 
-@Getter
-@Setter
-@ToString
 @NoArgsConstructor
+@Data
 @Entity
 @Table(name = "authors", indexes = {
         @Index(name = "idx_author_first_name", columnList = "first_name"),
@@ -25,7 +22,7 @@ public class Author {
     @Column(name = "photo")
     private String photo;
 
-    @Column(name = "slug", nullable = false, unique = true)
+    @Column(name = "slug", nullable = false)
     private String slug;
 
     @Column(name = "first_name", nullable = false)
@@ -36,23 +33,4 @@ public class Author {
 
     @Column(name = "description", columnDefinition = "TEXT")
     private String description;
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (!(o instanceof Author)) {
-            return false;
-        }
-        Author author = (Author) o;
-        return getId().equals(author.getId()) &&
-                getFirstName().equals(author.getFirstName()) &&
-                getLastName().equals(author.getLastName());
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(getId(), getFirstName(), getLastName());
-    }
 }

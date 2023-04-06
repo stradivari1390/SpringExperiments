@@ -1,18 +1,12 @@
 package com.example.my_book_shop_app.data.model.book.review;
 
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.time.LocalDateTime;
-import java.util.Objects;
 
-@Getter
-@Setter
-@ToString
 @NoArgsConstructor
+@Data
 @Entity
 @Table(name = "message")
 public class MessageEntity {
@@ -39,24 +33,4 @@ public class MessageEntity {
 
     @Column(columnDefinition = "TEXT NOT NULL")
     private String text;
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (!(o instanceof MessageEntity)) {
-            return false;
-        }
-        MessageEntity that = (MessageEntity) o;
-        return getId().equals(that.getId()) &&
-                getUserId().equals(that.getUserId()) &&
-                getTime().equals(that.getTime()) &&
-                getText().equals(that.getText());
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(getId(), getTime(), getUserId(), getText());
-    }
 }

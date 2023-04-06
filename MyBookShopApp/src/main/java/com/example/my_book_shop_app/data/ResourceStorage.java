@@ -2,7 +2,8 @@ package com.example.my_book_shop_app.data;
 
 import com.example.my_book_shop_app.data.model.book.file.BookFileEntity;
 import com.example.my_book_shop_app.data.repositories.BookFileEntityRepository;
-import liquibase.util.file.FilenameUtils;
+
+import org.apache.commons.io.FilenameUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;

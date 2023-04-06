@@ -1,17 +1,11 @@
 package com.example.my_book_shop_app.data.model.book.links;
 
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 
-import javax.persistence.*;
-import java.util.Objects;
+import jakarta.persistence.*;
 
-@Getter
-@Setter
-@ToString
 @NoArgsConstructor
+@Data
 @Entity
 @Table(name = "book2genre", indexes = {
         @Index(name = "idx_book2genreentity_unq", columnList = "bookId, genreId", unique = true)
@@ -27,23 +21,4 @@ public class Book2GenreEntity {
 
     @Column(columnDefinition = "INT NOT NULL")
     private int genreId;
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (!(o instanceof Book2GenreEntity)) {
-            return false;
-        }
-        Book2GenreEntity that = (Book2GenreEntity) o;
-        return getId() == that.getId() &&
-                getBookId().equals(that.getBookId()) &&
-                getGenreId() == that.getGenreId();
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(getId(), getBookId(), getGenreId());
-    }
 }

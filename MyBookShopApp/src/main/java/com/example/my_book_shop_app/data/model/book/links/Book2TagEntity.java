@@ -1,16 +1,11 @@
 package com.example.my_book_shop_app.data.model.book.links;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 
 @NoArgsConstructor
-@AllArgsConstructor
-@Getter
-@Setter
+@Data
 @Entity
 @Table(name = "book2tag_entity", indexes = {
         @Index(name = "idx_book2tagentity_bookid_unq", columnList = "bookId, tagId", unique = true)

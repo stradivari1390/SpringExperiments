@@ -34,10 +34,10 @@
           <p>
             <span th:text="#{footer.languageSelection}"></span>
             <select id="locales" onchange="location.href=this.value;">
-              <option th:value="'?lang=en' + (${#request.getQueryString() != null ? ('&amp;' + #request.getQueryString()) : ''})"
+              <option th:value="'?lang=en' + (${param.get('query') != null ? ('&amp;query=' + param.get('query')) : ''})"
                       th:selected="${#locale.toString() == 'en'}"
                       th:text="#{footer.englishLanguage}"></option>
-              <option th:value="'?lang=ru' + (${#request.getQueryString() != null ? ('&amp;' + #request.getQueryString()) : ''})"
+              <option th:value="'?lang=ru' + (${param.get('query') != null ? ('&amp;query=' + param.get('query')) : ''})"
                       th:selected="${#locale.toString() == 'ru'}"
                       th:text="#{footer.russianLanguage}"></option>
             </select>

@@ -1,17 +1,10 @@
 package com.example.my_book_shop_app.data.model.book.file;
 
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
+import jakarta.persistence.*;
+import lombok.*;
 
-import javax.persistence.*;
-import java.util.Objects;
-
-@Getter
-@Setter
 @NoArgsConstructor
-@ToString
+@Data
 @Entity
 @Table(name = "book_file")
 public class BookFileEntity {
@@ -32,24 +25,4 @@ public class BookFileEntity {
 
     @Column(name = "book_id", nullable = false)
     private Long bookId;
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (!(o instanceof BookFileEntity)) {
-            return false;
-        }
-        BookFileEntity that = (BookFileEntity) o;
-        return getFileType() == that.getFileType() &&
-                getId().equals(that.getId()) &&
-                getHash().equals(that.getHash()) &&
-                getPath().equals(that.getPath());
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(getId(), getHash(), getFileType(), getPath());
-    }
 }

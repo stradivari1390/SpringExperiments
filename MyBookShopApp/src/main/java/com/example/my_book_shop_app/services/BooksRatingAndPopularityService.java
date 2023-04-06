@@ -7,6 +7,7 @@ import com.example.my_book_shop_app.data.repositories.BookRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Map;
@@ -25,14 +26,13 @@ public class BooksRatingAndPopularityService {
         this.bookRateEntityRepository = bookRateEntityRepository;
     }
 
-    @Scheduled(fixedRate = 3600000/*, initialDelay = 3600000*/)
-    public void updatePopularityAndRating() {
+//    @Transactional
+    @Scheduled(fixedRate = 1000*60*60*24, initialDelay = 1000*60*60)
+    public void updatePopularity() {
         List<Book> books = bookRepository.findAll();
         for (Book book : books) {
             double popularity = calculatePopularity(book);
             book.setPopularity(popularity);
-            short rating = calculateRating(book);
-            book.setRating(rating);
         }
         bookRepository.saveAll(books);
     }
@@ -69,5 +69,12 @@ public class BooksRatingAndPopularityService {
         bookRateEntity.setBookId(bookId);
         bookRateEntity.setValue(value);
         bookRateEntityRepository.save(bookRateEntity);
+
+        Book book = bookRepository.findById(bookId).orElse(null);
+        if (book != null) {
+            short rating = calculateRating(book);
+            book.setRating(rating);
+            bookRepository.save(book);
+        }
     }
 }

@@ -1,12 +1,11 @@
 package com.example.my_book_shop_app.controllers;
 
+import jakarta.servlet.RequestDispatcher;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.boot.web.servlet.error.ErrorController;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
-
-import javax.servlet.RequestDispatcher;
-import javax.servlet.http.HttpServletRequest;
 
 @Controller
 public class CustomErrorController implements ErrorController {

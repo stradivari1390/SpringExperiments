@@ -1,6 +1,7 @@
 package com.example.my_book_shop_app.config;
 
 import com.example.my_book_shop_app.data.repositories.*;
+import com.example.my_book_shop_app.services.BooksRatingAndPopularityService;
 import com.example.my_book_shop_app.util.FakeDataFiller;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
@@ -21,11 +22,11 @@ public class FakeDataConfiguration {
                                          FaqEntityRepository faqEntityRepository, FileDownloadEntityRepository fileDownloadEntityRepository,
                                          MessageEntityRepository messageEntityRepository, UserContactEntityRepository userContactEntityRepository,
                                          TagEntityRepository tagEntityRepository, Book2TagEntityRepository book2TagEntityRepository,
-                                         BookRateEntityRepository bookRateEntityRepository) {
+                                         BookRateEntityRepository bookRateEntityRepository, BooksRatingAndPopularityService booksRatingAndPopularityService) {
         return new FakeDataFiller(authorRepository, bookRepository, book2AuthorRepository, bookFileEntityRepository,
                 bookFileTypeEntityRepository, genreRepository, userRepository, balanceTransactionEntityRepository,
                 book2GenreEntityRepository, book2UserEntityRepository, book2UserTypeEntityRepository, bookReviewEntityRepository,
                 bookReviewLikeEntityRepository, documentEntityRepository, faqEntityRepository, fileDownloadEntityRepository,
-                messageEntityRepository, userContactEntityRepository, tagEntityRepository, book2TagEntityRepository, bookRateEntityRepository);
+                messageEntityRepository, userContactEntityRepository, tagEntityRepository, book2TagEntityRepository, bookRateEntityRepository, booksRatingAndPopularityService);
     }
 }

@@ -1,12 +1,12 @@
 package com.example.my_book_shop_app.controllers;
 
 import com.example.my_book_shop_app.services.CartService;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletResponse;
 import java.util.Collections;
 
 @Controller
@@ -28,23 +28,17 @@ public class CartController {
                                          @CookieValue(name = "archivedContents", required = false) String archivedContents,
                                          HttpServletResponse response) {
         switch (status) {
-            case "CART":
-                cartService.addToCart(slug, 1L, cartContents, postponedContents, response);
-                break;
-            case "MASS_CART":
+            case "CART" -> cartService.addToCart(slug, 1L, cartContents, postponedContents, response);
+            case "MASS_CART" -> {
                 String[] bookIds = slug.split(",");
                 for (String bookId : bookIds) {
                     cartService.addToCart(bookId, 1L, cartContents, postponedContents, response);
                 }
-                break;
-            case "KEPT":
-                cartService.addToPostponed(slug, 1L, cartContents, postponedContents, response);
-                break;
-            case "ARCHIVED":
-                cartService.addToArchived(slug, 1L, archivedContents, response);
-                break;
-            default:
-                break;
+            }
+            case "KEPT" -> cartService.addToPostponed(slug, 1L, cartContents, postponedContents, response);
+            case "ARCHIVED" -> cartService.addToArchived(slug, 1L, archivedContents, response);
+            default -> {
+            }
         }
         if (referer != null && !referer.isEmpty()) {
             return "redirect:" + referer;

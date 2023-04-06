@@ -1,18 +1,12 @@
 package com.example.my_book_shop_app.data.model.user;
 
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.time.LocalDateTime;
-import java.util.Objects;
 
-@Getter
-@Setter
-@ToString
 @NoArgsConstructor
+@Data
 @Entity
 @Table(name = "users")
 public class UserEntity {
@@ -28,30 +22,15 @@ public class UserEntity {
     @Column(columnDefinition = "TIMESTAMP NOT NULL")
     private LocalDateTime regTime;
 
-    @Column(columnDefinition = "INT NOT NULL")
-    private int balance;
+    @Column(columnDefinition = "DOUBLE PRECISION NOT NULL")
+    private double balance;
 
     @Column(columnDefinition = "VARCHAR(255) NOT NULL")
     private String name;
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (!(o instanceof UserEntity)) {
-            return false;
-        }
-        UserEntity that = (UserEntity) o;
-        return getId().equals(that.getId()) &&
-                getBalance() == that.getBalance() &&
-                getHash().equals(that.getHash()) &&
-                getRegTime().equals(that.getRegTime()) &&
-                getName().equals(that.getName());
-    }
+    @Column(columnDefinition = "VARCHAR(255) NOT NULL")
+    private String username;
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(getId(), getHash(), getRegTime(), getBalance(), getName());
-    }
+    @Column(columnDefinition = "VARCHAR(255) NOT NULL")
+    private String password;
 }

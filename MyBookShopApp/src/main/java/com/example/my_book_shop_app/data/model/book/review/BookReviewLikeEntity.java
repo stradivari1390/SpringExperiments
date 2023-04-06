@@ -1,18 +1,12 @@
 package com.example.my_book_shop_app.data.model.book.review;
 
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.time.LocalDateTime;
-import java.util.Objects;
 
-@Getter
-@Setter
-@ToString
 @NoArgsConstructor
+@Data
 @Entity
 @Table(name = "book_review_like", indexes = {
         @Index(name = "idx_bookreviewlikeentity", columnList = "reviewId"),
@@ -35,25 +29,4 @@ public class BookReviewLikeEntity {
 
     @Column(columnDefinition = "SMALLINT NOT NULL")
     private short value;
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (!(o instanceof BookReviewLikeEntity)) {
-            return false;
-        }
-        BookReviewLikeEntity that = (BookReviewLikeEntity) o;
-        return getId() == that.getId() &&
-                getReviewId() == that.getReviewId() &&
-                getUserId().equals(that.getUserId()) &&
-                getValue() == that.getValue() &&
-                getTime().equals(that.getTime());
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(getId(), getReviewId(), getUserId(), getTime(), getValue());
-    }
 }

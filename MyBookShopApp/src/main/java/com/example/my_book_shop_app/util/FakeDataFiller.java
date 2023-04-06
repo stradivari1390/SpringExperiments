@@ -19,10 +19,13 @@ import com.example.my_book_shop_app.data.model.tag.TagEntity;
 import com.example.my_book_shop_app.data.model.user.UserContactEntity;
 import com.example.my_book_shop_app.data.model.user.UserEntity;
 import com.example.my_book_shop_app.data.repositories.*;
+import com.example.my_book_shop_app.services.BooksRatingAndPopularityService;
+
 import com.github.javafaker.Faker;
+
 import org.springframework.beans.factory.annotation.Value;
 
-import javax.annotation.PostConstruct;
+import jakarta.annotation.PostConstruct;
 import java.io.File;
 import java.io.IOException;
 import java.time.LocalDate;
@@ -55,7 +58,7 @@ public class FakeDataFiller {
     private final TagEntityRepository tagEntityRepository;
     private final Book2TagEntityRepository book2TagEntityRepository;
     private final BookRateEntityRepository bookRateEntityRepository;
-    private final Random random = new Random();
+    private final BooksRatingAndPopularityService booksRatingAndPopularityService;
     private final Faker faker = new Faker(new Locale("en"));
 
     public FakeDataFiller(AuthorRepository authorRepository, BookRepository bookRepository,
@@ -68,7 +71,7 @@ public class FakeDataFiller {
                           FaqEntityRepository faqEntityRepository, FileDownloadEntityRepository fileDownloadEntityRepository,
                           MessageEntityRepository messageEntityRepository, UserContactEntityRepository userContactEntityRepository,
                           TagEntityRepository tagEntityRepository, Book2TagEntityRepository book2TagEntityRepository,
-                          BookRateEntityRepository bookRateEntityRepository) {
+                          BookRateEntityRepository bookRateEntityRepository, BooksRatingAndPopularityService booksRatingAndPopularityService) {
         this.authorRepository = authorRepository;
         this.bookRepository = bookRepository;
         this.book2AuthorRepository = book2AuthorRepository;
@@ -90,10 +93,38 @@ public class FakeDataFiller {
         this.tagEntityRepository = tagEntityRepository;
         this.book2TagEntityRepository = book2TagEntityRepository;
         this.bookRateEntityRepository = bookRateEntityRepository;
+        this.booksRatingAndPopularityService = booksRatingAndPopularityService;
     }
 
     @Value("${download.path}")
     private String downloadPath;
+
+    @Value("${data.generation.authors}")
+    private int authorsAmount;
+    @Value("${data.generation.books}")
+    private int booksAmount;
+    @Value("${data.generation.genres}")
+    private int genresAmount;
+    @Value("${data.generation.tags}")
+    private int tagsAmount;
+    @Value("${data.generation.fileTypes}")
+    private int fileTypesAmount;
+    @Value("${data.generation.users}")
+    private int usersAmount;
+    @Value("${data.generation.book2user}")
+    private int book2userAmount;
+    @Value("${data.generation.transactions}")
+    private int transactionsAmount;
+    @Value("${data.generation.reviewLikes}")
+    private int reviewLikesAmount;
+    @Value("${data.generation.documents}")
+    private int documentsAmount;
+    @Value("${data.generation.faqs}")
+    private int faqsAmount;
+    @Value("${data.generation.messages}")
+    private int messagesAmount;
+    @Value("${data.generation.bookRatings}")
+    private int bookRatingsAmount;
 
     private void generateRandomAuthors(int amount) {
         List<Author> authors = new ArrayList<>();
@@ -103,7 +134,7 @@ public class FakeDataFiller {
             author.setSlug(UUID.randomUUID().toString());
             author.setFirstName(faker.name().firstName());
             author.setLastName(faker.name().lastName());
-            String description = String.join("\n", faker.lorem().paragraphs(random.nextInt(5) + 5));
+            String description = String.join("\n", faker.lorem().paragraphs(faker.random().nextInt(5) + 5));
             author.setDescription(description);
             authors.add(author);
         }
@@ -114,14 +145,14 @@ public class FakeDataFiller {
         List<Book> books = new ArrayList<>();
         for (int i = 0; i < amount; i++) {
             Book book = new Book();
-            book.setPublicationDate(LocalDate.now().minusDays(random.nextInt(365 * 10)));
-            book.setBestseller(random.nextBoolean());
+            book.setPublicationDate(LocalDate.now().minusDays(faker.random().nextInt(365 * 10)));
+            book.setBestseller(faker.random().nextBoolean());
             book.setSlug(UUID.randomUUID().toString());
             book.setTitle(faker.book().title());
             book.setImage("/assets/img/content/main/card1.jpg");
             book.setDescription("This is a description of Book " + book.getTitle());
-            book.setPrice((random.nextInt(5000) + 100) + random.nextDouble());
-            book.setDiscount(random.nextInt(51));
+            book.setPrice((faker.random().nextInt(5000) + 100) + faker.random().nextDouble());
+            book.setDiscount(faker.random().nextInt(51));
             books.add(book);
         }
         bookRepository.saveAll(books);
@@ -134,9 +165,9 @@ public class FakeDataFiller {
         for (Book book : books) {
             Book2AuthorEntity book2AuthorEntity = new Book2AuthorEntity();
             book2AuthorEntity.setBookId(book.getId());
-            Author author = authors.get(random.nextInt(authors.size()));
+            Author author = authors.get(faker.random().nextInt(authors.size()));
             book2AuthorEntity.setAuthorId(author.getId());
-            book2AuthorEntity.setSortIndex(random.nextInt(100));
+            book2AuthorEntity.setSortIndex(faker.random().nextInt(100));
             book2AuthorEntities.add(book2AuthorEntity);
         }
         book2AuthorRepository.saveAll(book2AuthorEntities);
@@ -169,8 +200,8 @@ public class FakeDataFiller {
         }
         genreRepository.saveAll(genres);
         for (GenreEntity genre : genres) {
-            if (random.nextBoolean()) {
-                genre.setParentId(genres.get(random.nextInt(genres.size())).getId());
+            if (faker.random().nextBoolean()) {
+                genre.setParentId(genres.get(faker.random().nextInt(genres.size())).getId());
             } else {
                 genre.setParentId(null);
             }
@@ -197,11 +228,11 @@ public class FakeDataFiller {
         List<BookFileTypeEntity> fileTypes = bookFileTypeEntityRepository.findAll();
 
         for (Book book : books) {
-            int numberOfBookFiles = random.nextInt(fileTypes.size() + 1);
+            int numberOfBookFiles = faker.random().nextInt(fileTypes.size() + 1);
 
             for (int j = 0; j < numberOfBookFiles; j++) {
                 BookFileEntity bookFile = new BookFileEntity();
-                BookFileTypeEntity fileType = fileTypes.get(j % fileTypes.size());
+                BookFileTypeEntity fileType = fileTypes.get(j);
                 bookFile.setHash(UUID.randomUUID().toString());
                 bookFile.setFileType(fileType.getId());
                 bookFile.setBookId(book.getId());
@@ -246,11 +277,13 @@ public class FakeDataFiller {
             UserEntity user = new UserEntity();
             user.setHash(UUID.randomUUID().toString());
             user.setRegTime(LocalDateTime.now()
-                    .minusDays(random.nextInt(365 * 5))
-                    .minusHours(random.nextInt(24))
-                    .minusMinutes(random.nextInt(60)));
-            user.setBalance(random.nextInt(100000));
+                    .minusDays(faker.random().nextInt(365 * 5))
+                    .minusHours(faker.random().nextInt(24))
+                    .minusMinutes(faker.random().nextInt(60)));
+            user.setBalance(faker.random().nextInt(100000));
             user.setName(faker.name().fullName());
+            user.setUsername("");
+            user.setPassword("");
             users.add(user);
         }
         userRepository.saveAll(users);
@@ -262,14 +295,14 @@ public class FakeDataFiller {
         List<Book2GenreEntity> book2GenreEntities = new ArrayList<>();
 
         for (Book book : books) {
-            int numberOfGenres = random.nextInt(3) + 1;
+            int numberOfGenres = faker.random().nextInt(3) + 1;
             Set<GenreEntity> assignedGenres = new HashSet<>();
 
             for (int i = 0; i < numberOfGenres; i++) {
-                GenreEntity genre = genres.get(random.nextInt(genres.size()));
+                GenreEntity genre = genres.get(faker.random().nextInt(genres.size()));
 
                 while (assignedGenres.contains(genre)) {
-                    genre = genres.get(random.nextInt(genres.size()));
+                    genre = genres.get(faker.random().nextInt(genres.size()));
                 }
                 assignedGenres.add(genre);
 
@@ -288,15 +321,15 @@ public class FakeDataFiller {
         List<Book2UserEntity> book2UserEntities = new ArrayList<>();
 
         for (int i = 0; i < amount; i++) {
-            UserEntity user = users.get(random.nextInt(users.size()));
-            Book book = books.get(random.nextInt(books.size()));
+            UserEntity user = users.get(faker.random().nextInt(users.size()));
+            Book book = books.get(faker.random().nextInt(books.size()));
             if (book2UserEntityRepository.findByUserIdAndBookId(user.getId(), book.getId()) != null) {
                 continue;
             }
             LocalDateTime book2UserTime = LocalDateTime.now()
-                    .minusDays(random.nextInt(365 * 5))
-                    .minusHours(random.nextInt(24))
-                    .minusMinutes(random.nextInt(60));
+                    .minusDays(faker.random().nextInt(365 * 5))
+                    .minusHours(faker.random().nextInt(24))
+                    .minusMinutes(faker.random().nextInt(60));
 
             if (book2UserTime.isAfter(user.getRegTime()) && book2UserTime.isAfter(book.getPublicationDate().atStartOfDay())) {
                 Book2UserEntity book2UserEntity = new Book2UserEntity();
@@ -307,10 +340,10 @@ public class FakeDataFiller {
                 if (transaction != null) {
                     book2UserEntity.setTypeId(2);
                     if (book2UserTime.isBefore(transaction.getTime())) {
-                        book2UserEntity.setTime(transaction.getTime().plusSeconds(random.nextInt(60)));
+                        book2UserEntity.setTime(transaction.getTime().plusSeconds(faker.random().nextInt(60)));
                     }
                 } else {
-                    book2UserEntity.setTypeId(random.nextInt(2) + 3);
+                    book2UserEntity.setTypeId(faker.random().nextInt(2) + 3);
                 }
                 book2UserEntities.add(book2UserEntity);
             } else {
@@ -320,7 +353,7 @@ public class FakeDataFiller {
         List<Book2UserEntity> b2uList = book2UserEntityRepository.findAllByTypeId(2);
         for (int i = 0; i < b2uList.size(); i += 10) {
             b2uList.get(i).setTypeId(1);
-            b2uList.get(i).setTime(b2uList.get(i).getTime().plusDays(random.nextInt(180) + 90));
+            b2uList.get(i).setTime(b2uList.get(i).getTime().plusDays(faker.random().nextInt(180) + 90));
         }
         book2UserEntityRepository.saveAll(book2UserEntities);
     }
@@ -344,14 +377,14 @@ public class FakeDataFiller {
         List<Book> books = bookRepository.findAll();
 
         for (int i = 0; i < users.size(); i++) {
-            for (int j = random.nextInt(books.size() / 20);
+            for (int j = faker.random().nextInt(books.size() / 20);
                  j < books.size();
-                 j += random.nextInt(books.size() / (amount / users.size()))
+                 j += faker.random().nextInt(books.size() / (amount / users.size()))
             ) {
                 LocalDateTime transactionTime = LocalDateTime.now()
-                        .minusDays(random.nextInt(365 * 5))
-                        .minusHours(random.nextInt(24))
-                        .minusMinutes(random.nextInt(60));
+                        .minusDays(faker.random().nextInt(365 * 5))
+                        .minusHours(faker.random().nextInt(24))
+                        .minusMinutes(faker.random().nextInt(60));
 
                 if (transactionTime.isAfter(users.get(i).getRegTime())) {
                     BalanceTransactionEntity transaction = new BalanceTransactionEntity();
@@ -373,9 +406,9 @@ public class FakeDataFiller {
 
         for (BalanceTransactionEntity transaction : transactions) {
             LocalDateTime reviewTime = transaction.getTime()
-                    .plusDays(random.nextInt(365))
-                    .plusHours(random.nextInt(24))
-                    .plusMinutes(random.nextInt(60));
+                    .plusDays(faker.random().nextInt(365))
+                    .plusHours(faker.random().nextInt(24))
+                    .plusMinutes(faker.random().nextInt(60));
             BookReviewEntity bookReviewEntity = new BookReviewEntity();
             bookReviewEntity.setUserId(transaction.getUserId());
             bookReviewEntity.setBookId(transaction.getBookId());
@@ -393,20 +426,20 @@ public class FakeDataFiller {
         List<BookReviewEntity> bookReviews = bookReviewEntityRepository.findAll();
 
         for (BookReviewEntity bookReview : bookReviews) {
-            for (int j = random.nextInt(users.size() / 25);
+            for (int j = faker.random().nextInt(users.size() / 25);
                  j < users.size();
                  j += users.size() / (amount / bookReviews.size())
             ) {
                 LocalDateTime bookReviewLikeTime = LocalDateTime.now()
-                        .minusDays(random.nextInt(365 * 5))
-                        .minusHours(random.nextInt(24))
-                        .minusMinutes(random.nextInt(60));
+                        .minusDays(faker.random().nextInt(365 * 5))
+                        .minusHours(faker.random().nextInt(24))
+                        .minusMinutes(faker.random().nextInt(60));
 
                 if (bookReviewLikeTime.isAfter(bookReview.getTime()) && bookReviewLikeTime.isAfter(users.get(j).getRegTime())) {
                     BookReviewLikeEntity bookReviewLikeEntity = new BookReviewLikeEntity();
                     bookReviewLikeEntity.setUserId(users.get(j).getId());
                     bookReviewLikeEntity.setReviewId(bookReview.getId());
-                    bookReviewLikeEntity.setValue((short) (random.nextBoolean() ? 1 : -1));
+                    bookReviewLikeEntity.setValue((short) (faker.random().nextBoolean() ? 1 : (faker.random().nextBoolean() ? 1 : -1)));
                     bookReviewLikeEntity.setTime(bookReviewLikeTime);
 
                     bookReviewLikeEntities.add(bookReviewLikeEntity);
@@ -424,8 +457,8 @@ public class FakeDataFiller {
             documentEntity.setTitle(faker.lorem().sentence());
             documentEntity.setSlug(UUID.randomUUID().toString());
             documentEntity.setText(faker.lorem().paragraph());
-            if (random.nextBoolean()) {
-                documentEntity.setSortIndex(random.nextInt(5) + 1);
+            if (faker.random().nextBoolean()) {
+                documentEntity.setSortIndex(faker.random().nextInt(5) + 1);
             }
 
             documentEntities.add(documentEntity);
@@ -440,8 +473,8 @@ public class FakeDataFiller {
             FaqEntity faqEntity = new FaqEntity();
             faqEntity.setQuestion(faker.lorem().sentence());
             faqEntity.setAnswer(faker.lorem().paragraph());
-            if (random.nextBoolean()) {
-                faqEntity.setSortIndex(random.nextInt(5) + 1);
+            if (faker.random().nextBoolean()) {
+                faqEntity.setSortIndex(faker.random().nextInt(5) + 1);
             }
             faqEntities.add(faqEntity);
         }
@@ -456,7 +489,7 @@ public class FakeDataFiller {
             FileDownloadEntity fileDownloadEntity = new FileDownloadEntity();
             fileDownloadEntity.setUserId(balanceTransactionEntity.getUserId());
             fileDownloadEntity.setBookId(balanceTransactionEntity.getBookId());
-            fileDownloadEntity.setCount(random.nextInt(2) + 1);
+            fileDownloadEntity.setCount(faker.random().nextInt(2) + 1);
 
             fileDownloadEntities.add(fileDownloadEntity);
         }
@@ -466,22 +499,26 @@ public class FakeDataFiller {
     private void generateRandomUserContactEntities() {
         List<UserContactEntity> userContactEntities = new ArrayList<>();
         List<UserEntity> users = userRepository.findAll();
-        String[] codes = {"code1", "code2", "code3"};
         for (UserEntity user : users) {
             UserContactEntity userContactEntity = new UserContactEntity();
-
             userContactEntity.setUserId(user.getId());
-            userContactEntity.setType(random.nextBoolean() ? ContactType.EMAIL : ContactType.PHONE);
-            userContactEntity.setContact(userContactEntity.getType() == ContactType.PHONE ?
-                    faker.phoneNumber().phoneNumber() : faker.internet().emailAddress());
-            userContactEntity.setCode(codes[random.nextInt(3)]);
-            userContactEntity.setApproved((short) (random.nextBoolean() ? 0 : 1));
-            userContactEntity.setCodeTime(user.getRegTime().plusMinutes(random.nextInt(10)));
-            userContactEntity.setCodeTrails(userContactEntity.getCode().hashCode());
-
+            userContactEntity.setType(ContactType.EMAIL);
+            userContactEntity.setContact(faker.internet().emailAddress());
+            userContactEntity.setApproved((short) (faker.random().nextBoolean() ? (faker.random().nextBoolean() ? 0 : 1) : 1));
             userContactEntities.add(userContactEntity);
+
+            user.setUsername(userContactEntity.getContact().substring(0, userContactEntity.getContact().indexOf("@")));
+            user.setPassword(UUID.randomUUID().toString());
+
+            UserContactEntity userContactEntity2 = new UserContactEntity();
+            userContactEntity2.setUserId(user.getId());
+            userContactEntity2.setType(ContactType.PHONE);
+            userContactEntity2.setContact(faker.phoneNumber().cellPhone());
+            userContactEntity2.setApproved(userContactEntity.getApproved());
+            userContactEntities.add(userContactEntity2);
         }
         userContactEntityRepository.saveAll(userContactEntities);
+        userRepository.saveAll(users);
     }
 
     private void generateRandomMessageEntities(int amount) {
@@ -489,16 +526,16 @@ public class FakeDataFiller {
         List<UserEntity> users = userRepository.findAll();
 
         for (int i = 0; i < amount; i++) {
-            UserEntity user = users.get(random.nextInt(users.size()));
+            UserEntity user = users.get(faker.random().nextInt(users.size()));
 
             LocalDateTime messageTime = LocalDateTime.now()
-                    .minusDays(random.nextInt(365 * 2))
-                    .minusHours(random.nextInt(24))
-                    .minusMinutes(random.nextInt(60));
+                    .minusDays(faker.random().nextInt(365 * 2))
+                    .minusHours(faker.random().nextInt(24))
+                    .minusMinutes(faker.random().nextInt(60));
 
             if (messageTime.isAfter(user.getRegTime())) {
                 MessageEntity messageEntity = new MessageEntity();
-                if (random.nextBoolean()) {
+                if (faker.random().nextBoolean()) {
                     messageEntity.setUserId(user.getId());
                     UserContactEntity contact = userContactEntityRepository.findByUserIdAndType(user.getId(), ContactType.EMAIL);
                     if(contact != null) {
@@ -507,7 +544,7 @@ public class FakeDataFiller {
                     messageEntity.setName(user.getName());
                 }
                 messageEntity.setSubject(faker.lorem().sentence());
-                messageEntity.setText(faker.lorem().paragraph(random.nextInt(4)));
+                messageEntity.setText(faker.lorem().paragraph(faker.random().nextInt(4)));
                 messageEntity.setTime(messageTime);
 
                 messageEntities.add(messageEntity);
@@ -551,14 +588,14 @@ public class FakeDataFiller {
         List<Book2TagEntity> book2TagEntities = new ArrayList<>();
 
         for (Book book : books) {
-            int numberOfTags = random.nextInt(4) + 1;
+            int numberOfTags = faker.random().nextInt(4) + 1;
             Set<TagEntity> assignedTags = new HashSet<>();
 
             for (int i = 0; i < numberOfTags; i++) {
-                TagEntity tag = tags.get(random.nextInt(tags.size()));
+                TagEntity tag = tags.get(faker.random().nextInt(tags.size()));
 
                 while (assignedTags.contains(tag)) {
-                    tag = tags.get(random.nextInt(tags.size()));
+                    tag = tags.get(faker.random().nextInt(tags.size()));
                 }
                 assignedTags.add(tag);
 
@@ -580,40 +617,50 @@ public class FakeDataFiller {
             BookRateEntity bookRateEntity = new BookRateEntity();
             bookRateEntity.setBookId(bre.getBookId());
             bookRateEntity.setUserId(bre.getUserId());
-            bookRateEntity.setValue((short) (random.nextInt(5) + 1));
+            bookRateEntity.setValue((short) (faker.random().nextInt(5) + 1));
             rateEntities.add(bookRateEntity);
         }
         for(int i = 0; i < amount - bookReviewEntities.size(); i++) {
             BookRateEntity bookRateEntity = new BookRateEntity();
-            bookRateEntity.setBookId(books.get(random.nextInt(books.size())).getId());
-            bookRateEntity.setValue((short) (random.nextInt(5) + 1));
+            bookRateEntity.setBookId(books.get(faker.random().nextInt(books.size())).getId());
+            bookRateEntity.setValue((short) (faker.random().nextInt(5) + 1));
             rateEntities.add(bookRateEntity);
         }
         bookRateEntityRepository.saveAll(rateEntities);
+
+        Set<Long> bookIds = rateEntities.stream().mapToLong(BookRateEntity::getBookId).boxed().collect(Collectors.toSet());
+        for (Book book : books) {
+            if (bookIds.contains(book.getId())) {
+                short rating = booksRatingAndPopularityService.calculateRating(book);
+                book.setRating(rating);
+            }
+        }
+        bookRepository.saveAll(books);
     }
 
     @PostConstruct
     public void run() {
-        generateRandomAuthors(1000);
-        generateRandomBooks(20000);
+        generateRandomAuthors(authorsAmount);
+        generateRandomBooks(booksAmount);
         generateRandomBook2AuthorEntities();
-        generateRandomGenres(200);
+        generateRandomGenres(genresAmount);
         generateRandomBook2GenreEntities();
-        generateRandomTagEntities(75);
+        generateRandomTagEntities(tagsAmount);
         generateRandomBook2TagEntities();
-        generateRandomBookFileTypes(3);
+        generateRandomBookFileTypes(fileTypesAmount);
         generateRandomBookFiles();
-        generateRandomUsers(25_000);
+        generateRandomUsers(usersAmount);
         generateRandomBook2UserTypeEntities();
-        generateRandomBook2UserEntities(125_000);
-        generateRandomBalanceTransactions(50_000);
+        generateRandomBook2UserEntities(book2userAmount);
+        generateRandomBalanceTransactions(transactionsAmount);
         generateRandomBookReviewEntities();
-        generateRandomBookReviewLikeEntities(3_000_000);
-        generateRandomDocumentEntities(15);
-        generateRandomFaqEntities(30);
+        generateRandomBookReviewLikeEntities(reviewLikesAmount);
+        generateRandomDocumentEntities(documentsAmount);
+        generateRandomFaqEntities(faqsAmount);
         generateRandomFileDownloadEntities();
         generateRandomUserContactEntities();
-        generateRandomMessageEntities(5000);
-        generateRandomRatingValues(125_000);
+        generateRandomMessageEntities(messagesAmount);
+        generateRandomRatingValues(bookRatingsAmount);
+        booksRatingAndPopularityService.updatePopularity();
     }
 }
