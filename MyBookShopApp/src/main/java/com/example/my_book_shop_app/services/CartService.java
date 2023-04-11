@@ -69,7 +69,7 @@ public class CartService {
         if (postponedContents != null) {
             removeSlugFromCookie(slug, postponedContents, "postponedContents", response);
         }
-        bookService.updateBook2UserEntity(slug, userId, 4);
+        bookService.updateBook2UserEntity(userId, slug, "in_cart");
     }
 
     public void addAllToCart(Long userId, String cartContents, String postponedContents, HttpServletResponse response) {
@@ -81,7 +81,7 @@ public class CartService {
         if (postponedContents != null && !postponedContents.equals("")) {
             postponedBooksSlugs = List.of(postponedContents.split("/"));
             booksSlugsFromCookie.addAll(postponedBooksSlugs);
-            postponedBooksSlugs.forEach(bs -> bookService.updateBook2UserEntity(bs, userId, 4));
+            postponedBooksSlugs.forEach(bs -> bookService.updateBook2UserEntity(userId, bs, "in_cart"));
         }
         Cookie cartCookie = new Cookie("cartContents", String.join("/", booksSlugsFromCookie));
         cartCookie.setPath("/");
@@ -96,12 +96,12 @@ public class CartService {
         if (cartContents != null) {
             removeSlugFromCookie(slug, cartContents, "cartContents", response);
         }
-        bookService.updateBook2UserEntity(slug, userId, 3);
+        bookService.updateBook2UserEntity(userId, slug, "postponed");
     }
 
     public void addToArchived(String slug, Long userId, String archivedContents, HttpServletResponse response) {
         addSlugToCookie("archivedContents", archivedContents, slug, response);
-        bookService.updateBook2UserEntity(slug, userId, 1);
+        bookService.updateBook2UserEntity(userId, slug, "archived");
     }
 
     private void addSlugToCookie(String cookieName, String cookieContents, String slug, HttpServletResponse response) {
@@ -131,5 +131,9 @@ public class CartService {
     public void removeBook2UserRelation(Long userId, String bookSlug) {
         Long bookId = bookRepository.findBySlug(bookSlug).getId();
         book2UserEntityRepository.deleteByBookIdAndUserId(bookId, userId);
+    }
+
+    public void changeBook2UserRelation(Long userId, String slug, String book2userType) {
+        bookService.updateBook2UserEntity(userId, slug, book2userType);
     }
 }

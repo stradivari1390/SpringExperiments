@@ -499,21 +499,34 @@ public class FakeDataFiller {
     private void generateRandomUserContactEntities() {
         List<UserContactEntity> userContactEntities = new ArrayList<>();
         List<UserEntity> users = userRepository.findAll();
+        List<String> contacts = new ArrayList<>();
         for (UserEntity user : users) {
             UserContactEntity userContactEntity = new UserContactEntity();
             userContactEntity.setUserId(user.getId());
             userContactEntity.setType(ContactType.EMAIL);
-            userContactEntity.setContact(faker.internet().emailAddress());
-            userContactEntity.setApproved((short) (faker.random().nextBoolean() ? (faker.random().nextBoolean() ? 0 : 1) : 1));
+            userContactEntity.setContact(
+                    user.getName().toLowerCase().replaceAll(" ", "") + "@gmail.com"
+            );
+            if (contacts.contains(userContactEntity.getContact())) {
+                userContactEntity.setContact(
+                        user.getName().toLowerCase().replaceAll(" ", "") + "1@gmail.com"
+                );
+            }
+            contacts.add(userContactEntity.getContact());
+            userContactEntity.setApproved((short) 1);
             userContactEntities.add(userContactEntity);
 
-            user.setUsername(userContactEntity.getContact().substring(0, userContactEntity.getContact().indexOf("@")));
+            user.setUsername(userContactEntity.getContact());
             user.setPassword(UUID.randomUUID().toString());
 
             UserContactEntity userContactEntity2 = new UserContactEntity();
             userContactEntity2.setUserId(user.getId());
             userContactEntity2.setType(ContactType.PHONE);
             userContactEntity2.setContact(faker.phoneNumber().cellPhone());
+            if (contacts.contains(userContactEntity2.getContact())) {
+                userContactEntity.setContact(userContactEntity2.getContact() + "1");
+            }
+            contacts.add(userContactEntity2.getContact());
             userContactEntity2.setApproved(userContactEntity.getApproved());
             userContactEntities.add(userContactEntity2);
         }

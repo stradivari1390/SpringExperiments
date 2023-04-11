@@ -33,14 +33,19 @@
     </script>
 </head>
 <body class="Site">
-<header class="Header"
-        th:replace="~{fragments/common_header_fragment :: head(main='menu-item menu-item_ACTIVE', status='unauthorized')}"></header>
+<header class="Header" th:replace="~{fragments/common_header_fragment :: head(main='menu-item menu-item_ACTIVE', status=${authStatus})}"></header>
 <div class="Middle">
     <div class="wrap">
         <main class="Middle-main">
             <div class="Section">
-                <div th:replace="~{fragments/book_slider_fragment :: bookSlider(title=#{menu.title.recommended}, booksList=${recommendedBooks}, dataLoad='recommended', userId=${userId})}">
-                </div>
+                <th:block th:if="${userId != null}">
+                    <div th:replace="~{fragments/book_slider_fragment :: bookSlider(title=#{menu.title.recommended}, booksList=${recommendedBooks}, dataLoad='recommended', userId=${userId})}">
+                    </div>
+                </th:block>
+                <th:block th:if="${userId == null}">
+                    <div th:replace="~{fragments/book_slider_fragment :: bookSlider(title=#{menu.title.recommended}, booksList=${popularBooks}, dataLoad='popular')}">
+                    </div>
+                </th:block>
                 <div th:replace="~{fragments/book_slider_fragment :: bookSlider(title=#{menu.title.recent}, booksList=${recentBooks}, dataLoad='recent', fromDate=${fromDate}, toDate=${toDate})}">
                 </div>
                 <div th:replace="~{fragments/book_slider_fragment :: bookSlider(title=#{menu.title.popular}, booksList=${popularBooks}, dataLoad='popular')}">

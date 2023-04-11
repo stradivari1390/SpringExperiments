@@ -2,6 +2,7 @@ package com.example.my_book_shop_app.controllers;
 
 import com.example.my_book_shop_app.data.ResourceStorage;
 import com.example.my_book_shop_app.dto.BookDto;
+import com.example.my_book_shop_app.security.BookstoreUserRegister;
 import com.example.my_book_shop_app.services.AuthorService;
 import com.example.my_book_shop_app.services.BookService;
 import com.example.my_book_shop_app.services.BooksRatingAndPopularityService;
@@ -15,6 +16,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -34,15 +36,18 @@ public class BookViewController {
     private final ReviewService reviewService;
     private final BooksRatingAndPopularityService booksRatingAndPopularityService;
     private final ResourceStorage storage;
+    private final BookstoreUserRegister bookstoreUserRegister;
 
     @Autowired
     public BookViewController(BookService bookService, AuthorService authorService, ReviewService reviewService,
-                              BooksRatingAndPopularityService booksRatingAndPopularityService, ResourceStorage storage) {
+                              BooksRatingAndPopularityService booksRatingAndPopularityService, ResourceStorage storage,
+                              BookstoreUserRegister bookstoreUserRegister) {
         this.bookService = bookService;
         this.authorService = authorService;
         this.reviewService = reviewService;
         this.booksRatingAndPopularityService = booksRatingAndPopularityService;
         this.storage = storage;
+        this.bookstoreUserRegister = bookstoreUserRegister;
     }
 
     @GetMapping("/books/recent")
@@ -93,13 +98,18 @@ public class BookViewController {
     }
 
     @GetMapping("/books/{slug}")
-    public String authorSlugPage(@PathVariable("slug") String slug, Model model) {
+    public String authorSlugPage(@PathVariable("slug") String slug, Authentication authentication, Model model) {
         model.addAttribute("book", bookService.getBookDtoBySlug(slug));
         model.addAttribute("bookFiles", bookService.getBookFilesByBookSlug(slug));
         model.addAttribute("reviews", reviewService.getReviewDtoListByBookSlug(slug));
         model.addAttribute("starRates", booksRatingAndPopularityService.calculateStarRatesByBookSlug(slug));
         model.addAttribute("ratesCount", booksRatingAndPopularityService.countRatesByBookSlug(slug));
         model.addAttribute("tags", bookService.getTagsByBookSlug(slug));
+        if (authentication != null && authentication.isAuthenticated()) {
+            model.addAttribute("authStatus", "authorized");
+        } else {
+            model.addAttribute("authStatus", "unauthorized");
+        }
         return "books/slug";
     }
 
@@ -108,7 +118,7 @@ public class BookViewController {
     public ResponseEntity<String> submitReview(@RequestBody Map<String, String> reviewData) {
         String slug = reviewData.get("slug");
         String reviewText = reviewData.get("text");
-        Long userId = 1L;
+        Long userId = bookstoreUserRegister.getCurrentUser().getId();
         boolean success = reviewService.saveReview(slug, userId, reviewText);
         return success ? new ResponseEntity<>(HttpStatus.OK) : new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
@@ -117,7 +127,7 @@ public class BookViewController {
     @ResponseBody
     public ResponseEntity<Map<String, String>> rateBook(@RequestParam("bookId") Long bookId,
                                                         @RequestParam("value") Short value) {
-        booksRatingAndPopularityService.addRating(bookId, value);
+        booksRatingAndPopularityService.addRating(bookId, bookstoreUserRegister.getCurrentUser().getId(), value);
         String redirectUrl = "/books/" + bookService.getBookById(bookId).getSlug();
 
         Map<String, String> response = new HashMap<>();
@@ -130,7 +140,7 @@ public class BookViewController {
     @ResponseBody
     public ResponseEntity<Map<String, Object>> rateReview(@RequestParam("reviewid") Integer reviewId,
                                                           @RequestParam("value") Short value) {
-        boolean success = reviewService.addReviewLike(reviewId, value, 1L);
+        boolean success = reviewService.addReviewLike(reviewId, value, bookstoreUserRegister.getCurrentUser().getId());
         String redirectUrl = "/books/" + bookService.getBookByReviewId(reviewId).getSlug();
 
         Map<String, Object> response = new HashMap<>();
@@ -145,7 +155,7 @@ public class BookViewController {
         Path path = storage.getBookFilePath(hash);
         MediaType mediaType = storage.getBookFileMime(hash);
         byte[] data = storage.getBookFileByteArray(hash);
-        bookService.saveDownloadEntityByFileHash(hash, 1L);
+        bookService.saveDownloadEntityByFileHash(hash, bookstoreUserRegister.getCurrentUser().getId());
         return ResponseEntity.ok()
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment;filename=" + path.getFileName().toString())
                 .contentType(mediaType)

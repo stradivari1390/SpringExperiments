@@ -2,6 +2,7 @@ package com.example.my_book_shop_app.security;
 
 import com.example.my_book_shop_app.data.model.user.UserEntity;
 import com.example.my_book_shop_app.data.repositories.UserEntityRepository;
+import com.example.my_book_shop_app.dto.UserDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -23,8 +24,12 @@ public class BookstoreUserDetailsService implements UserDetailsService {
         UserEntity bookstoreUser = userEntityRepository.findUserByUsername(username);
         if (bookstoreUser != null){
             return new BookstoreUserDetails(bookstoreUser);
-        }else{
+        } else {
             throw new UsernameNotFoundException("User not found.");
         }
+    }
+
+    public UserDto getUserDtoById(Long id) {
+        return userEntityRepository.findUserDtoById(id);
     }
 }

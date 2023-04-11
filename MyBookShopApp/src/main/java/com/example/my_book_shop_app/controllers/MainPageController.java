@@ -1,9 +1,11 @@
 package com.example.my_book_shop_app.controllers;
 
+import com.example.my_book_shop_app.security.BookstoreUserRegister;
 import com.example.my_book_shop_app.services.BookService;
 import com.example.my_book_shop_app.dto.BookDto;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -16,10 +18,12 @@ import java.util.List;
 public class MainPageController {
 
     private final BookService bookService;
+    private final BookstoreUserRegister bookstoreUserRegister;
 
     @Autowired
-    public MainPageController(BookService bookService) {
+    public MainPageController(BookService bookService, BookstoreUserRegister bookstoreUserRegister) {
         this.bookService = bookService;
+        this.bookstoreUserRegister = bookstoreUserRegister;
     }
 
     @ModelAttribute("query")
@@ -34,11 +38,19 @@ public class MainPageController {
     @GetMapping("/")
     public String mainPage(@RequestParam(value = "offset", defaultValue = "0") Integer offset,
                            @RequestParam(value = "limit", defaultValue = "10") Integer limit,
-                           Model model) {
-        model.addAttribute("recommendedBooks", bookService.getPageOfRecommendedBooks(440L, offset, limit).getContent());
-        model.addAttribute("recentBooks", bookService.getPageOfRecentBooks(offset, limit, LocalDate.now().minusYears(3), LocalDate.now()).getContent());
-        model.addAttribute("popularBooks", bookService.getPageOfPopularBooks(offset, limit).getContent());
-        model.addAttribute("userId", 440L);
+                           Model model, Authentication authentication) {
+        if (authentication != null && authentication.isAuthenticated()) {
+            model.addAttribute("authStatus", "authorized");
+            model.addAttribute("recommendedBooks",
+                    bookService.getPageOfRecommendedBooks(bookstoreUserRegister.getCurrentUser().getId(), offset, limit).getContent());
+            model.addAttribute("userId", bookstoreUserRegister.getCurrentUser().getId());
+        } else {
+            model.addAttribute("authStatus", "unauthorized");
+        }
+        model.addAttribute("recentBooks",
+                bookService.getPageOfRecentBooks(offset, limit, LocalDate.now().minusYears(3), LocalDate.now()).getContent());
+        model.addAttribute("popularBooks",
+                bookService.getPageOfPopularBooks(offset, limit).getContent());
         model.addAttribute("fromDate", LocalDate.now().minusMonths(1));
         model.addAttribute("toDate", LocalDate.now());
         return "index";

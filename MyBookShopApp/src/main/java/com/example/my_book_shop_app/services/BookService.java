@@ -9,7 +9,7 @@ import com.example.my_book_shop_app.data.repositories.*;
 import com.example.my_book_shop_app.dto.BookDto;
 import com.example.my_book_shop_app.dto.BookFileDto;
 import com.example.my_book_shop_app.dto.TagCloudDto;
-import com.example.my_book_shop_app.errors.BookstoreApiWrongParameterException;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.InvalidDataAccessResourceUsageException;
 import org.springframework.data.domain.Page;
@@ -21,7 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.List;
 
 @Service
 public class BookService {
@@ -31,20 +31,23 @@ public class BookService {
     private final FileDownloadEntityRepository fileDownloadEntityRepository;
     private final BookFileTypeEntityRepository bookFileTypeEntityRepository;
     private final BookFileEntityRepository bookFileEntityRepository;
-    private Book2UserEntityRepository book2UserEntityRepository;
+    private final Book2UserEntityRepository book2UserEntityRepository;
+    private final Book2UserTypeEntityRepository book2UserTypeEntityRepository;
 
     @Autowired
     public BookService(BookRepository bookRepository, TagEntityRepository tagEntityRepository,
                        FileDownloadEntityRepository fileDownloadEntityRepository,
                        BookFileTypeEntityRepository bookFileTypeEntityRepository,
                        BookFileEntityRepository bookFileEntityRepository,
-                       Book2UserEntityRepository book2UserEntityRepository) {
+                       Book2UserEntityRepository book2UserEntityRepository,
+                       Book2UserTypeEntityRepository book2UserTypeEntityRepository) {
         this.bookRepository = bookRepository;
         this.tagEntityRepository = tagEntityRepository;
         this.fileDownloadEntityRepository = fileDownloadEntityRepository;
         this.bookFileTypeEntityRepository = bookFileTypeEntityRepository;
         this.bookFileEntityRepository = bookFileEntityRepository;
         this.book2UserEntityRepository = book2UserEntityRepository;
+        this.book2UserTypeEntityRepository = book2UserTypeEntityRepository;
     }
 
     public List<BookDto> getBooks() {
@@ -61,23 +64,14 @@ public class BookService {
         return bookRepository.getPageOfBooksByAuthorSlug(slug, nextPage);
     }
 
-    public Page<BookDto> getPageOfBooksByTitle(String title, Integer offset, Integer limit) throws BookstoreApiWrongParameterException {
+    public Page<BookDto> getPageOfBooksByTitle(String title, Integer offset, Integer limit) {
         Pageable nextPage = PageRequest.of(offset, limit);
-        if (title.length() <= 1) {
-            throw new BookstoreApiWrongParameterException("Wrong values passed to one or more parameters");
-        } else {
-            Page<BookDto> data = bookRepository.getPageOfBooksByTitleContaining(title, nextPage);
-            if (data.getNumberOfElements() > 0) {
-                return data;
-            } else {
-                throw new BookstoreApiWrongParameterException("No data found with specified parameters...");
-            }
-        }
+        return bookRepository.getPageOfBooksByTitleContaining(title, nextPage);
     }
 
     public Page<BookDto> getPageOfBooksWithPriceBetween(Double min, Double max, Integer offset, Integer limit) {
         Pageable nextPage = PageRequest.of(offset, limit);
-        return bookRepository.getPageOfBooksByPriceBetween(min,max, nextPage);
+        return bookRepository.getPageOfBooksByPriceBetween(min, max, nextPage);
     }
 
     public Page<BookDto> getPageOfBooksWithPrice(Double price, Integer offset, Integer limit) {
@@ -100,8 +94,8 @@ public class BookService {
         return bookRepository.getPageOfBooksDto(nextPage);
     }
 
-    public Page<BookDto> getPageOfRecommendedBooks(Long userId, Integer offset, Integer limit){
-        Pageable nextPage = PageRequest.of(offset,limit);
+    public Page<BookDto> getPageOfRecommendedBooks(Long userId, Integer offset, Integer limit) {
+        Pageable nextPage = PageRequest.of(offset, limit);
         return bookRepository.getPageOfRecommendedBooksDto(userId, nextPage);
     }
 
@@ -117,12 +111,12 @@ public class BookService {
     }
 
     public Page<BookDto> getPageOfPopularBooks(Integer offset, Integer limit) {
-        Pageable nextPage = PageRequest.of(offset,limit);
+        Pageable nextPage = PageRequest.of(offset, limit);
         return bookRepository.getPageOfPopularBooksDto(nextPage);
     }
 
     public Page<BookDto> getPageOfSearchResultBooks(String searchWord, Integer offset, Integer limit) throws InvalidDataAccessResourceUsageException {
-        Pageable nextPage = PageRequest.of(offset,limit);
+        Pageable nextPage = PageRequest.of(offset, limit);
         return bookRepository.getPageOfBooksByTitleContaining(searchWord, nextPage);
     }
 
@@ -195,7 +189,7 @@ public class BookService {
     }
 
     @Transactional
-    public void updateBook2UserEntity(String bookSlug, Long userId, int typeId) {
+    public void updateBook2UserEntity(Long userId, String bookSlug, String type) {
         Long bookId = bookRepository.findBySlug(bookSlug).getId();
         Book2UserEntity book2UserEntity = book2UserEntityRepository.findByUserIdAndBookId(userId, bookId);
         if (book2UserEntity == null) {
@@ -203,7 +197,7 @@ public class BookService {
             book2UserEntity.setBookId(bookId);
             book2UserEntity.setUserId(userId);
         }
-        book2UserEntity.setTypeId(typeId);
+        book2UserEntity.setTypeId(book2UserTypeEntityRepository.findByName(type).getId());
         book2UserEntity.setTime(LocalDateTime.now());
         book2UserEntityRepository.save(book2UserEntity);
     }

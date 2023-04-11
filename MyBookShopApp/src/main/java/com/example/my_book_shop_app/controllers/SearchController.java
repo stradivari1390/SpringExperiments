@@ -1,17 +1,28 @@
 package com.example.my_book_shop_app.controllers;
 
 import com.example.my_book_shop_app.dto.BooksPageDto;
-import com.example.my_book_shop_app.errors.EmptySearchException;
 import com.example.my_book_shop_app.services.SearchingService;
+
+import jakarta.validation.ConstraintViolationException;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.Size;
+import org.hibernate.validator.constraints.Length;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.springframework.validation.ObjectError;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
-import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 @Controller
+@Validated
 public class SearchController {
 
     private final SearchingService searchingService;
@@ -22,10 +33,10 @@ public class SearchController {
     }
 
     @GetMapping(value = {"/search"})
-    public String getSearchResults(@RequestParam(name = "query", required = false) String query,
+    public String getSearchResults(@NotEmpty(message = "Query must not be empty") @Size(min = 3, message = "query is too short") @RequestParam(name = "query") String query,
                                    @RequestParam(name = "offset", defaultValue = "0") int offset,
                                    @RequestParam(name = "limit", defaultValue = "10") int limit,
-                                   Model model) throws EmptySearchException {
+                                   Model model) {
         model.addAttribute("query", query);
         model.addAttribute("foundBooks", new BooksPageDto(searchingService.search(query, offset, limit)));
         return "search/index";
@@ -35,14 +46,23 @@ public class SearchController {
     @ResponseBody
     public BooksPageDto getNextSearchPage(@RequestParam("offset") Integer offset,
                                           @RequestParam("limit") Integer limit,
-                                          @RequestParam(name = "query", required = false) String query) throws EmptySearchException {
+                                          @NotEmpty(message = "Query must not be empty") @Length(min = 3, message = "query is too short") @RequestParam(name = "query") String query) {
         return searchingService.getNextSearchPage(query, offset, limit);
     }
 
-    @ExceptionHandler(EmptySearchException.class)
-    public String handleEmptySearchException(EmptySearchException e, RedirectAttributes redirectAttributes){
-        Logger.getLogger(this.getClass().getSimpleName()).warning(e.getLocalizedMessage());
-        redirectAttributes.addFlashAttribute("searchError", e);
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<String> handleValidationExceptions(MethodArgumentNotValidException ex) {
+        String errorMessage = ex.getBindingResult()
+                .getAllErrors()
+                .stream()
+                .map(ObjectError::getDefaultMessage)
+                .collect(Collectors.joining(", "));
+
+        return ResponseEntity.badRequest().body(errorMessage);
+    }
+
+    @ExceptionHandler(ConstraintViolationException.class)
+    public String handleValidationExceptions2() {
         return "redirect:/";
     }
 }

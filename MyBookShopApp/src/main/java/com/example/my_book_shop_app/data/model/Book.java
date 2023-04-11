@@ -51,4 +51,9 @@ public class Book {
 
     @Column(name = "rating")
     private short rating;
+
+    private int quantity;
+
+    @Version
+    private int version;
 }

@@ -9,14 +9,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import java.util.Collection;
 import java.util.List;
 
-public class BookstoreUserDetails implements UserDetails {
-
-    @Getter
-    private final UserEntity bookstoreUser;
-
-    public BookstoreUserDetails(UserEntity bookstoreUser) {
-        this.bookstoreUser = bookstoreUser;
-    }
+public record BookstoreUserDetails(@Getter UserEntity bookstoreUser) implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

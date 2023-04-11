@@ -1,6 +1,8 @@
 package com.example.my_book_shop_app.security;
 
-import com.example.my_book_shop_app.security.jwt.JWTRequestFilter;
+import com.example.my_book_shop_app.security.jwt.JWTUtil;
+import com.example.my_book_shop_app.security.jwt.JwtAuthenticationEntryPoint;
+import com.example.my_book_shop_app.security.jwt.JwtAuthenticationFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -21,12 +23,15 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 public class SecurityConfig {
 
     private final BookstoreUserDetailsService bookstoreUserDetailsService;
-    private final JWTRequestFilter filter;
+    private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
+    private final JWTUtil jwtTokenUtil;
 
     @Autowired
-    public SecurityConfig(BookstoreUserDetailsService bookstoreUserDetailsService, JWTRequestFilter filter) {
+    public SecurityConfig(BookstoreUserDetailsService bookstoreUserDetailsService,
+                          JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint, JWTUtil jwtTokenUtil) {
         this.bookstoreUserDetailsService = bookstoreUserDetailsService;
-        this.filter = filter;
+        this.jwtAuthenticationEntryPoint = jwtAuthenticationEntryPoint;
+        this.jwtTokenUtil = jwtTokenUtil;
     }
 
     @Bean
@@ -40,7 +45,8 @@ public class SecurityConfig {
     }
 
     @Bean
-    public AuthenticationManager authenticationManager(HttpSecurity http, PasswordEncoder bCryptPasswordEncoder, UserDetailsService userDetailsService)
+    public AuthenticationManager authenticationManager(HttpSecurity http, PasswordEncoder bCryptPasswordEncoder,
+                                                       UserDetailsService userDetailsService)
             throws Exception {
         return http.getSharedObject(AuthenticationManagerBuilder.class)
                 .userDetailsService(userDetailsService)
@@ -52,23 +58,24 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.csrf().disable()
+                .exceptionHandling().authenticationEntryPoint(jwtAuthenticationEntryPoint)
+                .and()
                 .authorizeHttpRequests()
-                .requestMatchers("/my", "/profile").authenticated()
+                .requestMatchers("/my", "/myArchive", "/profile").authenticated()
                 .requestMatchers("/**").permitAll()
                 .and().formLogin()
                 .loginPage("/signin").failureUrl("/signin")
+                .failureHandler(new CustomAuthenticationFailureHandler())
+                .defaultSuccessUrl("/my")
                 .and().logout().logoutUrl("/logout").logoutSuccessUrl("/signin").deleteCookies("token")
                 .and().oauth2Login()
                 .and().oauth2Client();
-
-        http.addFilterBefore(filter, UsernamePasswordAuthenticationFilter.class);
-
+        http.addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
 
-    // WebSecurityCustomizer bean if needed
-    // @Bean
-    // public WebSecurityCustomizer webSecurityCustomizer() {
-    //     return (web) -> web.ignoring().antMatchers("/css/**", "/js/**", "/img/**", "/lib/**", "/favicon.ico");
-    // }
+    @Bean
+    public JwtAuthenticationFilter jwtAuthenticationFilter() {
+        return new JwtAuthenticationFilter(jwtTokenUtil, bookstoreUserDetailsService);
+    }
 }
