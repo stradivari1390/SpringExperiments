@@ -1,6 +1,5 @@
 package com.example.my_book_shop_app.security;
 
-import com.example.my_book_shop_app.data.repositories.UserEntityRepository;
 import com.example.my_book_shop_app.security.jwt.JWTUtil;
 import com.example.my_book_shop_app.security.jwt.JwtResponse;
 import jakarta.servlet.http.Cookie;
@@ -39,6 +38,7 @@ public class AuthUserController {
     public String handleSignIn(Model model, Authentication authentication) {
         if (authentication != null && authentication.isAuthenticated()) {
             model.addAttribute("authStatus", "authorized");
+            model.addAttribute("curUsr", bookstoreUserDetailsService.getUserDtoById(userRegister.getCurrentUser().getId()));
         } else {
             model.addAttribute("authStatus", "unauthorized");
         }
@@ -92,32 +92,34 @@ public class AuthUserController {
 
     @GetMapping("/my")
     public String handleMy(@CookieValue("postponedContents") String postponedContents,
-                           @CookieValue("token") String token,
                            Model model) {
+        model.addAttribute("curUsr", bookstoreUserDetailsService.getUserDtoById(userRegister.getCurrentUser().getId()));
         model.addAttribute(postponedContents);
         return "my";
     }
 
     @GetMapping("/myArchive")
     public String handleMyArchive(@CookieValue("archiveContents") String archiveContents,
-                                  @CookieValue("token") String token,
                                   Model model) {
+        model.addAttribute("curUsr", bookstoreUserDetailsService.getUserDtoById(userRegister.getCurrentUser().getId()));
         model.addAttribute(archiveContents);
         return "myarchive";
     }
 
     @GetMapping("/profile")
-    public String handleProfile(@CookieValue("token") String token,
-                                Model model) {
+    public String handleProfile(Model model) {
         model.addAttribute("curUsr", bookstoreUserDetailsService.getUserDtoById(userRegister.getCurrentUser().getId()));
         return "profile";
     }
 
     @PostMapping("/login")
-    public ResponseEntity<JwtResponse> createAuthenticationToken(@RequestBody ContactConfirmationPayload payload) throws Exception {
+    public ResponseEntity<JwtResponse> createAuthenticationToken(@RequestBody ContactConfirmationPayload payload,
+                                                                 HttpServletResponse httpServletResponse) throws Exception {
         authenticate(payload.getContact(), payload.getCode());
         final UserDetails userDetails = bookstoreUserDetailsService.loadUserByUsername(payload.getContact());
         final String token = jwtTokenUtil.generateToken(userDetails);
+        Cookie cookie = new Cookie("token", token);
+        httpServletResponse.addCookie(cookie);
         return ResponseEntity.ok(new JwtResponse(token));
     }
 

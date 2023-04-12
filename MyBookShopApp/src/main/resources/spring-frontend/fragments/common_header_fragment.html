@@ -29,7 +29,8 @@
                         </div>
                     </div>
                 </div>
-                <div class="row-block Header-cart" th:replace="~{fragments/cart_block_fragment :: ${status}}"></div>
+                <div class="row-block Header-cart" th:if="${authStatus == 'unauthorized'}" th:insert="fragments/cart_block_fragment :: unauthorized"></div>
+                <div class="row-block Header-cart" th:if="${authStatus == 'authorized'}" th:insert="fragments/cart_block_fragment :: authorized(status=${status}, curUser=${curUser})"></div>
                 <div class="row-block Header-trigger"><a class="menuTrigger" href="#navigate">
                     <div class="menuTrigger-content">Показать навигацию
                     </div>

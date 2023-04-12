@@ -61,7 +61,7 @@ public class SecurityConfig {
                 .exceptionHandling().authenticationEntryPoint(jwtAuthenticationEntryPoint)
                 .and()
                 .authorizeHttpRequests()
-                .requestMatchers("/my", "/myArchive", "/profile").authenticated()
+                .requestMatchers("/my", "/myArchive", "/profile", "/rateBook", "/rateBookReview", "/submitReview").authenticated()
                 .requestMatchers("/**").permitAll()
                 .and().formLogin()
                 .loginPage("/signin").failureUrl("/signin")
