@@ -29,8 +29,8 @@
                         </div>
                     </div>
                 </div>
-                <div class="row-block Header-cart" th:if="${authStatus == 'unauthorized'}" th:insert="fragments/cart_block_fragment :: unauthorized"></div>
-                <div class="row-block Header-cart" th:if="${authStatus == 'authorized'}" th:insert="fragments/cart_block_fragment :: authorized(status=${status}, curUser=${curUser})"></div>
+                <div class="row-block Header-cart" th:if="${authStatus == 'unauthorized'}" th:insert="~{fragments/cart_block_fragment :: unauthorized}"></div>
+                <div class="row-block Header-cart" th:if="${authStatus == 'authorized'}" th:insert="~{fragments/cart_block_fragment :: authorized(status=${status}, curUser=${curUser})}"></div>
                 <div class="row-block Header-trigger"><a class="menuTrigger" href="#navigate">
                     <div class="menuTrigger-content">Показать навигацию
                     </div>
@@ -57,6 +57,9 @@
                     </li>
                     <li class="menu-item" th:class="${authors}"><a class="menu-link" th:href="@{/authors}" th:text="#{menu.authors}"
                                                                    href="/authors/index.html">Авторы</a>
+                    </li>
+                    <li th:if="${authStatus == 'authorized'}" class="menu-item" th:class="${logout}">
+                        <a class="menu-link" th:href="@{/logout}" th:text="#{menu.logout}">Logout</a>
                     </li>
                 </ul>
             </nav>

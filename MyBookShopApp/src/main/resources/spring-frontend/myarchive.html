@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+<html lang="ru" xmlns:th="http://www.thymeleaf.org" xmlns="http://www.w3.org/1999/html">
 <head>
     <title th:text="#{main.title}">Магазин 📚</title>
     <meta name="description" content="Описание страницы">
@@ -18,7 +18,7 @@
 </head>
 <body class="Site">
 <header class="Header"
-        th:replace="~{fragments/common_header_fragment :: head(status='authorized', curUser=${curUsr})}"></header>
+        th:replace="~{fragments/common_header_fragment :: head(status=${authStatus}, curUser=${curUsr})}"></header>
 <div class="Middle">
     <div class="wrap">
         <main class="Middle-main">
@@ -40,33 +40,37 @@
                     </div>
                 </div>
                 <div class="Cards">
-                    <div class="Card">
+                    <div class="Card" th:each="book: ${archivedBooks}">
                         <div class="Card-picture">
-                            <a href="#">
-                                <img src="/assets/img/content/main/card.jpg" alt="card.jpg"/>
-                            </a>
-                            <div class="Card-sale">30% скидка
-                            </div>
-                            <div class="Card-ribbon">
-                                <span class="Card-ribbonText">Бестселлер
-                                </span>
-                            </div>
-                            <a class="Card-status" title="Куплена">
-                                <img src="/assets/img/icons/check.svg" alt="check.svg"/>
-                            </a>
-                            <a class="Card-status" title="В корзине">
-                                <img src="/assets/img/icons/shopping-basket.svg" alt="shopping-basket.svg"/>
-                            </a>
-                            <a class="Card-status" title="Отложена">
-                                <img src="/assets/img/icons/heart.svg" alt="heart.svg"/>
+                            <a th:href="@{'/books/' + ${book.slug}}">
+                                <img class="Cart-img" th:src="${book.image}" alt="card.jpg"/>
+                                <div class="Cart-sale" th:if="${book.discount != 0}"
+                                     th:text="'-' + ${#strings.toString(book.discount)} + '%'">-30%
+                                </div>
+                                <div th:if="${book.bestseller}" class="Card-ribbon">
+                                    <span class="Card-ribbonText" th:text="#{menu.bestseller}">Бестселлер
+                                    </span>
+                                </div>
+                                <a class="Card-status" title="Куплена">
+                                    <img src="/assets/img/icons/check.svg" alt="check.svg"/>
+                                </a>
                             </a>
                         </div>
                         <div class="Card-content">
-                            <strong class="Card-title"><a href="#">My archived book</a>
+                            <strong class="Card-title">
+                                <a th:href="@{'/books/' + ${book.slug}}" th:text="${book.title}">
+                                </a>
                             </strong>
-                            <div class="Card-description">Petr Samuraevich
+                            <div class="Card-description">
+                                <a th:href="@{'/authors/' + ${book.authorSlug}}" th:text="${book.authorFirstName} + ' ' + ${book.authorLastName}">
+                                </a>
                             </div>
-                            <div class="Card-cost"><span class="Card-priceOld">₽300.00</span><span class="Card-price">₽190.00</span>
+                            <div class="Card-cost">
+                                <span class="Card-priceOld" th:if="${book.discount != 0}"
+                                      th:text="'₽' + ${#numbers.formatDecimal(book.price, 1, 2)}">₽300.00
+                                </span>
+                                <span class="Card-price" th:text="'₽' + ${#numbers.formatDecimal(book.price * (100 - book.discount) / 100, 1, 2)}">₽190.00
+                                </span>
                             </div>
                         </div>
                     </div>

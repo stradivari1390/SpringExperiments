@@ -1,6 +1,7 @@
 package com.example.my_book_shop_app.data.repositories;
 
 import com.example.my_book_shop_app.data.model.Book;
+import com.example.my_book_shop_app.dto.Book2UserDto;
 import com.example.my_book_shop_app.dto.BookDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -15,7 +16,8 @@ public interface BookRepository extends JpaRepository<Book, Long> {
     Book findBySlug(String slug);
 
     String SELECT_BOOK_DTO = "SELECT new com.example.my_book_shop_app.dto.BookDto" +
-            "(b.id, b.slug, b.title, b.image, b.description, b.price, b.discount, b.rating, a.firstName, a.lastName, a.slug) ";
+            "(b.id, b.slug, b.title, b.image, b.description, b.price, b.discount, " +
+            "b.isBestseller, b.rating, a.firstName, a.lastName, a.slug) ";
 
     @Query(value = SELECT_BOOK_DTO +
             "FROM Book b " +
@@ -209,4 +211,24 @@ public interface BookRepository extends JpaRepository<Book, Long> {
             "JOIN BookReviewEntity br ON b.id = br.bookId " +
             "WHERE br.id = :reviewId")
     Book findByReviewId(@Param("reviewId") Integer reviewId);
+
+    @Query(value = "SELECT new com.example.my_book_shop_app.dto.Book2UserDto" +
+            "(b.slug, b.image, b.price, b.discount, b.isBestseller, b.title, a.slug, a.firstName, a.lastName, b2ut.name) " +
+            "FROM Book b " +
+            "JOIN Book2AuthorEntity ba ON b.id = ba.bookId " +
+            "JOIN Author a ON ba.authorId = a.id " +
+            "Join Book2UserEntity b2u on b.id = b2u.bookId " +
+            "JOIN Book2UserTypeEntity b2ut on b2u.typeId = b2ut.id " +
+            "WHERE b2u.userId = :userId  and b2ut.name not like 'archived'")
+    List<Book2UserDto> findAllBook2UserDtoByUserId(@Param("userId") Long id);
+
+    @Query(value = "SELECT new com.example.my_book_shop_app.dto.Book2UserDto" +
+            "(b.slug, b.image, b.price, b.discount, b.isBestseller, b.title, a.slug, a.firstName, a.lastName, b2ut.name) " +
+            "FROM Book b " +
+            "JOIN Book2AuthorEntity ba ON b.id = ba.bookId " +
+            "JOIN Author a ON ba.authorId = a.id " +
+            "Join Book2UserEntity b2u on b.id = b2u.bookId " +
+            "JOIN Book2UserTypeEntity b2ut on b2u.typeId = b2ut.id " +
+            "WHERE b2u.userId = :userId and b2ut.name = 'archived'")
+    List<Book2UserDto> findAllArchivedBook2UserDtoByUserId(@Param("userId") Long id);
 }

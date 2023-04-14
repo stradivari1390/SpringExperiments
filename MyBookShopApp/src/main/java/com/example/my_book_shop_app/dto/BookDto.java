@@ -31,6 +31,9 @@ public class BookDto {
     @ApiModelProperty("The discount on the book's price")
     private Integer discount;
 
+    @ApiModelProperty("Is the book a bestseller")
+    private boolean bestseller;
+
     @ApiModelProperty("The rating of the book from 1 to 5")
     private Short rating;
 

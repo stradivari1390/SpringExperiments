@@ -2,6 +2,7 @@ package com.example.my_book_shop_app.controllers;
 
 import com.example.my_book_shop_app.data.ResourceStorage;
 import com.example.my_book_shop_app.dto.BookDto;
+import com.example.my_book_shop_app.security.BookstoreUserDetailsService;
 import com.example.my_book_shop_app.security.BookstoreUserRegister;
 import com.example.my_book_shop_app.services.AuthorService;
 import com.example.my_book_shop_app.services.BookService;
@@ -37,17 +38,22 @@ public class BookViewController {
     private final BooksRatingAndPopularityService booksRatingAndPopularityService;
     private final ResourceStorage storage;
     private final BookstoreUserRegister bookstoreUserRegister;
+    private final BookstoreUserDetailsService bookstoreUserDetailsService;
+    private final BookstoreUserRegister userRegister;
 
     @Autowired
     public BookViewController(BookService bookService, AuthorService authorService, ReviewService reviewService,
                               BooksRatingAndPopularityService booksRatingAndPopularityService, ResourceStorage storage,
-                              BookstoreUserRegister bookstoreUserRegister) {
+                              BookstoreUserRegister bookstoreUserRegister, BookstoreUserDetailsService bookstoreUserDetailsService,
+                              BookstoreUserRegister userRegister) {
         this.bookService = bookService;
         this.authorService = authorService;
         this.reviewService = reviewService;
         this.booksRatingAndPopularityService = booksRatingAndPopularityService;
         this.storage = storage;
         this.bookstoreUserRegister = bookstoreUserRegister;
+        this.bookstoreUserDetailsService = bookstoreUserDetailsService;
+        this.userRegister = userRegister;
     }
 
     @GetMapping("/books/recent")
@@ -55,16 +61,28 @@ public class BookViewController {
                                   @RequestParam(value = "limit", defaultValue = "10") Integer limit,
                                   @RequestParam(value = "fromDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fromDate,
                                   @RequestParam(value = "toDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate toDate,
-                                  Model model) {
+                                  Model model, Authentication authentication) {
         model.addAttribute("recentBooks", bookService.getPageOfRecentBooks(offset, limit, fromDate, toDate).getContent());
+        if (authentication != null && authentication.isAuthenticated()) {
+            model.addAttribute("authStatus", "authorized");
+            model.addAttribute("curUsr", bookstoreUserDetailsService.getUserDtoById(userRegister.getCurrentUser().getId()));
+        } else {
+            model.addAttribute("authStatus", "unauthorized");
+        }
         return "books/recent";
     }
 
     @GetMapping("/books/popular")
     public String popularBooksPage(@RequestParam(value = "offset", defaultValue = "0") Integer offset,
                                    @RequestParam(value = "limit", defaultValue = "10") Integer limit,
-                                   Model model) {
+                                   Model model, Authentication authentication) {
         model.addAttribute("popularBooks", bookService.getPageOfPopularBooks(offset, limit).getContent());
+        if (authentication != null && authentication.isAuthenticated()) {
+            model.addAttribute("authStatus", "authorized");
+            model.addAttribute("curUsr", bookstoreUserDetailsService.getUserDtoById(userRegister.getCurrentUser().getId()));
+        } else {
+            model.addAttribute("authStatus", "unauthorized");
+        }
         return "books/popular";
     }
 
@@ -82,18 +100,30 @@ public class BookViewController {
     public String tagsIndex(@RequestParam(value = "offset", defaultValue = "0") Integer offset,
                             @RequestParam(value = "limit", defaultValue = "10") Integer limit,
                             @RequestParam("tag") String tag,
-                            Model model) {
+                            Model model, Authentication authentication) {
         model.addAttribute("tag", bookService.getTagByName(tag));
         model.addAttribute("taggedBookPage", bookService.getPageOfBooksByTag(tag, offset, limit).getContent());
+        if (authentication != null && authentication.isAuthenticated()) {
+            model.addAttribute("authStatus", "authorized");
+            model.addAttribute("curUsr", bookstoreUserDetailsService.getUserDtoById(userRegister.getCurrentUser().getId()));
+        } else {
+            model.addAttribute("authStatus", "unauthorized");
+        }
         return "tags/index";
     }
 
     @GetMapping("/books/author")
     public String authorBooksPage(@RequestParam(value = "offset", defaultValue = "0") Integer offset,
                                   @RequestParam(value = "limit", defaultValue = "10") Integer limit,
-                                  @RequestParam("authorSlug") String slug, Model model) {
+                                  @RequestParam("authorSlug") String slug, Model model, Authentication authentication) {
         model.addAttribute("author", authorService.getAuthorBySlug(slug));
         model.addAttribute("booksPageByAuthor", bookService.getPageOfBooksByAuthor(slug, offset, limit).getContent());
+        if (authentication != null && authentication.isAuthenticated()) {
+            model.addAttribute("authStatus", "authorized");
+            model.addAttribute("curUsr", bookstoreUserDetailsService.getUserDtoById(userRegister.getCurrentUser().getId()));
+        } else {
+            model.addAttribute("authStatus", "unauthorized");
+        }
         return "books/author";
     }
 
@@ -107,6 +137,7 @@ public class BookViewController {
         model.addAttribute("tags", bookService.getTagsByBookSlug(slug));
         if (authentication != null && authentication.isAuthenticated()) {
             model.addAttribute("authStatus", "authorized");
+            model.addAttribute("curUsr", bookstoreUserDetailsService.getUserDtoById(userRegister.getCurrentUser().getId()));
         } else {
             model.addAttribute("authStatus", "unauthorized");
         }
@@ -138,7 +169,7 @@ public class BookViewController {
 
     @PostMapping("/rateBookReview")
     @ResponseBody
-    public ResponseEntity<Map<String, Object>> rateReview(@RequestParam("reviewid") Integer reviewId,
+    public ResponseEntity<Map<String, Object>> rateReview(@RequestParam("reviewid") int reviewId,
                                                           @RequestParam("value") Short value) {
         boolean success = reviewService.addReviewLike(reviewId, value, bookstoreUserRegister.getCurrentUser().getId());
         String redirectUrl = "/books/" + bookService.getBookByReviewId(reviewId).getSlug();

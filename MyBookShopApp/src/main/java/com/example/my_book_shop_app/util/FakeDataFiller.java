@@ -409,6 +409,9 @@ public class FakeDataFiller {
                     .plusDays(faker.random().nextInt(365))
                     .plusHours(faker.random().nextInt(24))
                     .plusMinutes(faker.random().nextInt(60));
+            if (reviewTime.isAfter(LocalDateTime.now())) {
+                reviewTime = LocalDateTime.now();
+            }
             BookReviewEntity bookReviewEntity = new BookReviewEntity();
             bookReviewEntity.setUserId(transaction.getUserId());
             bookReviewEntity.setBookId(transaction.getBookId());

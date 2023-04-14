@@ -45,7 +45,7 @@
     </style>
 </head>
 <body class="Site">
-<header class="Header" th:replace="~{fragments/common_header_fragment :: head(status=${authStatus})}"></header>
+<header class="Header" th:replace="~{fragments/common_header_fragment :: head(status=${authStatus}, curUser=${curUsr})}"></header>
 <div class="Middle">
     <div class="wrap">
         <main class="Middle-main">
@@ -57,7 +57,7 @@
                         <div class="ProductCard-photo"><img th:src="${book.image}" alt="card.jpg"/>
                         </div>
                     </div>
-                    <div class="ProductCard-desc" th:replace="~{fragments/book_description_fragment :: bookDesc(book=${book}, bookFiles=${bookFiles}, starRates=${starRates}, tags=${tags}, ratesCount=${ratesCount})}"></div>
+                    <div class="ProductCard-desc" th:replace="~{fragments/book_description_fragment :: bookDesc(book=${book}, bookFiles=${bookFiles}, starRates=${starRates}, tags=${tags}, ratesCount=${ratesCount}, authStatus=${authStatus})}"></div>
                 </div>
                 <div class="Product-comments">
                     <div class="Product-comments-header">
@@ -67,9 +67,9 @@
                 </div>
                 <div class="Product-comments-form">
                     <h4>Leave a review:</h4>
-                    <form id="review-form">
+                    <form th:if="${authStatus == 'authorized'}" id="review-form">
                         <textarea id="review-text" name="reviewText" rows="4" cols="50" placeholder="Write your review here..."></textarea>
-                        <input th:if="${authStatus == 'authorized'}" type="submit" value="Submit">
+                        <input type="submit" value="Submit">
                     </form>
                 </div>
                 <script>
@@ -100,7 +100,7 @@
                     });
                 </script>
                 <p></p>
-                <div th:replace="~{fragments/book_reviews_fragment :: reviewBlock(reviews=${reviews})}"></div>
+                <div th:replace="~{fragments/book_reviews_fragment :: reviewBlock(reviews=${reviews}, authStatus=${authStatus})}"></div>
             </div>
         </main>
     </div>

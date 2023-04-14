@@ -1,5 +1,6 @@
 package com.example.my_book_shop_app.controllers;
 
+import com.example.my_book_shop_app.security.BookstoreUserDetailsService;
 import com.example.my_book_shop_app.security.BookstoreUserRegister;
 import com.example.my_book_shop_app.services.BookService;
 import com.example.my_book_shop_app.dto.BookDto;
@@ -19,11 +20,14 @@ public class MainPageController {
 
     private final BookService bookService;
     private final BookstoreUserRegister bookstoreUserRegister;
+    private final BookstoreUserDetailsService bookstoreUserDetailsService;
 
     @Autowired
-    public MainPageController(BookService bookService, BookstoreUserRegister bookstoreUserRegister) {
+    public MainPageController(BookService bookService, BookstoreUserRegister bookstoreUserRegister,
+                              BookstoreUserDetailsService bookstoreUserDetailsService) {
         this.bookService = bookService;
         this.bookstoreUserRegister = bookstoreUserRegister;
+        this.bookstoreUserDetailsService = bookstoreUserDetailsService;
     }
 
     @ModelAttribute("query")
@@ -43,7 +47,7 @@ public class MainPageController {
             model.addAttribute("authStatus", "authorized");
             model.addAttribute("recommendedBooks",
                     bookService.getPageOfRecommendedBooks(bookstoreUserRegister.getCurrentUser().getId(), offset, limit).getContent());
-            model.addAttribute("userId", bookstoreUserRegister.getCurrentUser().getId());
+            model.addAttribute("curUsr", bookstoreUserDetailsService.getUserDtoById(bookstoreUserRegister.getCurrentUser().getId()));
         } else {
             model.addAttribute("authStatus", "unauthorized");
         }

@@ -20,6 +20,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
+@Transactional
 public class BooksRatingAndPopularityService {
 
     private final BookRepository bookRepository;
@@ -97,7 +98,6 @@ public class BooksRatingAndPopularityService {
         return bookRateEntityRepository.countByBookSlug(slug);
     }
 
-    @Transactional
     public void addRating(Long bookId, Long userId, Short value) {
         BookRateEntity bookRateEntity = new BookRateEntity();
         bookRateEntity.setBookId(bookId);

@@ -18,7 +18,7 @@
 </head>
 <body class="Site">
 <header class="Header"
-        th:replace="~{fragments/common_header_fragment :: head(status='authorized', curUser=${curUsr})}"></header>
+        th:replace="~{fragments/common_header_fragment :: head(status=${authStatus}, curUser=${curUsr})}"></header>
 <div class="Middle">
     <div class="Middle-top">
         <div class="wrap">
@@ -61,7 +61,7 @@
                                             <label class="form-label" for="phone" th:text="#{login.type.phone}">Телефон
                                             </label>
                                             <input class="form-input" id="phone" name="phone" type="text"
-                                                   th:value="${curUsr.phone}" placeholder="+70000000000" data-mask="+7 (999) 999-99-99"
+                                                   th:value="${curUsr.phone}" placeholder="+1234567890" data-mask="+62 (999) 9999-9999"
                                                    data-validate="require"/>
                                             <div class="Profile-btn Profile-btn_confirm">
                                                 <button class="btn btn_primary" type="button" th:text="#{login.submit}">Подтвердить
@@ -134,7 +134,7 @@
                     <div class="Tabs-block" id="topup">
                         <form class="form Topup" action="#" method="post" data-sendHash="34534535">
                             <div class="Topup-wrap">
-                                <strong class="Topup-title" th:text="profile.enter_topup_sum">Введите сумму, на которую хотите пополнить свой счет:
+                                <strong class="Topup-title" th:text="#{profile.topup_sum}">Введите сумму, на которую хотите пополнить свой счет:
                                 </strong>
                                 <div class="form-group form-group_row Topup-group">
                                     <input class="form-input" id="sum" name="sum" type="text"/><span th:text="#{profile.rubles}">рублей</span>

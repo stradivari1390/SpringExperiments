@@ -1,6 +1,7 @@
 package com.example.my_book_shop_app.services;
 
 import com.example.my_book_shop_app.data.repositories.Book2UserEntityRepository;
+import com.example.my_book_shop_app.data.repositories.Book2UserTypeEntityRepository;
 import com.example.my_book_shop_app.data.repositories.BookRepository;
 import com.example.my_book_shop_app.dto.BookDto;
 import jakarta.servlet.http.Cookie;
@@ -22,13 +23,16 @@ public class CartService {
     private final BookRepository bookRepository;
     private final BookService bookService;
     private final Book2UserEntityRepository book2UserEntityRepository;
+    private final Book2UserTypeEntityRepository book2UserTypeEntityRepository;
 
     @Autowired
     public CartService(BookRepository bookRepository, BookService bookService,
-                       Book2UserEntityRepository book2UserEntityRepository) {
+                       Book2UserEntityRepository book2UserEntityRepository,
+                       Book2UserTypeEntityRepository book2UserTypeEntityRepository) {
         this.bookRepository = bookRepository;
         this.bookService = bookService;
         this.book2UserEntityRepository = book2UserEntityRepository;
+        this.book2UserTypeEntityRepository = book2UserTypeEntityRepository;
     }
 
     public Page<BookDto> getPageOfCartBooks(Long userId, Integer offset, Integer limit) {
@@ -99,8 +103,7 @@ public class CartService {
         bookService.updateBook2UserEntity(userId, slug, "postponed");
     }
 
-    public void addToArchived(String slug, Long userId, String archivedContents, HttpServletResponse response) {
-        addSlugToCookie("archivedContents", archivedContents, slug, response);
+    public void addToArchived(String slug, Long userId) {
         bookService.updateBook2UserEntity(userId, slug, "archived");
     }
 
@@ -135,5 +138,9 @@ public class CartService {
 
     public void changeBook2UserRelation(Long userId, String slug, String book2userType) {
         bookService.updateBook2UserEntity(userId, slug, book2userType);
+    }
+
+    public String findBook2UserRelation(String slug, Long id) {
+        return book2UserTypeEntityRepository.findByBookIdAndUserId(bookRepository.findBySlug(slug).getId(), id).orElse("");
     }
 }

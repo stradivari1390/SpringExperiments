@@ -15,7 +15,7 @@ public interface UserEntityRepository extends JpaRepository<UserEntity, Integer>
 
     UserEntity findUserByUsername(String username);
 
-    @Query(value = "select new com.example.my_book_shop_app.dto.UserDto(u.balance, u.name, u.username, uce.contact, ucp.contact) " +
+    @Query(value = "select new com.example.my_book_shop_app.dto.UserDto(u.id, u.balance, u.name, u.username, uce.contact, ucp.contact) " +
             "from UserEntity u " +
             "JOIN UserContactEntity uce ON u.id = uce.userId AND uce.type = 'EMAIL' " +
             "JOIN UserContactEntity ucp ON u.id = ucp.userId AND ucp.type = 'PHONE' " +

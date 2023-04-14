@@ -55,7 +55,7 @@
                         </div>
                         <div class="form-group">
                             <input class="form-input form-input_phone" id="phone" name="phone" type="text"
-                                   th:placeholder="#{login.title.phone}" data-mask="+7 (999) 999-99-99"
+                                   th:placeholder="#{login.title.phone}" data-mask="+62 (999) 9999-9999"
                                    data-validate="require"/>
                             <input class="form-input form-input_mail" id="mail" name="mail" type="text"
                                    th:placeholder="#{login.title.email}" data-validate="mail require"/>
@@ -100,10 +100,9 @@
                                                                  href="/signup.html" th:text="#{login.sign.up}">Зарегистрироваться
                     </a>
                     </div>
-                    <div class="form-group form-group_center"><a class="Login-reg"
-                                                                 th:href="@{/oauth2/authorization/github}"
-                                                                 href="/signup.html" th:text="#{login.sign_github}">Войти с Facebook
-                    </a>
+                    <div class="form-group form-group_center">
+                        <a class="Login-reg" th:href="@{/oauth2/authorize/github}" href="/signin.html"
+                           th:text="#{login.sign_github}">Sign in with GitHub</a>
                     </div>
                 </div>
             </form>

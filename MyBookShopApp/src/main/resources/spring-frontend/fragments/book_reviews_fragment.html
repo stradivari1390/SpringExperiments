@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="ru" xmlns:th="http://www.thymeleaf.org">
-<div th:fragment="reviewBlock(reviews)">
+<div th:fragment="reviewBlock(reviews, authStatus)">
     <div class="Comments">
         <div th:each="review : ${reviews}" class="Comment">
             <div class="Comment-column Comment-column_pict">

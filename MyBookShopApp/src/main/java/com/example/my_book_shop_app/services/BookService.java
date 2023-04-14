@@ -6,6 +6,7 @@ import com.example.my_book_shop_app.data.model.book.file.FileDownloadEntity;
 import com.example.my_book_shop_app.data.model.book.links.Book2UserEntity;
 import com.example.my_book_shop_app.data.model.tag.TagEntity;
 import com.example.my_book_shop_app.data.repositories.*;
+import com.example.my_book_shop_app.dto.Book2UserDto;
 import com.example.my_book_shop_app.dto.BookDto;
 import com.example.my_book_shop_app.dto.BookFileDto;
 import com.example.my_book_shop_app.dto.TagCloudDto;
@@ -204,5 +205,13 @@ public class BookService {
 
     public Book getBookBySlug(String bookSlug) {
         return bookRepository.findBySlug(bookSlug);
+    }
+
+    public List<Book2UserDto> getUsersBooks(Long id) {
+        return bookRepository.findAllBook2UserDtoByUserId(id);
+    }
+
+    public List<Book2UserDto> getUsersArchivedBooks(Long id) {
+        return bookRepository.findAllArchivedBook2UserDtoByUserId(id);
     }
 }

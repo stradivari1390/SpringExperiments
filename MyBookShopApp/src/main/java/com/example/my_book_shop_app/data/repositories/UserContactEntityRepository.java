@@ -8,5 +8,4 @@ import org.springframework.lang.Nullable;
 public interface UserContactEntityRepository extends JpaRepository<UserContactEntity, Integer> {
     @Nullable
     UserContactEntity findByUserIdAndType(Long userId, ContactType type);
-
 }

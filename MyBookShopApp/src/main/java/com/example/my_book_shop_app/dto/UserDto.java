@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Data
 public class UserDto {
+    private Long id;
     private double balance;
     private String name;
     private String username;

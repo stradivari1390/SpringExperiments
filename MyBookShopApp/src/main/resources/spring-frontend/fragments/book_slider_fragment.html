@@ -16,15 +16,19 @@
                     <div class="Card">
                         <a class="Card-picture" th:href="@{'/books/' + ${book.slug}}">
                             <img th:src="${book.image}" alt="card.jpg"/>
-                            <div class="Card-sale" th:if="${book.discount != 0}"
-                                 th:text="'-' + ${#strings.toString(book.discount)} + '%'">
+                            <div th:if="${book.bestseller}" class="Card-ribbon">
+                                <span class="Card-ribbonText" th:text="#{menu.bestseller}">Бестселлер
+                                </span>
                             </div>
                         </a>
+                        <div class="Cart-sale" th:if="${book.discount != 0}"
+                             th:text="'-' + ${#strings.toString(book.discount)} + '%'">-30%
+                        </div>
                         <div class="Card-content">
                             <strong class="Card-title">
                                 <a th:href="@{'/books/' + ${book.slug}}" th:text="${book.title}"></a>
                             </strong>
-                            <div class="Card-description" th:text="${book.authorFirstName} + ' ' + ${book.authorLastName}"></div>
+                            <a class="Card-description" th:href="@{'/authors/' + ${book.authorSlug}}" th:text="${book.authorFirstName} + ' ' + ${book.authorLastName}"></a>
                             <div class="Card-cost">
                                 <span class="Card-priceOld" th:if="${book.discount != 0}"
                                   th:text="'₽' + ${#numbers.formatDecimal(book.price, 1, 2)}">

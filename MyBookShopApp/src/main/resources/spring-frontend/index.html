@@ -33,16 +33,16 @@
     </script>
 </head>
 <body class="Site">
-<header class="Header" th:replace="~{fragments/common_header_fragment :: head(main='menu-item menu-item_ACTIVE', status=${authStatus})}"></header>
+<header class="Header" th:replace="~{fragments/common_header_fragment :: head(main='menu-item menu-item_ACTIVE', status=${authStatus}, curUser=${curUsr})}"></header>
 <div class="Middle">
     <div class="wrap">
         <main class="Middle-main">
             <div class="Section">
-                <th:block th:if="${userId != null}">
-                    <div th:replace="~{fragments/book_slider_fragment :: bookSlider(title=#{menu.title.recommended}, booksList=${recommendedBooks}, dataLoad='recommended', userId=${userId})}">
+                <th:block th:if="${curUsr != null}">
+                    <div th:replace="~{fragments/book_slider_fragment :: bookSlider(title=#{menu.title.recommended}, booksList=${recommendedBooks}, dataLoad='recommended', userId=${curUsr.id})}">
                     </div>
                 </th:block>
-                <th:block th:if="${userId == null}">
+                <th:block th:if="${curUsr == null}">
                     <div th:replace="~{fragments/book_slider_fragment :: bookSlider(title=#{menu.title.recommended}, booksList=${popularBooks}, dataLoad='popular')}">
                     </div>
                 </th:block>

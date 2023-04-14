@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="ru" xmlns:th="http://www.thymeleaf.org">
-<div th:fragment="panel(bookSlug, bookFiles)">
+<div th:fragment="panel(bookSlug, bookFiles, authStatus)">
     <div class="ProductCard-cart">
         <div class="ProductCard-cartElement">
             <button class="btn btn_primary btn_outline" data-sendstatus="KEPT" th:data-bookid="${bookSlug}"
@@ -19,7 +19,7 @@
             </button>
         </div>
     </div>
-    <div class="ProductCard-cart">
+    <div th:if="${authStatus == 'authorized'}" class="ProductCard-cart">
         <div class="ProductCard-cartElement">
             <a class="btn btn_primary btn_outline" href="#" id="downloadButton">
                 <span class="btn-icon">
