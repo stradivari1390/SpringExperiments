@@ -24,10 +24,10 @@
         <main class="Middle-main">
             <h1 class="Middle-title" th:text="#{cart.basket}">Корзина</h1>
             <form class="form Cart" action="#" method="post">
-                <div th:if="${#lists.isEmpty(cartBooks)}" th:text="#{cart.empty_cart}">
+                <div th:if="${#lists.isEmpty(authStatus == 'unauthorized' ? cartBooks : curUsr.cartBooks)}" th:text="#{cart.empty_cart}">
                     <p>Корзина пуста</p>
                 </div>
-                <div th:if="${not #lists.isEmpty(cartBooks)}" th:each="book : ${cartBooks}">
+                <div th:if="${not #lists.isEmpty(authStatus == 'unauthorized' ? cartBooks : curUsr.cartBooks)}" th:each="book : ${authStatus == 'unauthorized' ? cartBooks : curUsr.cartBooks}">
                     <div class="Cart-product">
                         <div class="Cart-block Cart-block_row">
                             <div class="Cart-block Cart-block_pict">

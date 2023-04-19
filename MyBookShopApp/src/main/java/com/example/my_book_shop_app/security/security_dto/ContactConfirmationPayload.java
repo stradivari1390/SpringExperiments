@@ -1,4 +1,4 @@
-package com.example.my_book_shop_app.security;
+package com.example.my_book_shop_app.security.security_dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

@@ -13,5 +13,5 @@ public interface Book2UserTypeEntityRepository extends JpaRepository<Book2UserTy
     @Query(value = "SELECT b2ut.name FROM Book2UserTypeEntity b2ut " +
                     "JOIN Book2UserEntity b2u on b2ut.id = b2u.typeId " +
                     "WHERE b2u.bookId = :bookId and b2u.userId = :userId")
-    Optional<String> findByBookIdAndUserId(@Param("bookId") Long bookId, @Param("userId") Long userId);
+    Optional<String> findTypeNameByBookIdAndUserId(@Param("bookId") Long bookId, @Param("userId") Long userId);
 }

@@ -1,7 +1,7 @@
 package com.example.my_book_shop_app.controllers;
 
-import com.example.my_book_shop_app.security.BookstoreUserDetailsService;
-import com.example.my_book_shop_app.security.BookstoreUserRegister;
+import com.example.my_book_shop_app.security.security_services.BookstoreUserDetailsService;
+import com.example.my_book_shop_app.security.security_services.BookstoreUserRegister;
 import com.example.my_book_shop_app.services.BookService;
 import com.example.my_book_shop_app.dto.BookDto;
 

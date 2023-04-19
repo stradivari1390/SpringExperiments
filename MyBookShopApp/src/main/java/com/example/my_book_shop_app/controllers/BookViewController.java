@@ -2,8 +2,8 @@ package com.example.my_book_shop_app.controllers;
 
 import com.example.my_book_shop_app.data.ResourceStorage;
 import com.example.my_book_shop_app.dto.BookDto;
-import com.example.my_book_shop_app.security.BookstoreUserDetailsService;
-import com.example.my_book_shop_app.security.BookstoreUserRegister;
+import com.example.my_book_shop_app.security.security_services.BookstoreUserDetailsService;
+import com.example.my_book_shop_app.security.security_services.BookstoreUserRegister;
 import com.example.my_book_shop_app.services.AuthorService;
 import com.example.my_book_shop_app.services.BookService;
 import com.example.my_book_shop_app.services.BooksRatingAndPopularityService;
@@ -128,7 +128,8 @@ public class BookViewController {
     }
 
     @GetMapping("/books/{slug}")
-    public String authorSlugPage(@PathVariable("slug") String slug, Authentication authentication, Model model) {
+    public String authorSlugPage(@PathVariable("slug") String slug,
+                                 Authentication authentication, Model model) {
         model.addAttribute("book", bookService.getBookDtoBySlug(slug));
         model.addAttribute("bookFiles", bookService.getBookFilesByBookSlug(slug));
         model.addAttribute("reviews", reviewService.getReviewDtoListByBookSlug(slug));

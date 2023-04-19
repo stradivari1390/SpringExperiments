@@ -41,7 +41,7 @@
                     </div>
                 </div>
                 <div class="Cards">
-                    <div class="Card" th:each="book: ${booksList}">
+                    <div class="Card" th:each="book: ${curUsr.purchasedBooks}">
                         <div class="Card-picture">
                             <a th:href="@{'/books/' + ${book.slug}}">
                                 <img class="Cart-img" th:src="${book.image}" alt="card.jpg"/>
@@ -52,15 +52,15 @@
                                         <span class="Card-ribbonText" th:text="#{menu.bestseller}">Бестселлер
                                         </span>
                                 </div>
-                                <a th:if="${book.relation == 'purchased'}" class="Card-status" title="Куплена">
+                                <a class="Card-status" title="Куплена">
                                     <img src="/assets/img/icons/check.svg" alt="check.svg"/>
                                 </a>
-                                <a th:if="${book.relation == 'in_cart'}" class="Card-status" title="В корзине">
+                                <!--<a th:if="${book.relation == 'in_cart'}" class="Card-status" title="В корзине">
                                     <img src="/assets/img/icons/shopping-basket.svg" alt="shopping-basket.svg"/>
                                 </a>
                                 <a th:if="${book.relation == 'postponed'}" class="Card-status" title="Отложена">
                                     <img src="/assets/img/icons/heart.svg" alt="heart.svg"/>
-                                </a>
+                                </a>-->
                             </a>
                         </div>
                         <div class="Card-content">
@@ -72,13 +72,13 @@
                                 <a th:href="@{'/authors/' + ${book.authorSlug}}" th:text="${book.authorFirstName} + ' ' + ${book.authorLastName}">
                                 </a>
                             </div>
-                            <div class="Card-cost">
+                            <!--<div class="Card-cost">
                                 <span class="Card-priceOld" th:if="${book.discount != 0}"
                                       th:text="'₽' + ${#numbers.formatDecimal(book.price, 1, 2)}">₽300.00
                                 </span>
                                 <span class="Card-price" th:text="'₽' + ${#numbers.formatDecimal(book.price * (100 - book.discount) / 100, 1, 2)}">₽190.00
                                 </span>
-                            </div>
+                            </div>-->
                         </div>
                     </div>
                 </div>

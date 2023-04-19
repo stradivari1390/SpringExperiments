@@ -553,10 +553,7 @@ public class FakeDataFiller {
                 MessageEntity messageEntity = new MessageEntity();
                 if (faker.random().nextBoolean()) {
                     messageEntity.setUserId(user.getId());
-                    UserContactEntity contact = userContactEntityRepository.findByUserIdAndType(user.getId(), ContactType.EMAIL);
-                    if(contact != null) {
-                        messageEntity.setEmail(contact.getContact());
-                    }
+                    userContactEntityRepository.findByUserIdAndType(user.getId(), ContactType.EMAIL).ifPresent(contact -> messageEntity.setEmail(contact.getContact()));
                     messageEntity.setName(user.getName());
                 }
                 messageEntity.setSubject(faker.lorem().sentence());

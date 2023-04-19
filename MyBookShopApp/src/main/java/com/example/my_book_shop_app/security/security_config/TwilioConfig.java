@@ -1,4 +1,4 @@
-package com.example.my_book_shop_app.security.twilio;
+package com.example.my_book_shop_app.security.security_config;
 
 import com.twilio.http.TwilioRestClient;
 import com.twilio.type.PhoneNumber;

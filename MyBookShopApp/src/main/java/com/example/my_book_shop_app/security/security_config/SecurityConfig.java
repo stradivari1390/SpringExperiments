@@ -1,21 +1,25 @@
-package com.example.my_book_shop_app.security;
+package com.example.my_book_shop_app.security.security_config;
 
+import com.example.my_book_shop_app.security.CustomAuthenticationFailureHandler;
 import com.example.my_book_shop_app.security.jwt.JWTUtil;
 import com.example.my_book_shop_app.security.jwt.JwtAuthenticationEntryPoint;
 import com.example.my_book_shop_app.security.jwt.JwtAuthenticationFilter;
-import com.example.my_book_shop_app.security.jwt.TokenBlacklistService;
-import com.example.my_book_shop_app.security.oauth.CustomOAuth2UserService;
+import com.example.my_book_shop_app.security.security_services.TokenBlacklistService;
+import com.example.my_book_shop_app.security.security_services.CustomOAuth2UserService;
 import com.example.my_book_shop_app.security.oauth.OAuth2AuthenticationFailureHandler;
 import com.example.my_book_shop_app.security.oauth.OAuth2AuthenticationSuccessHandler;
+import com.example.my_book_shop_app.security.security_services.BookstoreUserDetailsService;
+
 import org.springframework.beans.factory.annotation.Autowired;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
+
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.client.web.AuthorizationRequestRepository;
@@ -64,16 +68,11 @@ public class SecurityConfig {
     }
 
     @Bean
-    public UserDetailsService userDetailsService(PasswordEncoder bCryptPasswordEncoder) {
-        return bookstoreUserDetailsService;
-    }
-
-    @Bean
     public AuthenticationManager authenticationManager(HttpSecurity http, PasswordEncoder bCryptPasswordEncoder,
-                                                       UserDetailsService userDetailsService)
+                                                       BookstoreUserDetailsService bookstoreUserDetailsService)
             throws Exception {
         return http.getSharedObject(AuthenticationManagerBuilder.class)
-                .userDetailsService(userDetailsService)
+                .userDetailsService(bookstoreUserDetailsService)
                 .passwordEncoder(bCryptPasswordEncoder)
                 .and()
                 .build();

@@ -1,8 +1,10 @@
-package com.example.my_book_shop_app.security.twilio;
+package com.example.my_book_shop_app.security.security_services;
 
+import com.example.my_book_shop_app.data.model.enums.ContactType;
+import com.example.my_book_shop_app.data.model.user.UserEntity;
 import com.example.my_book_shop_app.data.repositories.UserEntityRepository;
-import com.example.my_book_shop_app.security.BookstoreUserDetailsService;
-import com.example.my_book_shop_app.security.ContactConfirmationPayload;
+import com.example.my_book_shop_app.exceptions.NoUserFoundException;
+import com.example.my_book_shop_app.security.security_dto.ContactConfirmationPayload;
 import com.twilio.http.TwilioRestClient;
 import com.twilio.rest.api.v2010.account.Message;
 import com.twilio.rest.api.v2010.account.MessageCreator;
@@ -11,7 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
-public class SMSService {
+public class TwilioService {
 
     private final TwilioRestClient twilioRestClient;
     private final PhoneNumber fromPhoneNumber;
@@ -19,8 +21,8 @@ public class SMSService {
     private final UserEntityRepository userEntityRepository;
 
     @Autowired
-    public SMSService(TwilioRestClient twilioRestClient, PhoneNumber fromPhoneNumber,
-                      BookstoreUserDetailsService bookstoreUserDetailsService, UserEntityRepository userEntityRepository) {
+    public TwilioService(TwilioRestClient twilioRestClient, PhoneNumber fromPhoneNumber,
+                         BookstoreUserDetailsService bookstoreUserDetailsService, UserEntityRepository userEntityRepository) {
         this.twilioRestClient = twilioRestClient;
         this.fromPhoneNumber = fromPhoneNumber;
         this.bookstoreUserDetailsService = bookstoreUserDetailsService;
@@ -34,12 +36,9 @@ public class SMSService {
     }
 
     public void handleSmsSend(ContactConfirmationPayload payload) {
-        String code = bookstoreUserDetailsService.createSmsCode(
-                userEntityRepository
-                        .findByContacts(payload.getContact().replaceAll("[^0-9+]", ""))
-                        .getId()
-        );
+        String phoneNumber = payload.getContact();
+        String code = bookstoreUserDetailsService.createSmsOrEmailCode(phoneNumber);
         String message = "Your verification code is: " + code;
-        sendSMS(payload.getContact().replaceAll("[^0-9+]", ""), message);
+//        sendSMS(phoneNumber.replaceAll("[^0-9+]", ""), message);
     }
 }

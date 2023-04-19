@@ -7,8 +7,6 @@ import java.util.List;
 
 public interface Book2UserEntityRepository extends JpaRepository<Book2UserEntity, Integer> {
 
-    long deleteByBookIdAndUserId(Long bookId, Long userId);
-
     Book2UserEntity findByUserIdAndBookId(Long userId, Long bookId);
 
     List<Book2UserEntity> findAllByTypeId(int i);

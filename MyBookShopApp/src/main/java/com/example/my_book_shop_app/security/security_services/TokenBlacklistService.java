@@ -1,4 +1,4 @@
-package com.example.my_book_shop_app.security.jwt;
+package com.example.my_book_shop_app.security.security_services;
 
 import org.springframework.stereotype.Service;
 

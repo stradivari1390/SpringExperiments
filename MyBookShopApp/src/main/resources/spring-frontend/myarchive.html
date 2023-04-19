@@ -40,7 +40,7 @@
                     </div>
                 </div>
                 <div class="Cards">
-                    <div class="Card" th:each="book: ${archivedBooks}">
+                    <div class="Card" th:each="book: ${curUsr.archivedBooks}">
                         <div class="Card-picture">
                             <a th:href="@{'/books/' + ${book.slug}}">
                                 <img class="Cart-img" th:src="${book.image}" alt="card.jpg"/>
@@ -65,13 +65,13 @@
                                 <a th:href="@{'/authors/' + ${book.authorSlug}}" th:text="${book.authorFirstName} + ' ' + ${book.authorLastName}">
                                 </a>
                             </div>
-                            <div class="Card-cost">
+                            <!--<div class="Card-cost">
                                 <span class="Card-priceOld" th:if="${book.discount != 0}"
                                       th:text="'₽' + ${#numbers.formatDecimal(book.price, 1, 2)}">₽300.00
                                 </span>
                                 <span class="Card-price" th:text="'₽' + ${#numbers.formatDecimal(book.price * (100 - book.discount) / 100, 1, 2)}">₽190.00
                                 </span>
-                            </div>
+                            </div>-->
                         </div>
                     </div>
                 </div>

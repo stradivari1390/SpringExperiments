@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="ru" xmlns:th="http://www.thymeleaf.org">
-<div class="ProductCard-desc" th:fragment="bookDesc(book, bookFiles, starRates, tags, ratesCount, authStatus)">
+<div class="ProductCard-desc" th:fragment="bookDesc(book, bookFiles, starRates, tags, ratesCount, authStatus, curUser)">
     <div class="ProductCard-header">
         <h1 class="ProductCard-title" th:text="${book.title}">Мара и морок
         </h1>
@@ -114,6 +114,6 @@
     <div class="ProductCard-text">
         <p th:text="${book.description}"></p>
     </div>
-    <div th:replace="~{fragments/book_slug_buttons_fragment :: panel(bookSlug=${book.slug}, bookFiles=${bookFiles}, authStatus=${authStatus})}"></div>
+    <div th:replace="~{fragments/book_slug_buttons_fragment :: panel(book=${book}, bookFiles=${bookFiles}, authStatus=${authStatus}, curUser=${curUser})}"></div>
 </div>
 </html>

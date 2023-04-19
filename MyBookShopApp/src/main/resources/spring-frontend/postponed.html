@@ -28,7 +28,7 @@
                 <div th:if="${#lists.isEmpty(postponedBooks)}" th:text="#{cart.empty_postponed}">
                     <p>Нет избранного</p>
                 </div>
-                <div class="Cart-product" th:each="book : ${postponedBooks}">
+                <div class="Cart-product" th:each="book : ${authStatus == 'unauthorized' ? postponedBooks : curUsr.postponedBooks}">
                     <div class="Cart-block Cart-block_row">
                         <div class="Cart-block Cart-block_pict">
                             <a class="Cart-pict" th:href="@{'/books/' + ${book.slug}}">
@@ -99,9 +99,9 @@
                                 <div class="Cart-priceTitle"  th:text="#{cart.price}">Цена:
                                 </div>
                                 <div class="Cart-price Cart-price_old" th:if="${book.discount != 0}"
-                                     th:text="${#numbers.formatDecimal(book.price, 1, 2)}">
+                                     th:text="'₽' + ${#numbers.formatDecimal(book.price, 1, 2)}">
                                 </div>
-                                <div class="Cart-price" th:text="${#numbers.formatDecimal(book.price * (100 - book.discount) / 100, 1, 2)}">
+                                <div class="Cart-price" th:text="'₽' + ${#numbers.formatDecimal(book.price * (100 - book.discount) / 100, 1, 2)}">
                                 </div>
                                 <div class="Cart-sale" th:if="${book.discount != 0}"
                                      th:text="'-' + ${#strings.toString(book.discount)} + '%'">-30%
@@ -113,9 +113,9 @@
                 <div class="Cart-total">
                     <div class="Cart-block Cart-block_total">
                     </div>
-                    <div th:if="${!postponedBooks.isEmpty()}" class="Cart-block">
+                    <div th:if="${!(authStatus == 'unauthorized' ? postponedBooks : curUsr.postponedBooks).isEmpty()}" class="Cart-block">
                         <button class="btn btn_success btn_md Cart-buyAll" data-sendstatus="MASS_CART"
-                                th:data-bookid="${postponedBooksSlugs}" th:text="#{cart.buy_all}">Купить все
+                                th:data-bookid="${(authStatus == 'unauthorized' ? postponedBooks : curUsr.postponedBooks).get(0).slug}" th:text="#{cart.buy_all}">Купить все
                         </button>
                     </div>
                 </div>

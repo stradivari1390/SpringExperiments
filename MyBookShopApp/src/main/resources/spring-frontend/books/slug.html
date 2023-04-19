@@ -57,7 +57,7 @@
                         <div class="ProductCard-photo"><img th:src="${book.image}" alt="card.jpg"/>
                         </div>
                     </div>
-                    <div class="ProductCard-desc" th:replace="~{fragments/book_description_fragment :: bookDesc(book=${book}, bookFiles=${bookFiles}, starRates=${starRates}, tags=${tags}, ratesCount=${ratesCount}, authStatus=${authStatus})}"></div>
+                    <div class="ProductCard-desc" th:replace="~{fragments/book_description_fragment :: bookDesc(book=${book}, bookFiles=${bookFiles}, starRates=${starRates}, tags=${tags}, ratesCount=${ratesCount}, authStatus=${authStatus}, curUser=${curUsr})}"></div>
                 </div>
                 <div class="Product-comments">
                     <div class="Product-comments-header">

@@ -6,7 +6,6 @@ import com.example.my_book_shop_app.data.model.book.file.FileDownloadEntity;
 import com.example.my_book_shop_app.data.model.book.links.Book2UserEntity;
 import com.example.my_book_shop_app.data.model.tag.TagEntity;
 import com.example.my_book_shop_app.data.repositories.*;
-import com.example.my_book_shop_app.dto.Book2UserDto;
 import com.example.my_book_shop_app.dto.BookDto;
 import com.example.my_book_shop_app.dto.BookFileDto;
 import com.example.my_book_shop_app.dto.TagCloudDto;
@@ -190,28 +189,39 @@ public class BookService {
     }
 
     @Transactional
-    public void updateBook2UserEntity(Long userId, String bookSlug, String type) {
+    public void createOrUpdateBook2UserEntity(Long userId, String bookSlug, String type) {
         Long bookId = bookRepository.findBySlug(bookSlug).getId();
         Book2UserEntity book2UserEntity = book2UserEntityRepository.findByUserIdAndBookId(userId, bookId);
-        if (book2UserEntity == null) {
+
+        if (book2UserEntity == null && (type.equals("in_cart") || type.equals("postponed"))) {
             book2UserEntity = new Book2UserEntity();
             book2UserEntity.setBookId(bookId);
             book2UserEntity.setUserId(userId);
+        } else if (book2UserEntity != null) {
+            String currentType = book2UserTypeEntityRepository
+                    .findTypeNameByBookIdAndUserId(bookRepository.findBySlug(bookSlug).getId(), userId).orElse("");
+            if (!isValidTransition(currentType, type)) {
+                return;
+            }
+        } else {
+            return;
         }
         book2UserEntity.setTypeId(book2UserTypeEntityRepository.findByName(type).getId());
         book2UserEntity.setTime(LocalDateTime.now());
         book2UserEntityRepository.save(book2UserEntity);
     }
 
+    private boolean isValidTransition(String from, String to) {
+        return switch (from) {
+            case "in_cart" -> "purchased".equals(to) || "postponed".equals(to);
+            case "purchased" -> "archived".equals(to);
+            case "postponed" -> "in_cart".equals(to);
+            case "archived" -> "purchased".equals(to);
+            default -> false;
+        };
+    }
+
     public Book getBookBySlug(String bookSlug) {
         return bookRepository.findBySlug(bookSlug);
-    }
-
-    public List<Book2UserDto> getUsersBooks(Long id) {
-        return bookRepository.findAllBook2UserDtoByUserId(id);
-    }
-
-    public List<Book2UserDto> getUsersArchivedBooks(Long id) {
-        return bookRepository.findAllArchivedBook2UserDtoByUserId(id);
     }
 }

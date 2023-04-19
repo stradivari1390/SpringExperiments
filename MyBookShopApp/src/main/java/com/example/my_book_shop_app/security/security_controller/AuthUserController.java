@@ -1,44 +1,50 @@
-package com.example.my_book_shop_app.security;
+package com.example.my_book_shop_app.security.security_controller;
 
-import com.example.my_book_shop_app.security.jwt.TokenBlacklistService;
-import com.example.my_book_shop_app.security.twilio.SMSService;
-import com.example.my_book_shop_app.services.BookService;
+import com.example.my_book_shop_app.security.security_dto.ContactConfirmationPayload;
+import com.example.my_book_shop_app.security.security_dto.ContactConfirmationResponse;
+import com.example.my_book_shop_app.security.security_dto.RegistrationForm;
+import com.example.my_book_shop_app.security.security_services.*;
 
+import com.example.my_book_shop_app.services.CartService;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.HashMap;
+import java.util.Map;
 
 @Controller
 public class AuthUserController {
 
     private final BookstoreUserRegister userRegister;
     private final BookstoreUserDetailsService bookstoreUserDetailsService;
-    private final BookService bookService;
     private final TokenBlacklistService tokenBlacklistService;
-    private final SMSService smsService;
+    private final TwilioService twilioService;
     private final BookstoreUserRegister bookstoreUserRegister;
+    private final EmailService emailService;
+    private final CartService cartService;
 
     @Autowired
     public AuthUserController(BookstoreUserRegister userRegister,
-                              BookstoreUserDetailsService bookstoreUserDetailsService, BookService bookService,
-                              TokenBlacklistService tokenBlacklistService, SMSService smsService,
-                              BookstoreUserRegister bookstoreUserRegister) {
+                              BookstoreUserDetailsService bookstoreUserDetailsService,
+                              TokenBlacklistService tokenBlacklistService, TwilioService twilioService,
+                              BookstoreUserRegister bookstoreUserRegister, EmailService emailService,
+                              CartService cartService) {
         this.userRegister = userRegister;
         this.bookstoreUserDetailsService = bookstoreUserDetailsService;
-        this.bookService = bookService;
         this.bookstoreUserRegister = bookstoreUserRegister;
         this.tokenBlacklistService = tokenBlacklistService;
-        this.smsService = smsService;
+        this.twilioService = twilioService;
+        this.emailService = emailService;
+        this.cartService = cartService;
     }
 
     @GetMapping("/signin")
@@ -68,7 +74,9 @@ public class AuthUserController {
     public ContactConfirmationResponse handleRequestContactConfirmation(@RequestBody ContactConfirmationPayload payload) {
         ContactConfirmationResponse response = userRegister.requestContactConfirmation(payload);
         if (response.getResult().equals("true") && !payload.getContact().contains("@")) {
-            smsService.handleSmsSend(payload);
+            twilioService.handleSmsSend(payload);
+        } else if (response.getResult().equals("true") && payload.getContact().contains("@")) {
+            emailService.handleEmailSend(payload);
         }
         return response;
     }
@@ -90,7 +98,6 @@ public class AuthUserController {
     public String handleMy(Model model) {
         model.addAttribute("authStatus", "authorized");
         model.addAttribute("curUsr", bookstoreUserDetailsService.getUserDtoById(userRegister.getCurrentUser().getId()));
-        model.addAttribute("booksList", bookService.getUsersBooks(userRegister.getCurrentUser().getId()));
         return "my";
     }
 
@@ -102,10 +109,25 @@ public class AuthUserController {
     }
 
     @PostMapping("/login")
-    public String createAuthenticationToken(@RequestBody ContactConfirmationPayload payload,
-                                            HttpServletResponse httpServletResponse) throws Exception {
+    public ResponseEntity<?> createAuthenticationToken(@RequestBody ContactConfirmationPayload payload,
+                                                       HttpServletResponse httpServletResponse,
+                                                       HttpServletRequest httpServletRequest,
+                                                       Authentication authentication) throws Exception {
         bookstoreUserRegister.jwtTokenLogin(payload, httpServletResponse);
-        return "redirect:/my";
+        Map<String, Object> response = new HashMap<>();
+        response.put("success", true);
+        response.put("redirect", "/my");
+        if(authentication.isAuthenticated()) {
+            cartService.putCookieBooksToDB(
+                    cartService.getCookieContents("cartContents", httpServletRequest),
+                    "in_cart"
+            );
+            cartService.putCookieBooksToDB(
+                    cartService.getCookieContents("postponedContents", httpServletRequest),
+                    "postponed"
+            );
+        }
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/logout")

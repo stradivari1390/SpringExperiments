@@ -1,9 +1,10 @@
-package com.example.my_book_shop_app.security.oauth;
+package com.example.my_book_shop_app.security.security_services;
 
 import com.example.my_book_shop_app.data.model.user.UserEntity;
 import com.example.my_book_shop_app.data.repositories.UserEntityRepository;
-import com.example.my_book_shop_app.security.BookstoreUserRegister;
-import com.example.my_book_shop_app.security.RegistrationForm;
+import com.example.my_book_shop_app.exceptions.NoUserFoundException;
+import com.example.my_book_shop_app.security.oauth.CustomOAuth2User;
+import com.example.my_book_shop_app.security.security_dto.RegistrationForm;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.security.core.Authentication;
@@ -44,7 +45,8 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         String email = oAuth2User.getAttribute("email");
         String name = oAuth2User.getAttribute("name");
         String phone = oAuth2User.getAttribute("phone");
-        UserEntity user = userEntityRepository.findByContacts(email);
+        UserEntity user = userEntityRepository.findByContacts(email)
+                .orElseThrow(() -> new NoUserFoundException("User not found with email: " + email));
         if (user == null) {
             RegistrationForm registrationForm = new RegistrationForm();
             registrationForm.setName(name);
@@ -52,7 +54,8 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
             registrationForm.setPhone(phone);
             registrationForm.setPass("123456");
             bookstoreUserRegister.registerNewUser(registrationForm);
-            user = userEntityRepository.findByContacts(email);
+            user = userEntityRepository.findByContacts(email)
+                    .orElseThrow(() -> new NoUserFoundException("User not found, incorrect registration with form: " + registrationForm));
         }
         return user;
     }

@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html lang="ru" xmlns:th="http://www.thymeleaf.org">
-<div th:fragment="panel(bookSlug, bookFiles, authStatus)">
+<div th:fragment="panel(book, bookFiles, authStatus, curUser)">
     <div class="ProductCard-cart">
         <div class="ProductCard-cartElement">
-            <button class="btn btn_primary btn_outline" data-sendstatus="KEPT" th:data-bookid="${bookSlug}"
+            <button class="btn btn_primary btn_outline" data-sendstatus="KEPT" th:data-bookid="${book.slug}"
                     data-btntype="check" data-btnradio="buyblock" data-check="false"
                     th:data-alttext="#{cart.postponed}" data-url="/changeBookStatus"><span class="btn-icon"><img
                     src="/assets/img/icons/heart.svg" alt="heart.svg"/></span><span
@@ -11,7 +11,7 @@
             </button>
         </div>
         <div class="ProductCard-cartElement">
-            <button class="btn btn_primary btn_outline" data-sendstatus="CART" th:data-bookid="${bookSlug}"
+            <button class="btn btn_primary btn_outline" data-sendstatus="CART" th:data-bookid="${book.slug}"
                     data-btntype="check" data-btnradio="buyblock" data-check="false"
                     th:data-alttext="#{cart.in_cart}" data-url="/changeBookStatus"><span class="btn-icon"><img
                     src="/assets/img/icons/shopping-basket.svg"
@@ -20,7 +20,8 @@
         </div>
     </div>
     <div th:if="${authStatus == 'authorized'}" class="ProductCard-cart">
-        <div class="ProductCard-cartElement">
+        <div th:if="${curUser.purchasedBooks.contains(book) || curUser.archivedBooks.contains(book)}"
+             class="ProductCard-cartElement">
             <a class="btn btn_primary btn_outline" href="#" id="downloadButton">
                 <span class="btn-icon">
                     <img src="/assets/img/icons/download.svg" alt="download.svg"/>
@@ -41,9 +42,9 @@
             <div id="myOverlay" class="overlay">
             </div>
         </div>
-        <div class="ProductCard-cartElement">
+        <div th:if="${curUser.purchasedBooks.contains(book)}" class="ProductCard-cartElement">
             <button class="btn btn_primary btn_outline" data-sendstatus="ARCHIVED"
-                    th:data-bookid="${bookSlug}" data-btntype="check" data-btnradio="buyblock"
+                    th:data-bookid="${book.slug}" data-btntype="check" data-btnradio="buyblock"
                     data-check="false" th:data-alttext="#{menu.back_from_archive}" data-url="/changeBookStatus"><span class="btn-icon"><img
                     src="/assets/img/icons/archive.svg" alt="archive.svg"/></span><span
                     class="btn-content" th:text="#{menu.archive}">В архив</span>

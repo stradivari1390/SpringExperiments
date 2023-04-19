@@ -1,20 +1,27 @@
 package com.example.my_book_shop_app.services;
 
+import com.example.my_book_shop_app.data.model.book.links.Book2UserEntity;
 import com.example.my_book_shop_app.data.repositories.Book2UserEntityRepository;
 import com.example.my_book_shop_app.data.repositories.Book2UserTypeEntityRepository;
 import com.example.my_book_shop_app.data.repositories.BookRepository;
 import com.example.my_book_shop_app.dto.BookDto;
+import com.example.my_book_shop_app.dto.UserDto;
+import com.example.my_book_shop_app.security.security_services.BookstoreUserRegister;
+
 import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 @Service
@@ -23,35 +30,24 @@ public class CartService {
     private final BookRepository bookRepository;
     private final BookService bookService;
     private final Book2UserEntityRepository book2UserEntityRepository;
+    private final BookstoreUserRegister bookstoreUserRegister;
     private final Book2UserTypeEntityRepository book2UserTypeEntityRepository;
 
     @Autowired
     public CartService(BookRepository bookRepository, BookService bookService,
                        Book2UserEntityRepository book2UserEntityRepository,
+                       BookstoreUserRegister bookstoreUserRegister,
                        Book2UserTypeEntityRepository book2UserTypeEntityRepository) {
         this.bookRepository = bookRepository;
         this.bookService = bookService;
         this.book2UserEntityRepository = book2UserEntityRepository;
+        this.bookstoreUserRegister = bookstoreUserRegister;
         this.book2UserTypeEntityRepository = book2UserTypeEntityRepository;
     }
 
     public Page<BookDto> getPageOfCartBooks(Long userId, Integer offset, Integer limit) {
         Pageable nextPage = PageRequest.of(offset, limit);
         return bookRepository.getPageOfBooksInCart(userId, nextPage);
-    }
-
-    public Double getTotalPrice(String cookieContents) {
-        return getBookDtoListByCookie(cookieContents)
-                .stream()
-                .mapToDouble(BookDto::getPrice)
-                .sum();
-    }
-
-    public Double getTotalDiscountPrice(String cookieContents) {
-        return getBookDtoListByCookie(cookieContents)
-                .stream()
-                .mapToDouble(b -> b.getPrice() * (100 - b.getDiscount()) / 100)
-                .sum();
     }
 
     public List<BookDto> getBookDtoListByCookie(String cookieContents) {
@@ -61,50 +57,55 @@ public class CartService {
         return bookRepository.findAllBookDtoBySlug(cookieSlugs);
     }
 
-    public List<String> getCookieBooksSlugs(String cookieContents) {
-        cookieContents = cookieContents.startsWith("/") ? cookieContents.substring(1) : cookieContents;
-        cookieContents = cookieContents.endsWith("/") ? cookieContents.substring(0, cookieContents.length() - 1) : cookieContents;
-        String[] cookieSlugs = cookieContents.split("/");
-        return List.of(cookieSlugs);
-    }
-
-    public void addToCart(String slug, Long userId, String cartContents, String postponedContents, HttpServletResponse response) {
+    public void addToCart(String slug, String cartContents, String postponedContents,
+                          HttpServletResponse response, Authentication authentication) {
+        if (authentication != null && authentication.isAuthenticated()) {
+            changeBook2UserRelation(bookstoreUserRegister.getCurrentUser().getId(), slug, "in_cart");
+        }
         addSlugToCookie("cartContents", cartContents, slug, response);
         if (postponedContents != null) {
             removeSlugFromCookie(slug, postponedContents, "postponedContents", response);
         }
-        bookService.updateBook2UserEntity(userId, slug, "in_cart");
     }
 
-    public void addAllToCart(Long userId, String cartContents, String postponedContents, HttpServletResponse response) {
-        ArrayList<String> booksSlugsFromCookie = new ArrayList<>();
-        if (cartContents != null && !cartContents.equals("")) {
-            booksSlugsFromCookie.addAll(List.of(cartContents.split("/")));
+    public void addAllToCart(String cartContents, String postponedContents,
+                             HttpServletResponse response, Authentication authentication) {
+        if (authentication != null && authentication.isAuthenticated()) {
+            Long userId = bookstoreUserRegister.getCurrentUser().getId();
+            List<BookDto> postponedBooks = bookRepository
+                    .findAllBooksDtoByUserIdAndRelation(userId, "postponed")
+                    .orElse(Collections.emptyList());
+            postponedBooks.forEach(b -> changeBook2UserRelation(userId, b.getSlug(), "in_cart"));
         }
-        List<String> postponedBooksSlugs;
-        if (postponedContents != null && !postponedContents.equals("")) {
-            postponedBooksSlugs = List.of(postponedContents.split("/"));
-            booksSlugsFromCookie.addAll(postponedBooksSlugs);
-            postponedBooksSlugs.forEach(bs -> bookService.updateBook2UserEntity(userId, bs, "in_cart"));
+        if (cartContents != null && !cartContents.isEmpty()) {
+            cartContents = cartContents + "/" + postponedContents;
+        } else {
+            cartContents = postponedContents;
         }
-        Cookie cartCookie = new Cookie("cartContents", String.join("/", booksSlugsFromCookie));
+        postponedContents = "";
+        Cookie cartCookie = new Cookie("cartContents", cartContents);
         cartCookie.setPath("/");
-        Cookie postponedCookie = new Cookie("postponedContents", "");
-        postponedCookie.setPath("/");
         response.addCookie(cartCookie);
+
+        Cookie postponedCookie = new Cookie("postponedContents", postponedContents);
+        postponedCookie.setPath("/");
         response.addCookie(postponedCookie);
     }
 
-    public void addToPostponed(String slug, Long userId, String cartContents, String postponedContents, HttpServletResponse response) {
+    public void addToPostponed(String slug, String cartContents, String postponedContents,
+                               HttpServletResponse response, Authentication authentication) {
+        if (authentication != null && authentication.isAuthenticated()) {
+            changeBook2UserRelation(bookstoreUserRegister.getCurrentUser().getId(), slug, "postponed");
+        }
         addSlugToCookie("postponedContents", postponedContents, slug, response);
         if (cartContents != null) {
             removeSlugFromCookie(slug, cartContents, "cartContents", response);
         }
-        bookService.updateBook2UserEntity(userId, slug, "postponed");
     }
 
-    public void addToArchived(String slug, Long userId) {
-        bookService.updateBook2UserEntity(userId, slug, "archived");
+    public void addToArchived(String slug) {
+        Long userId = bookstoreUserRegister.getCurrentUser().getId();
+        changeBook2UserRelation(userId, slug, "archived");
     }
 
     private void addSlugToCookie(String cookieName, String cookieContents, String slug, HttpServletResponse response) {
@@ -130,17 +131,61 @@ public class CartService {
         }
     }
 
-    @Transactional
+    public String getCookieContents(String cookieName, HttpServletRequest request) {
+        Cookie[] cookies = request.getCookies();
+        if (cookies != null) {
+            for (Cookie cookie : cookies) {
+                if (cookie.getName().equals(cookieName)) {
+                    return cookie.getValue();
+                }
+            }
+        }
+        return null;
+    }
+
     public void removeBook2UserRelation(Long userId, String bookSlug) {
         Long bookId = bookRepository.findBySlug(bookSlug).getId();
-        book2UserEntityRepository.deleteByBookIdAndUserId(bookId, userId);
+        String book2UserTypeName = book2UserTypeEntityRepository.findTypeNameByBookIdAndUserId(bookId, userId).orElse("");
+        if(book2UserTypeName.equals("postponed") || book2UserTypeName.equals("in_cart")) {
+            Book2UserEntity book2UserEntity = book2UserEntityRepository.findByUserIdAndBookId(userId, bookId);
+            book2UserEntityRepository.delete(book2UserEntity);
+        }
     }
 
     public void changeBook2UserRelation(Long userId, String slug, String book2userType) {
-        bookService.updateBook2UserEntity(userId, slug, book2userType);
+        bookService.createOrUpdateBook2UserEntity(userId, slug, book2userType);
     }
 
-    public String findBook2UserRelation(String slug, Long id) {
-        return book2UserTypeEntityRepository.findByBookIdAndUserId(bookRepository.findBySlug(slug).getId(), id).orElse("");
+    public void putCookieBooksToDB(String cookieValue, String user2BookRelationName) {
+        getBookDtoListByCookie(cookieValue)
+                .forEach(b -> changeBook2UserRelation(bookstoreUserRegister.getCurrentUser().getId(), b.getSlug(), user2BookRelationName));
+    }
+
+    public Double getTotalPrice(String cookieContents) {
+        return getBookDtoListByCookie(cookieContents)
+                .stream()
+                .mapToDouble(BookDto::getPrice)
+                .sum();
+    }
+
+    public Double getTotalDiscountPrice(String cookieContents) {
+        return getBookDtoListByCookie(cookieContents)
+                .stream()
+                .mapToDouble(b -> b.getPrice() * (100 - b.getDiscount()) / 100)
+                .sum();
+    }
+
+    public Double getTotalPrice(UserDto userDto) {
+        return userDto.getCartBooks()
+                .stream()
+                .mapToDouble(BookDto::getPrice)
+                .sum();
+    }
+
+    public Double getTotalDiscountPrice(UserDto userDto) {
+        return userDto.getCartBooks()
+                .stream()
+                .mapToDouble(b -> b.getPrice() * (100 - b.getDiscount()) / 100)
+                .sum();
     }
 }

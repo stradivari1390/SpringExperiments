@@ -1,6 +1,7 @@
 package com.example.my_book_shop_app.security.jwt;
 
 import com.example.my_book_shop_app.security.BookstoreUserDetails;
+import com.example.my_book_shop_app.security.security_services.TokenBlacklistService;
 import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
