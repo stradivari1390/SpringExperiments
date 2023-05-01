@@ -28,6 +28,7 @@ import org.springframework.security.oauth2.core.endpoint.OAuth2AuthorizationRequ
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 @Configuration
 @EnableWebSecurity
@@ -90,7 +91,7 @@ public class SecurityConfig {
                 .loginPage("/signin").failureUrl("/signin")
                 .failureHandler(new CustomAuthenticationFailureHandler())
                 .defaultSuccessUrl("/my")
-                .and().logout().logoutUrl("/logout").logoutSuccessUrl("/signin").deleteCookies("token")
+                .and().logout().logoutUrl("/logout").logoutSuccessUrl("/signin").deleteCookies("token").logoutRequestMatcher(new AntPathRequestMatcher("/logout", "POST"))
                 .and().oauth2Login()
                 .loginPage("/signin")
                 .authorizationEndpoint()

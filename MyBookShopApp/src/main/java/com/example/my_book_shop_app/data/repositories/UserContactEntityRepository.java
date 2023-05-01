@@ -11,4 +11,6 @@ public interface UserContactEntityRepository extends JpaRepository<UserContactEn
     Optional<UserContactEntity> findByUserIdAndType(Long userId, ContactType type);
 
     Optional<UserContactEntity> findByContact(String contact);
+
+    void deleteAllByUserId(Long userId);
 }

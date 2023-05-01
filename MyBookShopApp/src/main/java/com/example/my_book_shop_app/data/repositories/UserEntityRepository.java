@@ -23,4 +23,8 @@ public interface UserEntityRepository extends JpaRepository<UserEntity, Integer>
             "JOIN UserContactEntity ucp ON u.id = ucp.userId AND ucp.type = 'PHONE' " +
             "WHERE u.id = :id")
     Optional<UserDto> findUserDtoById(@Param("id") Long id);
+
+    void deleteById(Long id);
+
+    UserEntity findByUsername(String username);
 }

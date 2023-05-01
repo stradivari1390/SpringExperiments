@@ -58,9 +58,9 @@
                     <li class="menu-item" th:class="${authors}"><a class="menu-link" th:href="@{/authors}" th:text="#{menu.authors}"
                                                                    href="/authors/index.html">Авторы</a>
                     </li>
-                    <li th:if="${authStatus == 'authorized'}" class="menu-item" th:class="${logout}">
-                        <a class="menu-link" th:href="@{/logout}" th:text="#{menu.logout}">Logout</a>
-                    </li>
+                    <form th:if="${authStatus == 'authorized'}" class="menu-item" th:class="${logout}" method="post" action="/logout">
+                        <button type="submit" class="menu-link" th:text="#{menu.logout}">Logout</button>
+                    </form>
                 </ul>
             </nav>
         </div>

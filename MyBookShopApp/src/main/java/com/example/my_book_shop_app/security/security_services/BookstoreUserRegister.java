@@ -1,11 +1,13 @@
 package com.example.my_book_shop_app.security.security_services;
 
+import ch.qos.logback.classic.Logger;
 import com.example.my_book_shop_app.data.model.enums.ContactType;
 import com.example.my_book_shop_app.data.model.user.UserContactEntity;
 import com.example.my_book_shop_app.data.model.user.UserEntity;
 import com.example.my_book_shop_app.data.repositories.UserContactEntityRepository;
 import com.example.my_book_shop_app.data.repositories.UserEntityRepository;
 import com.example.my_book_shop_app.data.UserContactDetails;
+import com.example.my_book_shop_app.exceptions.NoUserFoundException;
 import com.example.my_book_shop_app.exceptions.UserAlreadyExistsException;
 import com.example.my_book_shop_app.exceptions.WrongPasswordException;
 import com.example.my_book_shop_app.security.BookstoreUserDetails;
@@ -19,11 +21,13 @@ import com.example.my_book_shop_app.security.security_dto.RegistrationForm;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 
+import org.slf4j.LoggerFactory;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.authentication.DisabledException;
+import org.springframework.security.authentication.InternalAuthenticationServiceException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -44,6 +48,7 @@ public class BookstoreUserRegister {
     private final BookstoreUserDetailsService bookstoreUserDetailsService;
     private final JWTUtil jwtTokenUtil;
     private final AuthUserController authUserController;
+    private final Logger log = (Logger) LoggerFactory.getLogger(getClass());
 
     @Autowired
     public BookstoreUserRegister(UserEntityRepository userEntityRepository, PasswordEncoder passwordEncoder,
@@ -109,12 +114,13 @@ public class BookstoreUserRegister {
         return response;
     }
 
-    public void jwtTokenLogin(ContactConfirmationPayload payload, HttpServletResponse httpServletResponse) throws Exception {
-//        handlePossessAuthentication(payload);
+    public void jwtTokenLogin(ContactConfirmationPayload payload, HttpServletResponse httpServletResponse) {
+        // handlePossessAuthentication(payload);
         handlePasswordAuthentication(payload);
 
         final UserDetails userDetails = bookstoreUserDetailsService.loadUserByUsername(payload.getContact());
         final String token = jwtTokenUtil.generateToken(userDetails);
+
         Cookie cookie = new Cookie("token", token);
         httpServletResponse.addCookie(cookie);
     }
@@ -126,11 +132,15 @@ public class BookstoreUserRegister {
         }
     }
 
-    private void handlePasswordAuthentication(ContactConfirmationPayload payload) throws Exception {
+    private void handlePasswordAuthentication(ContactConfirmationPayload payload) {
         try {
             authenticate(payload.getContact(), payload.getCode());
         } catch (BadCredentialsException e) {
-            throw new WrongPasswordException("Wrong password");
+            if (e.getCause() instanceof NoUserFoundException noUserFoundException) {
+                throw noUserFoundException;
+            } else {
+                throw new WrongPasswordException("Wrong password");
+            }
         }
     }
 
@@ -141,6 +151,7 @@ public class BookstoreUserRegister {
         } else if (principal instanceof CustomOAuth2User oAuth2User) {
             return oAuth2User.getUser();
         } else {
+            log.error("The principal is not an instance of BookstoreUserDetails or CustomOAuth2User. Principal: {}", principal);
             throw new IllegalStateException("The principal is not an instance of BookstoreUserDetails or CustomOAuth2User");
         }
     }
@@ -167,10 +178,12 @@ public class BookstoreUserRegister {
     private void authenticate(String username, String password) {
         try {
             authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
-//        } catch (DisabledException e) {
-//            throw new Exception("USER_DISABLED", e); move to exceptionHandler
-        } catch (BadCredentialsException e) {
-            throw new WrongPasswordException("INVALID PASSWORD");
+        } catch (InternalAuthenticationServiceException e) {
+            if (e.getCause() instanceof NoUserFoundException noUserFoundException) {
+                throw new BadCredentialsException("User not found", noUserFoundException);
+            } else {
+                throw new WrongPasswordException("Invalid password");
+            }
         }
     }
 }

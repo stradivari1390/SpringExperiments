@@ -21,7 +21,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 @Service
@@ -73,8 +72,7 @@ public class CartService {
         if (authentication != null && authentication.isAuthenticated()) {
             Long userId = bookstoreUserRegister.getCurrentUser().getId();
             List<BookDto> postponedBooks = bookRepository
-                    .findAllBooksDtoByUserIdAndRelation(userId, "postponed")
-                    .orElse(Collections.emptyList());
+                    .findAllBooksDtoByUserIdAndRelation(userId, "postponed");
             postponedBooks.forEach(b -> changeBook2UserRelation(userId, b.getSlug(), "in_cart"));
         }
         if (cartContents != null && !cartContents.isEmpty()) {

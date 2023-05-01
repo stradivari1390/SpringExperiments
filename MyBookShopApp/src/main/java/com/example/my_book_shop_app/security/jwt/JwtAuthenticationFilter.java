@@ -1,5 +1,6 @@
 package com.example.my_book_shop_app.security.jwt;
 
+import ch.qos.logback.classic.Logger;
 import com.example.my_book_shop_app.security.BookstoreUserDetails;
 import com.example.my_book_shop_app.security.security_services.TokenBlacklistService;
 import io.jsonwebtoken.ExpiredJwtException;
@@ -8,6 +9,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.slf4j.LoggerFactory;
 import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -22,6 +24,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final JWTUtil jwtTokenUtil;
     private final UserDetailsService userDetailsService;
     private final TokenBlacklistService tokenBlacklistService;
+    private final Logger log = (Logger) LoggerFactory.getLogger(getClass());
 
     public JwtAuthenticationFilter(JWTUtil jwtTokenUtil, UserDetailsService userDetailsService,
                                    TokenBlacklistService tokenBlacklistService) {
@@ -48,7 +51,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                         return;
                     }
                 }
-
                 if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
                     BookstoreUserDetails userDetails =
                             (BookstoreUserDetails) userDetailsService.loadUserByUsername(username);
@@ -58,8 +60,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                                         userDetails, null, userDetails.getAuthorities()
                                 );
                         authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(httpServletRequest));
+                        log.debug("Username: {}, Token: {}", username, token);
+                        log.debug("Authentication before setting SecurityContextHolder: {}", SecurityContextHolder.getContext().getAuthentication());
                         SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+                        log.debug("Authentication after setting SecurityContextHolder: {}", SecurityContextHolder.getContext().getAuthentication());
                     } else {
+                        log.debug("Username: {}, Token: {}", username, token);
+                        log.debug("Authentication: {}", SecurityContextHolder.getContext().getAuthentication());
                         httpServletResponse.sendRedirect("/logout");
                         return;
                     }
@@ -69,6 +76,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         if (httpServletRequest.getRequestURI().equals("/signup")) {
             SecurityContextHolder.clearContext();
         }
-        filterChain.doFilter(httpServletRequest,httpServletResponse);
+        filterChain.doFilter(httpServletRequest, httpServletResponse);
     }
 }

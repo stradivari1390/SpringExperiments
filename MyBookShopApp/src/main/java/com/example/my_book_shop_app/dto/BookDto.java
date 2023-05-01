@@ -5,6 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -36,6 +38,9 @@ public class BookDto {
 
     @ApiModelProperty("The rating of the book from 1 to 5")
     private Short rating;
+
+    @ApiModelProperty("The publication date of the book")
+    private LocalDate publicationDate;
 
     @ApiModelProperty("The first name of the book's author")
     private String authorFirstName;

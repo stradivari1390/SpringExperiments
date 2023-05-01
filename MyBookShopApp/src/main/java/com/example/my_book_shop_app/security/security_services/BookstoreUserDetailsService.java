@@ -16,7 +16,6 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.Collections;
 import java.util.Random;
 
 @Service
@@ -46,14 +45,10 @@ public class BookstoreUserDetailsService implements UserDetailsService {
     public UserDto getUserDtoById(Long id) {
         UserDto user = userEntityRepository.findUserDtoById(id)
                 .orElseThrow(() -> new NoUserFoundException("User not found with id: " + id));
-        user.setPostponedBooks(bookRepository.findAllBooksDtoByUserIdAndRelation(user.getId(), "postponed")
-                .orElse(Collections.emptyList()));
-        user.setCartBooks(bookRepository.findAllBooksDtoByUserIdAndRelation(user.getId(), "in_cart")
-                .orElse(Collections.emptyList()));
-        user.setPurchasedBooks(bookRepository.findAllBooksDtoByUserIdAndRelation(user.getId(), "purchased")
-                .orElse(Collections.emptyList()));
-        user.setArchivedBooks(bookRepository.findAllBooksDtoByUserIdAndRelation(user.getId(), "archived")
-                .orElse(Collections.emptyList()));
+        user.setPostponedBooks(bookRepository.findAllBooksDtoByUserIdAndRelation(user.getId(), "postponed"));
+        user.setCartBooks(bookRepository.findAllBooksDtoByUserIdAndRelation(user.getId(), "in_cart"));
+        user.setPurchasedBooks(bookRepository.findAllBooksDtoByUserIdAndRelation(user.getId(), "purchased"));
+        user.setArchivedBooks(bookRepository.findAllBooksDtoByUserIdAndRelation(user.getId(), "archived"));
         return user;
     }
 

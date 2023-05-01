@@ -5,6 +5,7 @@ import com.example.my_book_shop_app.dto.BookReviewDto;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.lang.NonNull;
 
 import java.util.List;
 
@@ -20,4 +21,9 @@ public interface BookReviewEntityRepository extends JpaRepository<BookReviewEnti
     List<BookReviewDto> findReviewDtoByBookSlug(@Param("slug") String slug);
 
     BookReviewEntity findByBookIdAndUserId(Long bookId, Long userId);
+
+    @Query("SELECT br FROM BookReviewEntity br JOIN UserEntity u ON br.userId = u.id WHERE u.name = :username ORDER BY br.time DESC")
+    List<BookReviewEntity> findReviewsByUserNameOrderByTimeDesc(@Param("username") String username);
+
+    void deleteById(@NonNull Integer id);
 }

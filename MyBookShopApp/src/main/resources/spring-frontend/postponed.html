@@ -25,7 +25,7 @@
             <h1 class="Middle-title" th:text="#{cart.postponed}">Отложенное
             </h1>
             <form class="form Cart Cart_postponed" action="#" method="post">
-                <div th:if="${#lists.isEmpty(postponedBooks)}" th:text="#{cart.empty_postponed}">
+                <div th:if="${#lists.isEmpty(authStatus == 'unauthorized' ? postponedBooks : curUsr.postponedBooks)}" th:text="#{cart.empty_postponed}">
                     <p>Нет избранного</p>
                 </div>
                 <div class="Cart-product" th:each="book : ${authStatus == 'unauthorized' ? postponedBooks : curUsr.postponedBooks}">

@@ -8,17 +8,17 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.lang.NonNull;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Optional;
 
 public interface BookRepository extends JpaRepository<Book, Long> {
     Book findBySlug(String slug);
 
     String SELECT_BOOK_DTO = "SELECT new com.example.my_book_shop_app.dto.BookDto" +
             "(b.id, b.slug, b.title, b.image, b.description, b.price, b.discount, " +
-            "b.isBestseller, b.rating, a.firstName, a.lastName, a.slug) ";
+            "b.isBestseller, b.rating, b.publicationDate, a.firstName, a.lastName, a.slug) ";
 
     @Query(value = SELECT_BOOK_DTO +
             "FROM Book b " +
@@ -220,5 +220,13 @@ public interface BookRepository extends JpaRepository<Book, Long> {
             "JOIN Book2AuthorEntity ba ON b.id = ba.bookId " +
             "JOIN Author a ON ba.authorId = a.id " +
             "WHERE b2u.userId = :userId AND b2ut.name = :relation")
-    Optional<List<BookDto>> findAllBooksDtoByUserIdAndRelation(@Param("userId") Long userId, @Param("relation") String relation);
+    @NonNull
+    List<BookDto> findAllBooksDtoByUserIdAndRelation(@Param("userId") Long userId, @Param("relation") String relation);
+
+    @Query(value = SELECT_BOOK_DTO +
+            "FROM Book b " +
+            "JOIN Book2AuthorEntity ba ON b.id = ba.bookId " +
+            "JOIN Author a ON ba.authorId = a.id " +
+            "WHERE a.firstName = :token")
+    List<BookDto> findAllBooksDtoByAuthorFirstName(@Param("token") String token);
 }

@@ -1,5 +1,6 @@
 package com.example.my_book_shop_app.security.security_controller;
 
+import ch.qos.logback.classic.Logger;
 import com.example.my_book_shop_app.security.security_dto.ContactConfirmationPayload;
 import com.example.my_book_shop_app.security.security_dto.ContactConfirmationResponse;
 import com.example.my_book_shop_app.security.security_dto.RegistrationForm;
@@ -10,6 +11,7 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -31,6 +33,7 @@ public class AuthUserController {
     private final BookstoreUserRegister bookstoreUserRegister;
     private final EmailService emailService;
     private final CartService cartService;
+    private final Logger log = (Logger) LoggerFactory.getLogger(getClass());
 
     @Autowired
     public AuthUserController(BookstoreUserRegister userRegister,
@@ -112,11 +115,15 @@ public class AuthUserController {
     public ResponseEntity<?> createAuthenticationToken(@RequestBody ContactConfirmationPayload payload,
                                                        HttpServletResponse httpServletResponse,
                                                        HttpServletRequest httpServletRequest,
-                                                       Authentication authentication) throws Exception {
+                                                       Authentication authentication) {
         bookstoreUserRegister.jwtTokenLogin(payload, httpServletResponse);
         Map<String, Object> response = new HashMap<>();
         response.put("success", true);
         response.put("redirect", "/my");
+        if (authentication == null) {
+            authentication = SecurityContextHolder.getContext().getAuthentication();
+        }
+        log.info("Authentication after login: {}", authentication);
         if(authentication.isAuthenticated()) {
             cartService.putCookieBooksToDB(
                     cartService.getCookieContents("cartContents", httpServletRequest),
@@ -130,9 +137,10 @@ public class AuthUserController {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/logout")
+    @PostMapping("/logout")
     public String handleLogout(HttpServletRequest request, HttpServletResponse response) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        log.info("Authentication before logout: {}", auth);
         if (auth != null) {
             Cookie[] cookies = request.getCookies();
             if (cookies != null) {

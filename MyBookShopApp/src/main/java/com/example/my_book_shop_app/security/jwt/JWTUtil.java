@@ -1,8 +1,8 @@
 package com.example.my_book_shop_app.security.jwt;
 
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
+import com.example.my_book_shop_app.security.security_services.TokenBlacklistService;
+import io.jsonwebtoken.*;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
@@ -15,10 +15,13 @@ import java.util.function.Function;
 @Component
 public class JWTUtil {
 
-    public static final long JWT_TOKEN_VALIDITY = 5 * 60 * 60 * 1000;
+    private static long jwtTokenValidity = 5 * 60 * 60 * 1000L;
 
     @Value("${jwt.secret}")
     private String secret;
+
+    @Autowired
+    private TokenBlacklistService tokenBlacklistService;
 
     public String getUsernameFromToken(String token) {
         return getClaimFromToken(token, Claims::getSubject);
@@ -49,12 +52,20 @@ public class JWTUtil {
 
     private String doGenerateToken(Map<String, Object> claims, String subject) {
         return Jwts.builder().setClaims(claims).setSubject(subject).setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + JWT_TOKEN_VALIDITY))
+                .setExpiration(new Date(System.currentTimeMillis() + jwtTokenValidity))
                 .signWith(SignatureAlgorithm.HS512, secret).compact();
     }
 
     public Boolean validateToken(String token, UserDetails userDetails) {
-        final String username = getUsernameFromToken(token);
-        return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
+        try {
+            final String username = getUsernameFromToken(token);
+            return (username.equals(userDetails.getUsername()) && !isTokenExpired(token) && !tokenBlacklistService.isBlacklisted(token));
+        } catch (MalformedJwtException | ExpiredJwtException e) {
+            return false;
+        }
+    }
+
+    public static void setTokenValidity(long durationMillis) {
+        jwtTokenValidity = durationMillis;
     }
 }
