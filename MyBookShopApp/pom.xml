@@ -134,11 +134,6 @@
         </dependency>
         <!--Swagger-->
 
-        <dependency>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok</artifactId>
-        </dependency>
-
         <!--Validation-->
         <dependency>
             <groupId>jakarta.validation</groupId>
@@ -151,6 +146,10 @@
         </dependency>
         <!--Validation-->
 
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+        </dependency>
         <dependency>
             <groupId>com.github.javafaker</groupId>
             <artifactId>javafaker</artifactId>

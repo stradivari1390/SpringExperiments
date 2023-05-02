@@ -21,6 +21,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 @Service
@@ -50,6 +51,9 @@ public class CartService {
     }
 
     public List<BookDto> getBookDtoListByCookie(String cookieContents) {
+        if (cookieContents == null) {
+            return Collections.emptyList();
+        }
         cookieContents = cookieContents.startsWith("/") ? cookieContents.substring(1) : cookieContents;
         cookieContents = cookieContents.endsWith("/") ? cookieContents.substring(0, cookieContents.length() - 1) : cookieContents;
         String[] cookieSlugs = cookieContents.split("/");

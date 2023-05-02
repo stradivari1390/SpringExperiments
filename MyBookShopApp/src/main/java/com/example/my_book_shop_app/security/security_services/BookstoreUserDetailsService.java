@@ -13,6 +13,7 @@ import com.example.my_book_shop_app.security.BookstoreUserDetails;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -36,7 +37,7 @@ public class BookstoreUserDetailsService implements UserDetailsService {
     }
 
     @Override
-    public UserDetails loadUserByUsername(String username) {
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         UserEntity bookstoreUser = userEntityRepository.findUserByUsername(username)
                 .orElseThrow(() -> new NoUserFoundException("User not found with username: " + username));
         return new BookstoreUserDetails(bookstoreUser);

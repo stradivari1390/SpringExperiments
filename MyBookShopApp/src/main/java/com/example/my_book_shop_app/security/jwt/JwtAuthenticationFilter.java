@@ -2,7 +2,6 @@ package com.example.my_book_shop_app.security.jwt;
 
 import ch.qos.logback.classic.Logger;
 import com.example.my_book_shop_app.security.BookstoreUserDetails;
-import com.example.my_book_shop_app.security.security_services.TokenBlacklistService;
 import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -23,14 +22,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JWTUtil jwtTokenUtil;
     private final UserDetailsService userDetailsService;
-    private final TokenBlacklistService tokenBlacklistService;
     private final Logger log = (Logger) LoggerFactory.getLogger(getClass());
 
-    public JwtAuthenticationFilter(JWTUtil jwtTokenUtil, UserDetailsService userDetailsService,
-                                   TokenBlacklistService tokenBlacklistService) {
+    public JwtAuthenticationFilter(JWTUtil jwtTokenUtil, UserDetailsService userDetailsService) {
         this.jwtTokenUtil = jwtTokenUtil;
         this.userDetailsService = userDetailsService;
-        this.tokenBlacklistService = tokenBlacklistService;
     }
 
     @Override
@@ -47,14 +43,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     try {
                         username = jwtTokenUtil.getUsernameFromToken(token);
                     } catch (ExpiredJwtException e) {
-                        httpServletResponse.sendRedirect("/logout");
+                        httpServletResponse.sendRedirect("/signin");
                         return;
                     }
                 }
                 if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
                     BookstoreUserDetails userDetails =
                             (BookstoreUserDetails) userDetailsService.loadUserByUsername(username);
-                    if (jwtTokenUtil.validateToken(token, userDetails) && !tokenBlacklistService.isBlacklisted(token)) {
+                    if (jwtTokenUtil.validateToken(token, userDetails)) {
                         UsernamePasswordAuthenticationToken authenticationToken =
                                 new UsernamePasswordAuthenticationToken(
                                         userDetails, null, userDetails.getAuthorities()

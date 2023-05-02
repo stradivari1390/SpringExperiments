@@ -7,6 +7,7 @@ import com.example.my_book_shop_app.data.model.user.UserEntity;
 import com.example.my_book_shop_app.data.repositories.UserContactEntityRepository;
 import com.example.my_book_shop_app.data.repositories.UserEntityRepository;
 import com.example.my_book_shop_app.data.UserContactDetails;
+import com.example.my_book_shop_app.exceptions.ContactNotFoundException;
 import com.example.my_book_shop_app.exceptions.NoUserFoundException;
 import com.example.my_book_shop_app.exceptions.UserAlreadyExistsException;
 import com.example.my_book_shop_app.exceptions.WrongPasswordException;
@@ -27,9 +28,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.authentication.InternalAuthenticationServiceException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -71,6 +72,9 @@ public class BookstoreUserRegister {
             UserEntity user = new UserEntity();
             user.setName(registrationForm.getName());
             user.setUsername(registrationForm.getEmail());
+            if (registrationForm.getPass() == null) {
+                throw new IllegalArgumentException("Password cannot be null");
+            }
             user.setPassword(passwordEncoder.encode(registrationForm.getPass()));
             user.setBalance(0D);
             user.setRegTime(LocalDateTime.now());
@@ -115,10 +119,13 @@ public class BookstoreUserRegister {
     }
 
     public void jwtTokenLogin(ContactConfirmationPayload payload, HttpServletResponse httpServletResponse) {
-        // handlePossessAuthentication(payload);
-        handlePasswordAuthentication(payload);
-
-        final UserDetails userDetails = bookstoreUserDetailsService.loadUserByUsername(payload.getContact());
+        if(!payload.getContact().contains("@")) {
+            handlePossessAuthentication(payload);
+        } else {
+            handlePasswordAuthentication(payload);
+        }
+        String email = userContactEntityRepository.getUserEmailByContact(payload.getContact(), ContactType.EMAIL);
+        final UserDetails userDetails = bookstoreUserDetailsService.loadUserByUsername(email);
         final String token = jwtTokenUtil.generateToken(userDetails);
 
         Cookie cookie = new Cookie("token", token);
@@ -136,8 +143,8 @@ public class BookstoreUserRegister {
         try {
             authenticate(payload.getContact(), payload.getCode());
         } catch (BadCredentialsException e) {
-            if (e.getCause() instanceof NoUserFoundException noUserFoundException) {
-                throw noUserFoundException;
+            if (e.getMessage().contains("UserDetailsService returned null")) {
+                throw new NoUserFoundException("User not found");
             } else {
                 throw new WrongPasswordException("Wrong password");
             }
@@ -157,33 +164,27 @@ public class BookstoreUserRegister {
     }
 
     public ContactConfirmationResponse requestContactConfirmation(ContactConfirmationPayload payload) {
-//        boolean userExists = userEntityRepository.findByContacts(payload.getContact()).isPresent();
-//        if (!userExists) {
-//            return new ContactConfirmationResponse("false");
-//            throw new ContactNotFoundException("Contact not found: " + payload.getContact());
-//        }
-        return new ContactConfirmationResponse("true");
+        boolean userExists = userEntityRepository.findByContacts(payload.getContact()).isPresent();
+        return new ContactConfirmationResponse(userExists ? "true" : "false");
+        // throw new ContactNotFoundException("Contact not found: " + payload.getContact());
     }
 
     public ContactConfirmationResponse approveContact(ContactConfirmationPayload payload) {
-//        String contact = payload.getContact();
-//        UserContactEntity userContactEntity = userContactEntityRepository.findByContact(contact)
-//                .orElseThrow(() -> new ContactNotFoundException(contact + " contact not found"));
-//        boolean confirmed = userContactEntity.getCode().equals(payload.getCode());
-//        return new ContactConfirmationResponse(confirmed ? "true" : "false");
-        return new ContactConfirmationResponse("true");
+        String contact = payload.getContact();
+        UserContactEntity userContactEntity = userContactEntityRepository.findByContact(contact)
+                .orElseThrow(() -> new ContactNotFoundException(contact + " contact not found"));
+        boolean confirmed = userContactEntity.getCode().equals(payload.getCode().replaceAll("\\s", ""));
+        return new ContactConfirmationResponse(confirmed ? "true" : "false");
     }
 
 
     private void authenticate(String username, String password) {
         try {
             authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
-        } catch (InternalAuthenticationServiceException e) {
-            if (e.getCause() instanceof NoUserFoundException noUserFoundException) {
-                throw new BadCredentialsException("User not found", noUserFoundException);
-            } else {
-                throw new WrongPasswordException("Invalid password");
-            }
+        } catch (NoUserFoundException e) {
+            throw e;
+        } catch (AuthenticationException e) {
+            throw new BadCredentialsException(e.getMessage());
         }
     }
 }

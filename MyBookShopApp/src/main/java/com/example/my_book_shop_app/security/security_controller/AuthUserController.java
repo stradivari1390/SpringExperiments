@@ -91,7 +91,7 @@ public class AuthUserController {
     }
 
     @PostMapping("/reg")
-    public String handleUserRegistration(RegistrationForm registrationForm, Model model, Authentication authentication) {
+    public String handleUserRegistration(@RequestBody RegistrationForm registrationForm, Model model, Authentication authentication) {
         userRegister.registerNewUser(registrationForm);
         model.addAttribute("regOk", true);
         return handleSignIn(model, authentication);

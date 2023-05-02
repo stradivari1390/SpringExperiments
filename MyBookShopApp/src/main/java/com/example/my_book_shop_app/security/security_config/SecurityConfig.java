@@ -4,7 +4,6 @@ import com.example.my_book_shop_app.security.CustomAuthenticationFailureHandler;
 import com.example.my_book_shop_app.security.jwt.JWTUtil;
 import com.example.my_book_shop_app.security.jwt.JwtAuthenticationEntryPoint;
 import com.example.my_book_shop_app.security.jwt.JwtAuthenticationFilter;
-import com.example.my_book_shop_app.security.security_services.TokenBlacklistService;
 import com.example.my_book_shop_app.security.security_services.CustomOAuth2UserService;
 import com.example.my_book_shop_app.security.oauth.OAuth2AuthenticationFailureHandler;
 import com.example.my_book_shop_app.security.oauth.OAuth2AuthenticationSuccessHandler;
@@ -38,7 +37,6 @@ public class SecurityConfig {
     private final BookstoreUserDetailsService bookstoreUserDetailsService;
     private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
     private final JWTUtil jwtTokenUtil;
-    private final TokenBlacklistService tokenBlacklistService;
     private final CustomOAuth2UserService customOAuth2UserService;
     private final OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler;
     private final OAuth2AuthenticationFailureHandler oAuth2AuthenticationFailureHandler;
@@ -51,13 +49,12 @@ public class SecurityConfig {
     @Autowired
     public SecurityConfig(BookstoreUserDetailsService bookstoreUserDetailsService,
                           JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint, JWTUtil jwtTokenUtil,
-                          TokenBlacklistService tokenBlacklistService, @Lazy CustomOAuth2UserService customOAuth2UserService,
+                          @Lazy CustomOAuth2UserService customOAuth2UserService,
                           OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler,
                           OAuth2AuthenticationFailureHandler oAuth2AuthenticationFailureHandler) {
         this.bookstoreUserDetailsService = bookstoreUserDetailsService;
         this.jwtAuthenticationEntryPoint = jwtAuthenticationEntryPoint;
         this.jwtTokenUtil = jwtTokenUtil;
-        this.tokenBlacklistService = tokenBlacklistService;
         this.customOAuth2UserService = customOAuth2UserService;
         this.oAuth2AuthenticationSuccessHandler = oAuth2AuthenticationSuccessHandler;
         this.oAuth2AuthenticationFailureHandler = oAuth2AuthenticationFailureHandler;
@@ -113,6 +110,6 @@ public class SecurityConfig {
 
     @Bean
     public JwtAuthenticationFilter jwtAuthenticationFilter() {
-        return new JwtAuthenticationFilter(jwtTokenUtil, bookstoreUserDetailsService, tokenBlacklistService);
+        return new JwtAuthenticationFilter(jwtTokenUtil, bookstoreUserDetailsService);
     }
 }

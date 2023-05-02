@@ -1,9 +1,10 @@
-package com.example.my_book_shop_app.services;
+package com.example.my_book_shop_app.security;
 
+import com.example.my_book_shop_app.data.model.enums.ContactType;
 import com.example.my_book_shop_app.data.model.user.UserEntity;
+import com.example.my_book_shop_app.data.repositories.UserContactEntityRepository;
 import com.example.my_book_shop_app.exceptions.NoUserFoundException;
 import com.example.my_book_shop_app.exceptions.WrongPasswordException;
-import com.example.my_book_shop_app.security.BookstoreUserDetails;
 import com.example.my_book_shop_app.security.jwt.JWTUtil;
 import com.example.my_book_shop_app.security.security_dto.ContactConfirmationPayload;
 import com.example.my_book_shop_app.security.security_services.BookstoreUserDetailsService;
@@ -26,6 +27,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
+
 import static org.mockito.Mockito.when;
 
 import org.springframework.test.web.servlet.MockMvc;
@@ -42,6 +44,8 @@ class AdditionalBookstoreUserRegisterTests {
     private JWTUtil jwtTokenUtil;
     @MockBean
     private BookstoreUserDetailsService bookstoreUserDetailsService;
+    @MockBean
+    private UserContactEntityRepository userContactEntityRepository;
     private MockMvc mockMvc;
     @Autowired
     private BookstoreUserRegister bookstoreUserRegister;
@@ -70,39 +74,41 @@ class AdditionalBookstoreUserRegisterTests {
     @Test
     void successfulUserLoginAndTokenGeneration() throws Exception {
         UserEntity user = new UserEntity();
-        user.setUsername("testuser");
+        user.setUsername("testuser@example.com");
         user.setPassword(passwordEncoder.encode("password"));
 
-        when(bookstoreUserDetailsService.loadUserByUsername("testuser")).thenReturn(new BookstoreUserDetails(user));
-
-        bookstoreUserRegister.jwtTokenLogin(new ContactConfirmationPayload("testuser", "password"), mockHttpServletResponse);
+        when(userContactEntityRepository.getUserEmailByContact("testuser@example.com", ContactType.EMAIL)).thenReturn("testuser@example.com");
+        when(bookstoreUserDetailsService.loadUserByUsername("testuser@example.com")).thenReturn(new BookstoreUserDetails(user));
+        bookstoreUserRegister.jwtTokenLogin(new ContactConfirmationPayload("testuser@example.com", "password"), mockHttpServletResponse);
 
         UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(user.getUsername(), user.getPassword());
         SecurityContextHolder.getContext().setAuthentication(authenticationToken);
 
         mockMvc.perform(post("/login")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"contact\":\"testuser\",\"code\":\"password\"}"))
+                        .content("{\"contact\":\"testuser@example.com\",\"code\":\"password\"}"))
                 .andExpect(status().isOk())
                 .andExpect(cookie().exists("token"))
                 .andExpect(result -> {
                     Cookie tokenCookie = result.getResponse().getCookie("token");
+                    assertNotNull(tokenCookie);
                     String responseToken = tokenCookie.getValue();
                     String username = jwtTokenUtil.getUsernameFromToken(responseToken);
-                    assertEquals("testuser", username);
+                    assertEquals("testuser@example.com", username);
                 });
     }
 
     @Test
     void unsuccessfulUserLoginWithInvalidPassword() {
         UserEntity user = new UserEntity();
-        user.setUsername("testuser");
+        user.setUsername("testuser@example.com");
         user.setPassword(passwordEncoder.encode("password"));
 
-        when(bookstoreUserDetailsService.loadUserByUsername("testuser")).thenReturn(new BookstoreUserDetails(user));
+        when(userContactEntityRepository.getUserEmailByContact("testuser@example.com", ContactType.EMAIL)).thenReturn("testuser@example.com");
+        when(bookstoreUserDetailsService.loadUserByUsername("testuser@example.com")).thenReturn(new BookstoreUserDetails(user));
 
         ContactConfirmationPayload payload = new ContactConfirmationPayload();
-        payload.setContact("testuser");
+        payload.setContact("testuser@example.com");
         payload.setCode("wrongpassword");
 
         assertThrows(WrongPasswordException.class, () -> bookstoreUserRegister.jwtTokenLogin(payload, mockHttpServletResponse));
@@ -110,10 +116,9 @@ class AdditionalBookstoreUserRegisterTests {
 
     @Test
     void unsuccessfulUserLoginWithNonExistentUser() {
-        when(bookstoreUserDetailsService.loadUserByUsername("nonexistentuser")).thenThrow(new NoUserFoundException("User not found"));
 
         ContactConfirmationPayload payload = new ContactConfirmationPayload();
-        payload.setContact("nonexistentuser");
+        payload.setContact("non@existent.user");
         payload.setCode("password");
 
         assertThrows(NoUserFoundException.class, () -> bookstoreUserRegister.jwtTokenLogin(payload, mockHttpServletResponse));

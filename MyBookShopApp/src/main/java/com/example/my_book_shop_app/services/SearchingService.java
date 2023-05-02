@@ -1,5 +1,6 @@
 package com.example.my_book_shop_app.services;
 
+import com.example.my_book_shop_app.annotations.Cacheable;
 import com.example.my_book_shop_app.dto.BookDto;
 import com.example.my_book_shop_app.dto.BooksPageDto;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,10 +17,12 @@ public class SearchingService {
         this.bookService = bookService;
     }
 
+    @Cacheable("search")
     public Page<BookDto> search(String query, int offset, int limit) {
         return bookService.getPageOfSearchResultBooks(query, offset, limit);
     }
 
+    @Cacheable("search_page")
     public BooksPageDto getNextSearchPage(String query, Integer offset, Integer limit) {
         return new BooksPageDto(bookService.getPageOfSearchResultBooks(query, offset, limit));
     }
