@@ -1,12 +1,11 @@
 package com.example.my_book_shop_app.security.security_services;
 
-import com.example.my_book_shop_app.data.model.enums.ContactType;
-import com.example.my_book_shop_app.data.model.user.UserEntity;
 import com.example.my_book_shop_app.data.repositories.UserEntityRepository;
 import com.example.my_book_shop_app.exceptions.EmailAuthorizationException;
-import com.example.my_book_shop_app.exceptions.NoUserFoundException;
 import com.example.my_book_shop_app.security.security_dto.ContactConfirmationPayload;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.mail.MailAuthenticationException;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -20,8 +19,9 @@ public class EmailService {
     private final JavaMailSender javaMailSender;
 
     @Autowired
-    public EmailService(BookstoreUserDetailsService bookstoreUserDetailsService, UserEntityRepository userEntityRepository,
-                         JavaMailSender javaMailSender) {
+    public EmailService(@Lazy BookstoreUserDetailsService bookstoreUserDetailsService,
+                        UserEntityRepository userEntityRepository,
+                        JavaMailSender javaMailSender) {
         this.bookstoreUserDetailsService = bookstoreUserDetailsService;
         this.userEntityRepository = userEntityRepository;
         this.javaMailSender = javaMailSender;
@@ -33,20 +33,30 @@ public class EmailService {
         String subject = "Verification Code";
         String message = "Your verification code is: " + code;
 
-//        sendEmail(email, subject, message);
+        sendEmail(email, subject, message);
     }
 
     private void sendEmail(String to, String subject, String messageText) {
         SimpleMailMessage message = new SimpleMailMessage();
+        message.setFrom("book_shop_test@mail.ru");
         message.setTo(to);
         message.setSubject(subject);
         message.setText(messageText);
         try {
             javaMailSender.send(message);
         } catch (MailAuthenticationException ex) {
-            throw new EmailAuthorizationException("from May 30, 2022 Google no longer supports the use of " +
-                    "third-party apps or devices which ask you to sign in to your Google Account " +
-                    "using only your username and password");
+            throw new EmailAuthorizationException("Email authorization failed");
+        }
+    }
+
+    public void sendPasswordResetEmail(String to, String token) {
+        String subject = "Password Reset";
+        String messageText = "To reset your password, please click the following link: "
+                + "http://localhost:8080/reset-password?token=" + token;
+        try {
+            sendEmail(to, subject, messageText);
+        } catch (Exception ex) {
+            ex.printStackTrace();
         }
     }
 }

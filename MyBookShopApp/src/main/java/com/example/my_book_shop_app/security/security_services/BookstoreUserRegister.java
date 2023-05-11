@@ -2,8 +2,10 @@ package com.example.my_book_shop_app.security.security_services;
 
 import ch.qos.logback.classic.Logger;
 import com.example.my_book_shop_app.data.model.enums.ContactType;
+import com.example.my_book_shop_app.data.model.payments.BalanceTransactionEntity;
 import com.example.my_book_shop_app.data.model.user.UserContactEntity;
 import com.example.my_book_shop_app.data.model.user.UserEntity;
+import com.example.my_book_shop_app.data.repositories.BalanceTransactionEntityRepository;
 import com.example.my_book_shop_app.data.repositories.UserContactEntityRepository;
 import com.example.my_book_shop_app.data.repositories.UserEntityRepository;
 import com.example.my_book_shop_app.data.UserContactDetails;
@@ -19,7 +21,11 @@ import com.example.my_book_shop_app.security.security_dto.ContactConfirmationPay
 import com.example.my_book_shop_app.security.security_dto.ContactConfirmationResponse;
 import com.example.my_book_shop_app.security.security_dto.RegistrationForm;
 
+import com.paypal.api.payments.*;
+import com.paypal.base.rest.APIContext;
+import com.paypal.base.rest.PayPalRESTException;
 import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import org.slf4j.LoggerFactory;
@@ -36,8 +42,12 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class BookstoreUserRegister {
@@ -50,13 +60,18 @@ public class BookstoreUserRegister {
     private final JWTUtil jwtTokenUtil;
     private final AuthUserController authUserController;
     private final Logger log = (Logger) LoggerFactory.getLogger(getClass());
+    private final BalanceTransactionEntityRepository balanceTransactionEntityRepository;
+    private final APIContext apiContext = new APIContext("AYKIRLX7gctbC0MHf4mWOFiBvHNOMp6laYgtzebaeWupUXJQJd8UH70KERxA6kwq8poBoobpfZ-mzz22",
+            "EI_YBne00EsEk3PSzBUJwB_waBDAq042GJ9T0_128870A14j8rs9nOU-5SuXnpKCG9u34ONfv_n5Mzmw",
+            "sandbox");
 
     @Autowired
     public BookstoreUserRegister(UserEntityRepository userEntityRepository, PasswordEncoder passwordEncoder,
                                  AuthenticationManager authenticationManager,
                                  BookstoreUserDetailsService bookstoreUserDetailsService, JWTUtil jwtTokenUtil,
                                  UserContactEntityRepository userContactEntityRepository,
-                                 @Lazy AuthUserController authUserController) {
+                                 @Lazy AuthUserController authUserController,
+                                 BalanceTransactionEntityRepository balanceTransactionEntityRepository) {
         this.userEntityRepository = userEntityRepository;
         this.passwordEncoder = passwordEncoder;
         this.authenticationManager = authenticationManager;
@@ -64,6 +79,7 @@ public class BookstoreUserRegister {
         this.jwtTokenUtil = jwtTokenUtil;
         this.userContactEntityRepository = userContactEntityRepository;
         this.authUserController = authUserController;
+        this.balanceTransactionEntityRepository = balanceTransactionEntityRepository;
     }
 
     public void registerNewUser(RegistrationForm registrationForm) {
@@ -119,7 +135,7 @@ public class BookstoreUserRegister {
     }
 
     public void jwtTokenLogin(ContactConfirmationPayload payload, HttpServletResponse httpServletResponse) {
-        if(!payload.getContact().contains("@")) {
+        if (!payload.getContact().contains("@")) {
             handlePossessAuthentication(payload);
         } else {
             handlePasswordAuthentication(payload);
@@ -186,5 +202,121 @@ public class BookstoreUserRegister {
         } catch (AuthenticationException e) {
             throw new BadCredentialsException(e.getMessage());
         }
+    }
+
+    public void updateProfile(String name, String email, String phone, String password) {
+        UserEntity userEntity = getCurrentUser();
+        UserContactEntity phoneEntity = userContactEntityRepository
+                .findByUserIdAndType(userEntity.getId(), ContactType.PHONE).orElse(new UserContactEntity());
+        UserContactEntity emailEntity = userContactEntityRepository
+                .findByUserIdAndType(userEntity.getId(), ContactType.EMAIL).orElse(new UserContactEntity());
+        if (name != null) {
+            userEntity.setName(name);
+        }
+        if (email != null) {
+            userEntity.setUsername(email);
+            emailEntity.setContact(email);
+            userContactEntityRepository.save(emailEntity);
+        }
+        if (phone != null) {
+            phoneEntity.setContact(phone);
+            userContactEntityRepository.save(phoneEntity);
+        }
+        if (!password.isEmpty()) {
+            userEntity.setPassword(passwordEncoder.encode(password));
+        }
+        userEntityRepository.save(userEntity);
+    }
+
+    public String topupWithPayPal(String sum) {
+        Amount amount = new Amount();
+        amount.setCurrency("USD");
+        amount.setTotal(sum);
+
+        Transaction transaction = new Transaction();
+        transaction.setDescription("Topup");
+        transaction.setAmount(amount);
+
+        Payer payer = new Payer();
+        payer.setPaymentMethod("paypal");
+
+        Payment payment = new Payment();
+        payment.setIntent("sale");
+        payment.setPayer(payer);
+        payment.setTransactions(List.of(transaction));
+
+        RedirectUrls redirectUrls = new RedirectUrls();
+        redirectUrls.setReturnUrl("http://localhost:8080/execute-payment");
+        redirectUrls.setCancelUrl("http://localhost:8080/cancel-payment");
+        payment.setRedirectUrls(redirectUrls);
+
+        Payment createdPayment = new Payment();
+        try {
+            createdPayment = payment.create(apiContext);
+        } catch (PayPalRESTException e) {
+            log.error(e.getMessage());
+        }
+
+        String redirectUrl = "";
+        for (Links link : createdPayment.getLinks()) {
+            if (link.getRel().equalsIgnoreCase("approval_url")) {
+                redirectUrl = link.getHref();
+                break;
+            }
+        }
+        return redirectUrl;
+    }
+
+    public void executePayPalPayment(HttpServletRequest request) {
+            String paymentId = request.getParameter("paymentId");
+            String payerId = request.getParameter("PayerID");
+
+            Payment payment = new Payment();
+            payment.setId(paymentId);
+
+            PaymentExecution paymentExecute = new PaymentExecution();
+            paymentExecute.setPayerId(payerId);
+
+            try {
+                Payment createdPayment = payment.execute(apiContext, paymentExecute);
+
+                String sum = createdPayment.getTransactions().get(0).getAmount().getTotal();
+                String hash = createdPayment.getPayer().getPayerInfo().getPayerId();
+
+                UserEntity currentUser = getCurrentUser();
+                currentUser.setHash(hash);
+                userEntityRepository.save(currentUser);
+
+                Map<String, String> payload = new HashMap<>();
+                payload.put("sum", sum);
+                payload.put("hash", hash);
+                processPayment(payload);
+
+            } catch (PayPalRESTException e) {
+                log.error(e.getMessage());
+            }
+        }
+
+    public String processPayment(Map<String, String> payload) {
+        String hash = payload.get("hash");
+        double sum = Double.parseDouble(payload.get("sum"));
+        long time = System.currentTimeMillis();
+
+        UserEntity userEntity = userEntityRepository.findByHash(hash);
+        if (userEntity == null) {
+            return "{\"result\": false, \"error\": \"Invalid user hash.\"}";
+        }
+
+        BalanceTransactionEntity balanceTransactionEntity = new BalanceTransactionEntity();
+        balanceTransactionEntity.setUserId(userEntity.getId());
+        balanceTransactionEntity.setTime(LocalDateTime.ofInstant(Instant.ofEpochMilli(time), ZoneId.of("UTC")));
+        balanceTransactionEntity.setValue(sum);
+        balanceTransactionEntity.setDescription("Payment received from payment system.");
+        balanceTransactionEntityRepository.save(balanceTransactionEntity);
+
+        userEntity.setBalance(userEntity.getBalance() + sum);
+        userEntityRepository.save(userEntity);
+
+        return "{\"result\": true}";
     }
 }

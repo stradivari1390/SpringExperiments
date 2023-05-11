@@ -5,14 +5,12 @@
         xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
                       http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd"
         objectQuotingStrategy="QUOTE_ONLY_RESERVED_WORDS">
-    <changeSet id="1681191644591-1" author="stradivari1390 (generated)">
+    <changeSet id="1683811587633-1" author="stradivari1390 (generated)">
         <createTable tableName="balance_transaction">
             <column autoIncrement="true" name="id" type="INTEGER">
                 <constraints nullable="false" primaryKey="true" primaryKeyName="balance_transaction_pkey"/>
             </column>
-            <column name="book_id" type="BIGINT">
-                <constraints nullable="false"/>
-            </column>
+            <column name="book_id" type="BIGINT"/>
             <column name="description" type="TEXT">
                 <constraints nullable="false"/>
             </column>
@@ -27,7 +25,7 @@
             </column>
         </createTable>
     </changeSet>
-    <changeSet id="1681191644591-2" author="stradivari1390 (generated)">
+    <changeSet id="1683811587633-2" author="stradivari1390 (generated)">
         <createTable tableName="book2author">
             <column autoIncrement="true" name="id" type="BIGINT">
                 <constraints nullable="false" primaryKey="true" primaryKeyName="book2author_pkey"/>
@@ -43,7 +41,7 @@
             </column>
         </createTable>
     </changeSet>
-    <changeSet id="1681191644591-3" author="stradivari1390 (generated)">
+    <changeSet id="1683811587633-3" author="stradivari1390 (generated)">
         <createTable tableName="document">
             <column name="id" type="INTEGER">
                 <constraints nullable="false" primaryKey="true" primaryKeyName="document_pkey"/>
@@ -62,7 +60,7 @@
             </column>
         </createTable>
     </changeSet>
-    <changeSet id="1681191644591-4" author="stradivari1390 (generated)">
+    <changeSet id="1683811587633-4" author="stradivari1390 (generated)">
         <createTable tableName="faq">
             <column name="id" type="INTEGER">
                 <constraints nullable="false" primaryKey="true" primaryKeyName="faq_pkey"/>
@@ -78,7 +76,7 @@
             </column>
         </createTable>
     </changeSet>
-    <changeSet id="1681191644591-5" author="stradivari1390 (generated)">
+    <changeSet id="1683811587633-5" author="stradivari1390 (generated)">
         <createTable tableName="file_download">
             <column name="id" type="BIGINT">
                 <constraints nullable="false" primaryKey="true" primaryKeyName="file_download_pkey"/>
@@ -94,7 +92,7 @@
             </column>
         </createTable>
     </changeSet>
-    <changeSet id="1681191644591-6" author="stradivari1390 (generated)">
+    <changeSet id="1683811587633-6" author="stradivari1390 (generated)">
         <createTable tableName="book2user">
             <column autoIncrement="true" name="id" type="INTEGER">
                 <constraints nullable="false" primaryKey="true" primaryKeyName="book2user_pkey"/>
@@ -113,7 +111,7 @@
             </column>
         </createTable>
     </changeSet>
-    <changeSet id="1681191644591-7" author="stradivari1390 (generated)">
+    <changeSet id="1683811587633-7" author="stradivari1390 (generated)">
         <createTable tableName="book_rate">
             <column autoIncrement="true" name="id" type="BIGINT">
                 <constraints nullable="false" primaryKey="true" primaryKeyName="book_rate_pkey"/>
@@ -123,7 +121,7 @@
             <column name="value" type="SMALLINT"/>
         </createTable>
     </changeSet>
-    <changeSet id="1681191644591-8" author="stradivari1390 (generated)">
+    <changeSet id="1683811587633-8" author="stradivari1390 (generated)">
         <createTable tableName="book_review">
             <column autoIncrement="true" name="id" type="INTEGER">
                 <constraints nullable="false" primaryKey="true" primaryKeyName="book_review_pkey"/>
@@ -142,7 +140,7 @@
             </column>
         </createTable>
     </changeSet>
-    <changeSet id="1681191644591-9" author="stradivari1390 (generated)">
+    <changeSet id="1683811587633-9" author="stradivari1390 (generated)">
         <createTable tableName="book_review_like">
             <column autoIncrement="true" name="id" type="INTEGER">
                 <constraints nullable="false" primaryKey="true" primaryKeyName="book_review_like_pkey"/>
@@ -161,7 +159,7 @@
             </column>
         </createTable>
     </changeSet>
-    <changeSet id="1681191644591-10" author="stradivari1390 (generated)">
+    <changeSet id="1683811587633-10" author="stradivari1390 (generated)">
         <createTable tableName="user_contact">
             <column autoIncrement="true" name="id" type="INTEGER">
                 <constraints nullable="false" primaryKey="true" primaryKeyName="user_contact_pkey"/>
@@ -183,7 +181,7 @@
             </column>
         </createTable>
     </changeSet>
-    <changeSet id="1681191644591-11" author="stradivari1390 (generated)">
+    <changeSet id="1683811587633-11" author="stradivari1390 (generated)">
         <createTable tableName="authors">
             <column name="id" type="BIGINT">
                 <constraints nullable="false" primaryKey="true" primaryKeyName="authors_pkey"/>
@@ -201,7 +199,7 @@
             </column>
         </createTable>
     </changeSet>
-    <changeSet id="1681191644591-12" author="stradivari1390 (generated)">
+    <changeSet id="1683811587633-12" author="stradivari1390 (generated)">
         <createTable tableName="books">
             <column name="id" type="BIGINT">
                 <constraints nullable="false" primaryKey="true" primaryKeyName="books_pkey"/>
@@ -232,7 +230,7 @@
             <column defaultValueNumeric="0" name="version" type="INTEGER"/>
         </createTable>
     </changeSet>
-    <changeSet id="1681191644591-13" author="stradivari1390 (generated)">
+    <changeSet id="1683811587633-13" author="stradivari1390 (generated)">
         <createTable tableName="users">
             <column name="id" type="BIGINT">
                 <constraints nullable="false" primaryKey="true" primaryKeyName="users_pkey"/>
@@ -257,7 +255,23 @@
             </column>
         </createTable>
     </changeSet>
-    <changeSet id="1681191644591-14" author="stradivari1390 (generated)">
+    <changeSet id="1683811587633-14" author="stradivari1390 (generated)">
+        <createTable tableName="password_reset_tokens">
+            <column autoIncrement="true" name="id" startWith="12" type="BIGINT">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="password_reset_tokens_pkey"/>
+            </column>
+            <column name="expiry_date" type="TIMESTAMP WITHOUT TIME ZONE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="token" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="user_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet id="1683811587633-15" author="stradivari1390 (generated)">
         <createTable tableName="book2genre">
             <column autoIncrement="true" name="id" type="INTEGER">
                 <constraints nullable="false" primaryKey="true" primaryKeyName="book2genre_pkey"/>
@@ -270,7 +284,7 @@
             </column>
         </createTable>
     </changeSet>
-    <changeSet id="1681191644591-15" author="stradivari1390 (generated)">
+    <changeSet id="1683811587633-16" author="stradivari1390 (generated)">
         <createTable tableName="book2tag_entity">
             <column autoIncrement="true" name="id" type="INTEGER">
                 <constraints nullable="false" primaryKey="true" primaryKeyName="book2tag_entity_pkey"/>
@@ -283,7 +297,7 @@
             </column>
         </createTable>
     </changeSet>
-    <changeSet id="1681191644591-16" author="stradivari1390 (generated)">
+    <changeSet id="1683811587633-17" author="stradivari1390 (generated)">
         <createTable tableName="genre">
             <column autoIncrement="true" name="id" type="INTEGER">
                 <constraints nullable="false" primaryKey="true" primaryKeyName="genre_pkey"/>
@@ -297,7 +311,7 @@
             </column>
         </createTable>
     </changeSet>
-    <changeSet id="1681191644591-17" author="stradivari1390 (generated)">
+    <changeSet id="1683811587633-18" author="stradivari1390 (generated)">
         <createTable tableName="tag_entity">
             <column autoIncrement="true" name="id" type="INTEGER">
                 <constraints nullable="false" primaryKey="true" primaryKeyName="tag_entity_pkey"/>
@@ -307,146 +321,149 @@
             </column>
         </createTable>
     </changeSet>
-    <changeSet id="1681191644591-18" author="stradivari1390 (generated)">
+    <changeSet id="1683811587633-19" author="stradivari1390 (generated)">
         <createIndex indexName="idx_balancetransactionentity" tableName="balance_transaction">
             <column name="user_id"/>
-            <column name="book_id"/>
         </createIndex>
     </changeSet>
-    <changeSet id="1681191644591-19" author="stradivari1390 (generated)">
+    <changeSet id="1683811587633-20" author="stradivari1390 (generated)">
         <addUniqueConstraint columnNames="book_id, author_id" constraintName="idx_book2authorentity_unq"
                              tableName="book2author"/>
     </changeSet>
-    <changeSet id="1681191644591-20" author="stradivari1390 (generated)">
+    <changeSet id="1683811587633-21" author="stradivari1390 (generated)">
         <createIndex indexName="idx_book2userentity_bookid" tableName="book2user">
             <column name="book_id"/>
             <column name="user_id"/>
             <column name="type_id"/>
         </createIndex>
     </changeSet>
-    <changeSet id="1681191644591-21" author="stradivari1390 (generated)">
+    <changeSet id="1683811587633-22" author="stradivari1390 (generated)">
         <createIndex indexName="idx_rateentity_bookid_userid" tableName="book_rate">
             <column name="book_id"/>
             <column name="user_id"/>
         </createIndex>
     </changeSet>
-    <changeSet id="1681191644591-22" author="stradivari1390 (generated)">
+    <changeSet id="1683811587633-23" author="stradivari1390 (generated)">
         <createIndex indexName="idx_bookreviewentity_bookid" tableName="book_review">
             <column name="book_id"/>
         </createIndex>
     </changeSet>
-    <changeSet id="1681191644591-23" author="stradivari1390 (generated)">
+    <changeSet id="1683811587633-24" author="stradivari1390 (generated)">
         <createIndex indexName="idx_bookreviewlikeentity" tableName="book_review_like">
             <column name="review_id"/>
         </createIndex>
     </changeSet>
-    <changeSet id="1681191644591-24" author="stradivari1390 (generated)">
+    <changeSet id="1683811587633-25" author="stradivari1390 (generated)">
         <addUniqueConstraint columnNames="review_id, user_id" constraintName="idx_bookreviewlikeentity_unq"
                              tableName="book_review_like"/>
     </changeSet>
-    <changeSet id="1681191644591-25" author="stradivari1390 (generated)">
+    <changeSet id="1683811587633-26" author="stradivari1390 (generated)">
         <createIndex indexName="idx_usercontactentity_userid" tableName="user_contact">
             <column name="user_id"/>
             <column name="type"/>
         </createIndex>
     </changeSet>
-    <changeSet id="1681191644591-26" author="stradivari1390 (generated)">
+    <changeSet id="1683811587633-27" author="stradivari1390 (generated)">
         <addUniqueConstraint columnNames="contact" constraintName="idx_usercontactentity_contact"
                              tableName="user_contact"/>
     </changeSet>
-    <changeSet id="1681191644591-27" author="stradivari1390 (generated)">
+    <changeSet id="1683811587633-28" author="stradivari1390 (generated)">
         <createIndex indexName="idx_author_first_name" tableName="authors">
             <column name="first_name"/>
         </createIndex>
     </changeSet>
-    <changeSet id="1681191644591-28" author="stradivari1390 (generated)">
+    <changeSet id="1683811587633-29" author="stradivari1390 (generated)">
         <createIndex indexName="idx_author_last_name" tableName="authors">
             <column name="last_name"/>
         </createIndex>
     </changeSet>
-    <changeSet id="1681191644591-29" author="stradivari1390 (generated)">
+    <changeSet id="1683811587633-30" author="stradivari1390 (generated)">
         <addUniqueConstraint columnNames="slug" constraintName="idx_author_slug" tableName="authors"/>
     </changeSet>
-    <changeSet id="1681191644591-30" author="stradivari1390 (generated)">
+    <changeSet id="1683811587633-31" author="stradivari1390 (generated)">
         <createIndex indexName="idx_book_price" tableName="books">
             <column name="price"/>
         </createIndex>
     </changeSet>
-    <changeSet id="1681191644591-31" author="stradivari1390 (generated)">
+    <changeSet id="1683811587633-32" author="stradivari1390 (generated)">
         <createIndex indexName="idx_book_discount" tableName="books">
             <column name="discount"/>
         </createIndex>
     </changeSet>
-    <changeSet id="1681191644591-32" author="stradivari1390 (generated)">
+    <changeSet id="1683811587633-33" author="stradivari1390 (generated)">
         <createIndex indexName="idx_book_is_bestseller" tableName="books">
             <column name="is_bestseller"/>
         </createIndex>
     </changeSet>
-    <changeSet id="1681191644591-33" author="stradivari1390 (generated)">
+    <changeSet id="1683811587633-34" author="stradivari1390 (generated)">
         <createIndex indexName="idx_book_pub_date" tableName="books">
             <column name="pub_date"/>
         </createIndex>
     </changeSet>
-    <changeSet id="1681191644591-34" author="stradivari1390 (generated)">
+    <changeSet id="1683811587633-35" author="stradivari1390 (generated)">
         <createIndex indexName="idx_book_title" tableName="books">
             <column name="title"/>
         </createIndex>
     </changeSet>
-    <changeSet id="1681191644591-35" author="stradivari1390 (generated)">
+    <changeSet id="1683811587633-36" author="stradivari1390 (generated)">
         <addUniqueConstraint columnNames="slug" constraintName="uk_67hmc2c9xvynx28p9f1wl6prb" tableName="books"/>
     </changeSet>
-    <changeSet id="1681191644591-36" author="stradivari1390 (generated)">
+    <changeSet id="1683811587633-37" author="stradivari1390 (generated)">
         <createIndex indexName="idx_userentity_username" tableName="users">
             <column name="username"/>
         </createIndex>
     </changeSet>
-    <changeSet id="1681191644591-37" author="stradivari1390 (generated)">
+    <changeSet id="1683811587633-38" author="stradivari1390 (generated)">
+        <addUniqueConstraint columnNames="token" constraintName="uk_71lqwbwtklmljk3qlsugr1mig"
+                             tableName="password_reset_tokens"/>
+    </changeSet>
+    <changeSet id="1683811587633-39" author="stradivari1390 (generated)">
         <addUniqueConstraint columnNames="book_id, genre_id" constraintName="idx_book2genreentity_unq"
                              tableName="book2genre"/>
     </changeSet>
-    <changeSet id="1681191644591-38" author="stradivari1390 (generated)">
+    <changeSet id="1683811587633-40" author="stradivari1390 (generated)">
         <addUniqueConstraint columnNames="book_id, tag_id" constraintName="idx_book2tagentity_bookid_unq"
                              tableName="book2tag_entity"/>
     </changeSet>
-    <changeSet id="1681191644591-39" author="stradivari1390 (generated)">
+    <changeSet id="1683811587633-41" author="stradivari1390 (generated)">
         <addUniqueConstraint columnNames="slug" constraintName="idx_genreentity_slug_unq" tableName="genre"/>
     </changeSet>
-    <changeSet id="1681191644591-40" author="stradivari1390 (generated)">
+    <changeSet id="1683811587633-42" author="stradivari1390 (generated)">
         <addUniqueConstraint columnNames="name" constraintName="idx_tagentity_name_unq" tableName="tag_entity"/>
     </changeSet>
-    <changeSet id="1681191644591-41" author="stradivari1390 (generated)">
+    <changeSet id="1683811587633-43" author="stradivari1390 (generated)">
         <createSequence cacheSize="1" cycle="false" dataType="bigint" incrementBy="1" maxValue="9223372036854775807"
                         minValue="1" sequenceName="author_id_seq" startValue="1"/>
     </changeSet>
-    <changeSet id="1681191644591-42" author="stradivari1390 (generated)">
+    <changeSet id="1683811587633-44" author="stradivari1390 (generated)">
         <createSequence cacheSize="1" cycle="false" dataType="bigint" incrementBy="1" maxValue="9223372036854775807"
                         minValue="1" sequenceName="book_file_id_seq" startValue="1"/>
     </changeSet>
-    <changeSet id="1681191644591-43" author="stradivari1390 (generated)">
+    <changeSet id="1683811587633-45" author="stradivari1390 (generated)">
         <createSequence cacheSize="1" cycle="false" dataType="bigint" incrementBy="1" maxValue="9223372036854775807"
                         minValue="1" sequenceName="book_id_seq" startValue="1"/>
     </changeSet>
-    <changeSet id="1681191644591-44" author="stradivari1390 (generated)">
+    <changeSet id="1683811587633-46" author="stradivari1390 (generated)">
         <createSequence cacheSize="1" cycle="false" dataType="bigint" incrementBy="1" maxValue="9223372036854775807"
                         minValue="1" sequenceName="document_id_seq" startValue="1"/>
     </changeSet>
-    <changeSet id="1681191644591-45" author="stradivari1390 (generated)">
+    <changeSet id="1683811587633-47" author="stradivari1390 (generated)">
         <createSequence cacheSize="1" cycle="false" dataType="bigint" incrementBy="1" maxValue="9223372036854775807"
                         minValue="1" sequenceName="faq_id_seq" startValue="1"/>
     </changeSet>
-    <changeSet id="1681191644591-46" author="stradivari1390 (generated)">
+    <changeSet id="1683811587633-48" author="stradivari1390 (generated)">
         <createSequence cacheSize="1" cycle="false" dataType="bigint" incrementBy="1" maxValue="9223372036854775807"
                         minValue="1" sequenceName="file_download_id_seq" startValue="1"/>
     </changeSet>
-    <changeSet id="1681191644591-47" author="stradivari1390 (generated)">
+    <changeSet id="1683811587633-49" author="stradivari1390 (generated)">
         <createSequence cacheSize="1" cycle="false" dataType="bigint" incrementBy="1" maxValue="9223372036854775807"
                         minValue="1" sequenceName="message_id_seq" startValue="1"/>
     </changeSet>
-    <changeSet id="1681191644591-48" author="stradivari1390 (generated)">
+    <changeSet id="1683811587633-50" author="stradivari1390 (generated)">
         <createSequence cacheSize="1" cycle="false" dataType="bigint" incrementBy="1" maxValue="9223372036854775807"
                         minValue="1" sequenceName="user_id_seq" startValue="1"/>
     </changeSet>
-    <changeSet id="1681191644591-49" author="stradivari1390 (generated)">
+    <changeSet id="1683811587633-51" author="stradivari1390 (generated)">
         <createTable tableName="book2user_type">
             <column autoIncrement="true" name="id" type="INTEGER">
                 <constraints nullable="false" primaryKey="true" primaryKeyName="book2user_type_pkey"/>
@@ -459,7 +476,7 @@
             </column>
         </createTable>
     </changeSet>
-    <changeSet id="1681191644591-50" author="stradivari1390 (generated)">
+    <changeSet id="1683811587633-52" author="stradivari1390 (generated)">
         <createTable tableName="book_file">
             <column name="id" type="BIGINT">
                 <constraints nullable="false" primaryKey="true" primaryKeyName="book_file_pkey"/>
@@ -478,7 +495,7 @@
             </column>
         </createTable>
     </changeSet>
-    <changeSet id="1681191644591-51" author="stradivari1390 (generated)">
+    <changeSet id="1683811587633-53" author="stradivari1390 (generated)">
         <createTable tableName="book_file_type">
             <column autoIncrement="true" name="id" type="INTEGER">
                 <constraints nullable="false" primaryKey="true" primaryKeyName="book_file_type_pkey"/>
@@ -489,7 +506,7 @@
             </column>
         </createTable>
     </changeSet>
-    <changeSet id="1681191644591-52" author="stradivari1390 (generated)">
+    <changeSet id="1683811587633-54" author="stradivari1390 (generated)">
         <createTable tableName="message">
             <column name="id" type="BIGINT">
                 <constraints nullable="false" primaryKey="true" primaryKeyName="message_pkey"/>
@@ -507,6 +524,11 @@
             </column>
             <column name="user_id" type="BIGINT"/>
         </createTable>
+    </changeSet>
+    <changeSet id="1683811587633-55" author="stradivari1390 (generated)">
+        <addForeignKeyConstraint baseColumnNames="user_id" baseTableName="password_reset_tokens"
+                                 constraintName="fkk3ndxg5xp6v7wd4gjyusp15gq" onDelete="NO ACTION" onUpdate="NO ACTION"
+                                 referencedColumnNames="id" referencedTableName="users"/>
     </changeSet>
 
 </databaseChangeLog>

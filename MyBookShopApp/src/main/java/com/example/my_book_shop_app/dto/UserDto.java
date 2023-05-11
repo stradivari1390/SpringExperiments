@@ -17,17 +17,19 @@ public class UserDto {
     private String username;
     private String email;
     private String phone;
+    private String hash;
     private List<BookDto> postponedBooks = new ArrayList<>();
     private List<BookDto> cartBooks = new ArrayList<>();
     private List<BookDto> purchasedBooks = new ArrayList<>();
     private List<BookDto> archivedBooks = new ArrayList<>();
 
-    public UserDto(Long id, double balance, String name, String username, String email, String phone) {
+    public UserDto(Long id, double balance, String name, String username, String email, String phone, String hash) {
         this.id = id;
         this.balance = balance;
         this.name = name;
         this.username = username;
         this.email = email;
         this.phone = phone;
+        this.hash = hash;
     }
 }

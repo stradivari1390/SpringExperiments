@@ -1,17 +1,24 @@
 package com.example.my_book_shop_app.security.security_controller;
 
 import ch.qos.logback.classic.Logger;
+
+import org.slf4j.LoggerFactory;
+
+import com.example.my_book_shop_app.exceptions.NoUserFoundException;
 import com.example.my_book_shop_app.security.security_dto.ContactConfirmationPayload;
 import com.example.my_book_shop_app.security.security_dto.ContactConfirmationResponse;
 import com.example.my_book_shop_app.security.security_dto.RegistrationForm;
-import com.example.my_book_shop_app.security.security_services.*;
-
+import com.example.my_book_shop_app.security.security_services.BookstoreUserDetailsService;
+import com.example.my_book_shop_app.security.security_services.BookstoreUserRegister;
+import com.example.my_book_shop_app.security.security_services.EmailService;
+import com.example.my_book_shop_app.security.security_services.TokenBlacklistService;
+import com.example.my_book_shop_app.security.security_services.TwilioService;
 import com.example.my_book_shop_app.services.CartService;
+
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -19,6 +26,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -156,5 +164,75 @@ public class AuthUserController {
         }
         SecurityContextHolder.clearContext();
         return "redirect:/signin";
+    }
+
+    @GetMapping("/recover-password")
+    public String handleRecoverPassword(Model model, Authentication authentication) {
+        if (authentication != null && authentication.isAuthenticated()) {
+            model.addAttribute("authStatus", "authorized");
+        } else {
+            model.addAttribute("authStatus", "unauthorized");
+        }
+        return "recover-password";
+    }
+
+    @PostMapping("/recover-password")
+    public String handleRecoverPasswordSubmit(@RequestParam("email") String email, Model model, Authentication authentication) {
+        try {
+            bookstoreUserDetailsService.createPasswordResetToken(email);
+            model.addAttribute("emailSent", true);
+        } catch (NoUserFoundException e) {
+            model.addAttribute("emailSent", false);
+        }
+        return handleRecoverPassword(model, authentication);
+    }
+
+    @GetMapping("/reset-password")
+    public String handleResetPassword(@RequestParam("token") String token, Model model) {
+        model.addAttribute("resetToken", bookstoreUserDetailsService.getPasswordResetToken(token));
+        return "reset-password";
+    }
+
+    @PostMapping("/reset-password")
+    public String handleResetPasswordSubmit(@RequestParam("password") String password,
+                                            @RequestParam("token") String token,
+                                            Model model, Authentication authentication) {
+        bookstoreUserDetailsService.resetPassword(password, token, model);
+        return handleSignIn(model, authentication);
+    }
+
+    @PostMapping("/updateProfile")
+    public String updateUserProfile(@RequestParam("name") String name,
+                                    @RequestParam("mail") String email,
+                                    @RequestParam("phone") String phone,
+                                    @RequestParam("password") String password,
+                                    @RequestParam("passwordReply") String passwordReply,
+                                    RedirectAttributes redirectAttributes) {
+        if (!password.equals(passwordReply)) {
+            redirectAttributes.addFlashAttribute("passwordError", "Passwords do not match");
+            return "redirect:/profile";
+        }
+        bookstoreUserRegister.updateProfile(name, email, phone, password);
+        redirectAttributes.addFlashAttribute("profileUpdateSuccess", "Profile updated successfully");
+        return "redirect:/profile";
+    }
+
+    @PostMapping("/topup")
+    public String handleTopup(@RequestParam("sum") String sum) {
+
+        String redirectUrl = bookstoreUserRegister.topupWithPayPal(sum);
+
+        return "redirect:" + redirectUrl;
+    }
+
+    @GetMapping("/execute-payment")
+    public String executePayment(HttpServletRequest request) {
+        bookstoreUserRegister.executePayPalPayment(request);
+        return "redirect:/profile";
+    }
+
+    @GetMapping("/cancel-payment")
+    public String cancelPayment() {
+        return "redirect:/profile";
     }
 }
