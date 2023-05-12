@@ -115,11 +115,12 @@
                         </strong>
                         <span class="Cart-price" th:text="'₽' + ${#numbers.formatDecimal(totalDiscountPrice, 1, 2)}">534 р.
                         </span>
-                        <span class="Cart-price_old" th:if="${totalPrice != totalDiscountPrice}" th:text="'₽' + ${#numbers.formatDecimal(totalPrice, 1, 2)}">658 р.
+                        <span class="Cart-price_old" th:if="${totalPrice != totalDiscountPrice}"
+                              th:text="'₽' + ${#numbers.formatDecimal(totalPrice, 1, 2)}">658 р.
                         </span>
                     </div>
                     <div class="Cart-block">
-                        <a class="btn btn_success btn_md" href="/order.html" th:text="#{cart.buy}">Купить
+                        <a class="btn btn_success btn_md" th:href="@{/buy}" th:text="#{cart.buy}">Купить
                         </a>
                     </div>
                 </div>

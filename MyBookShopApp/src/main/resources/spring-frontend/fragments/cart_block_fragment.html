@@ -124,7 +124,7 @@
             </svg>
             <span class="CartBlock-text" th:text="${curUser.name}">Дмитрий Петров
             </span>
-            <span class="CartBlock-budget" th:text="#{profile.balance} + ' ' + ${curUser.balance} + ' ' + #{profile.rubles}">На счете 100 рублей
+            <span class="CartBlock-budget" th:text="#{profile.balance} + ' ' + ${#numbers.formatDecimal(curUser.balance, 1, 2)} + ' $'">На счете 100 рублей
             </span>
         </a>
     </div>

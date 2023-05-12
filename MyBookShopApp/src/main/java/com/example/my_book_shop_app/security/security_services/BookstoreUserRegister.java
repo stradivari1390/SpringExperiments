@@ -3,12 +3,15 @@ package com.example.my_book_shop_app.security.security_services;
 import ch.qos.logback.classic.Logger;
 import com.example.my_book_shop_app.data.model.enums.ContactType;
 import com.example.my_book_shop_app.data.model.payments.BalanceTransactionEntity;
+import com.example.my_book_shop_app.data.model.user.ConfirmationEmailToken;
 import com.example.my_book_shop_app.data.model.user.UserContactEntity;
 import com.example.my_book_shop_app.data.model.user.UserEntity;
 import com.example.my_book_shop_app.data.repositories.BalanceTransactionEntityRepository;
+import com.example.my_book_shop_app.data.repositories.ConfirmationEmailTokenRepository;
 import com.example.my_book_shop_app.data.repositories.UserContactEntityRepository;
 import com.example.my_book_shop_app.data.repositories.UserEntityRepository;
 import com.example.my_book_shop_app.data.UserContactDetails;
+import com.example.my_book_shop_app.dto.BalanceTransactionDto;
 import com.example.my_book_shop_app.exceptions.ContactNotFoundException;
 import com.example.my_book_shop_app.exceptions.NoUserFoundException;
 import com.example.my_book_shop_app.exceptions.UserAlreadyExistsException;
@@ -32,6 +35,8 @@ import org.slf4j.LoggerFactory;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -41,6 +46,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -48,6 +54,7 @@ import java.time.ZoneId;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 @Service
 public class BookstoreUserRegister {
@@ -64,6 +71,8 @@ public class BookstoreUserRegister {
     private final APIContext apiContext = new APIContext("AYKIRLX7gctbC0MHf4mWOFiBvHNOMp6laYgtzebaeWupUXJQJd8UH70KERxA6kwq8poBoobpfZ-mzz22",
             "EI_YBne00EsEk3PSzBUJwB_waBDAq042GJ9T0_128870A14j8rs9nOU-5SuXnpKCG9u34ONfv_n5Mzmw",
             "sandbox");
+    private final EmailService emailService;
+    private final ConfirmationEmailTokenRepository confirmationEmailTokenRepository;
 
     @Autowired
     public BookstoreUserRegister(UserEntityRepository userEntityRepository, PasswordEncoder passwordEncoder,
@@ -71,7 +80,9 @@ public class BookstoreUserRegister {
                                  BookstoreUserDetailsService bookstoreUserDetailsService, JWTUtil jwtTokenUtil,
                                  UserContactEntityRepository userContactEntityRepository,
                                  @Lazy AuthUserController authUserController,
-                                 BalanceTransactionEntityRepository balanceTransactionEntityRepository) {
+                                 BalanceTransactionEntityRepository balanceTransactionEntityRepository,
+                                 EmailService emailService,
+                                 ConfirmationEmailTokenRepository confirmationEmailTokenRepository) {
         this.userEntityRepository = userEntityRepository;
         this.passwordEncoder = passwordEncoder;
         this.authenticationManager = authenticationManager;
@@ -80,6 +91,8 @@ public class BookstoreUserRegister {
         this.userContactEntityRepository = userContactEntityRepository;
         this.authUserController = authUserController;
         this.balanceTransactionEntityRepository = balanceTransactionEntityRepository;
+        this.emailService = emailService;
+        this.confirmationEmailTokenRepository = confirmationEmailTokenRepository;
     }
 
     public void registerNewUser(RegistrationForm registrationForm) {
@@ -204,28 +217,57 @@ public class BookstoreUserRegister {
         }
     }
 
-    public void updateProfile(String name, String email, String phone, String password) {
+    public String confirmProfileUpdate(String token, RedirectAttributes redirectAttributes) {
+        ConfirmationEmailToken emailToken = confirmationEmailTokenRepository.findByToken(token);
+
+        if (emailToken == null || emailToken.isExpired()) {
+            redirectAttributes.addFlashAttribute("token", "expired");
+            return "redirect:/profile";
+        } else {
+            UserEntity userEntity = emailToken.getUser();
+
+            if (emailToken.getName() != null) {
+                userEntity.setName(emailToken.getName());
+            }
+            if (emailToken.getPhone() != null) {
+                UserContactEntity phoneEntity = userContactEntityRepository
+                        .findByUserIdAndType(userEntity.getId(), ContactType.PHONE).orElse(new UserContactEntity());
+                phoneEntity.setContact(emailToken.getPhone());
+                userContactEntityRepository.save(phoneEntity);
+            }
+            if (emailToken.getPassword() != null) {
+                userEntity.setPassword(emailToken.getPassword());
+            }
+
+            userEntityRepository.save(userEntity);
+
+            confirmationEmailTokenRepository.delete(emailToken);
+        }
+
+        return "redirect:/profile";
+    }
+
+    public void updateProfile(String name, String email, String phone, String password, String passwordReply) {
+        if (!password.equals(passwordReply)) {
+            throw new IllegalArgumentException("Passwords do not match");
+        }
+
         UserEntity userEntity = getCurrentUser();
-        UserContactEntity phoneEntity = userContactEntityRepository
-                .findByUserIdAndType(userEntity.getId(), ContactType.PHONE).orElse(new UserContactEntity());
-        UserContactEntity emailEntity = userContactEntityRepository
-                .findByUserIdAndType(userEntity.getId(), ContactType.EMAIL).orElse(new UserContactEntity());
-        if (name != null) {
-            userEntity.setName(name);
-        }
-        if (email != null) {
-            userEntity.setUsername(email);
-            emailEntity.setContact(email);
-            userContactEntityRepository.save(emailEntity);
-        }
-        if (phone != null) {
-            phoneEntity.setContact(phone);
-            userContactEntityRepository.save(phoneEntity);
-        }
-        if (!password.isEmpty()) {
-            userEntity.setPassword(passwordEncoder.encode(password));
-        }
-        userEntityRepository.save(userEntity);
+        String token = UUID.randomUUID().toString();
+
+        ConfirmationEmailToken emailToken = new ConfirmationEmailToken();
+        emailToken.setToken(token);
+        emailToken.setUser(userEntity);
+        emailToken.setExpiryDate(LocalDateTime.now().plusMinutes(30));
+
+        emailToken.setName(name);
+        emailToken.setEmail(email);
+        emailToken.setPhone(phone);
+        emailToken.setPassword(passwordEncoder.encode(password));
+
+        confirmationEmailTokenRepository.save(emailToken);
+
+        emailService.sendConfirmationEmail(email, token);
     }
 
     public String topupWithPayPal(String sum) {
@@ -318,5 +360,22 @@ public class BookstoreUserRegister {
         userEntityRepository.save(userEntity);
 
         return "{\"result\": true}";
+    }
+
+    public BalanceTransactionDto mapToDto(BalanceTransactionEntity entity) {
+        BalanceTransactionDto dto = new BalanceTransactionDto();
+        dto.setId(entity.getId());
+        dto.setUserId(entity.getUserId());
+        dto.setTime(entity.getTime().toInstant(ZoneId.systemDefault().getRules().getOffset(entity.getTime())).toEpochMilli());
+        dto.setValue(entity.getValue());
+        dto.setBookId(entity.getBookId());
+        dto.setDescription(entity.getDescription());
+        return dto;
+    }
+
+    public Page<BalanceTransactionDto> getBalanceTransactionDtos(int offset, int limit) {
+        Page<BalanceTransactionEntity> entities = balanceTransactionEntityRepository
+                .findByUserIdOrderByTimeDesc(getCurrentUser().getId(), PageRequest.of(offset / limit, limit));
+        return entities.map(this::mapToDto);
     }
 }

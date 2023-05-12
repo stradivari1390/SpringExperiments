@@ -12,6 +12,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.Collections;
 
@@ -137,5 +138,21 @@ public class CartController {
             cartService.changeBook2UserRelation(bookstoreUserRegister.getCurrentUser().getId(), slug, "purchased");
         }
         return handleArchivedRequest(model, authentication);
+    }
+
+    @GetMapping("/buy")
+    public String handleBuyRequest(Authentication authentication, RedirectAttributes redirectAttributes) {
+        if (authentication != null && authentication.isAuthenticated()) {
+            UserDto userDto = bookstoreUserDetailsService.getUserDtoById(bookstoreUserRegister.getCurrentUser().getId());
+            boolean success = cartService.buy(userDto);
+            if (success) {
+                redirectAttributes.addFlashAttribute("message", "Purchase successful!");
+            } else {
+                redirectAttributes.addFlashAttribute("error", "Insufficient balance!");
+            }
+        } else {
+            return "redirect:/signin";
+        }
+        return "redirect:/my";
     }
 }

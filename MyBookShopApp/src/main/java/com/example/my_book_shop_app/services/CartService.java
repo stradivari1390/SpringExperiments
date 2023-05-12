@@ -1,11 +1,12 @@
 package com.example.my_book_shop_app.services;
 
 import com.example.my_book_shop_app.data.model.book.links.Book2UserEntity;
-import com.example.my_book_shop_app.data.repositories.Book2UserEntityRepository;
-import com.example.my_book_shop_app.data.repositories.Book2UserTypeEntityRepository;
-import com.example.my_book_shop_app.data.repositories.BookRepository;
+import com.example.my_book_shop_app.data.model.payments.BalanceTransactionEntity;
+import com.example.my_book_shop_app.data.model.user.UserEntity;
+import com.example.my_book_shop_app.data.repositories.*;
 import com.example.my_book_shop_app.dto.BookDto;
 import com.example.my_book_shop_app.dto.UserDto;
+import com.example.my_book_shop_app.exceptions.NoUserFoundException;
 import com.example.my_book_shop_app.security.security_services.BookstoreUserRegister;
 
 import jakarta.servlet.http.Cookie;
@@ -19,6 +20,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -32,17 +34,23 @@ public class CartService {
     private final Book2UserEntityRepository book2UserEntityRepository;
     private final BookstoreUserRegister bookstoreUserRegister;
     private final Book2UserTypeEntityRepository book2UserTypeEntityRepository;
+    private final BalanceTransactionEntityRepository balanceTransactionRepository;
+    private final UserEntityRepository userEntityRepository;
 
     @Autowired
     public CartService(BookRepository bookRepository, BookService bookService,
                        Book2UserEntityRepository book2UserEntityRepository,
                        BookstoreUserRegister bookstoreUserRegister,
-                       Book2UserTypeEntityRepository book2UserTypeEntityRepository) {
+                       Book2UserTypeEntityRepository book2UserTypeEntityRepository,
+                       BalanceTransactionEntityRepository balanceTransactionRepository,
+                       UserEntityRepository userEntityRepository) {
         this.bookRepository = bookRepository;
         this.bookService = bookService;
         this.book2UserEntityRepository = book2UserEntityRepository;
         this.bookstoreUserRegister = bookstoreUserRegister;
         this.book2UserTypeEntityRepository = book2UserTypeEntityRepository;
+        this.balanceTransactionRepository = balanceTransactionRepository;
+        this.userEntityRepository = userEntityRepository;
     }
 
     public Page<BookDto> getPageOfCartBooks(Long userId, Integer offset, Integer limit) {
@@ -189,5 +197,37 @@ public class CartService {
                 .stream()
                 .mapToDouble(b -> b.getPrice() * (100 - b.getDiscount()) / 100)
                 .sum();
+    }
+
+    public boolean hasSufficientBalance(UserDto userDto, Double totalCost) {
+        return userDto.getBalance() >= totalCost;
+    }
+
+    public boolean buy(UserDto userDto) {
+        Double totalCost = getTotalDiscountPrice(userDto);
+        if (!hasSufficientBalance(userDto, totalCost)) {
+            return false;
+        }
+
+        userDto.getCartBooks().forEach(b -> {
+            createTransaction(userDto.getId(), -b.getPrice(), "Purchase: " + b.getTitle());
+            changeBook2UserRelation(userDto.getId(), b.getSlug(), "purchased");
+        });
+
+        return true;
+    }
+
+    public void createTransaction(Long userId, Double value, String description) {
+        UserEntity user = userEntityRepository.findById(userId)
+                .orElseThrow(() -> new NoUserFoundException("User not found"));
+        user.setBalance(user.getBalance() + value);
+        userEntityRepository.save(user);
+
+        BalanceTransactionEntity transaction = new BalanceTransactionEntity();
+        transaction.setUserId(userId);
+        transaction.setTime(LocalDateTime.now());
+        transaction.setValue(value);
+        transaction.setDescription(description);
+        balanceTransactionRepository.save(transaction);
     }
 }

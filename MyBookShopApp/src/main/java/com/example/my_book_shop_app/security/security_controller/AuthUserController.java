@@ -2,6 +2,8 @@ package com.example.my_book_shop_app.security.security_controller;
 
 import ch.qos.logback.classic.Logger;
 
+import com.example.my_book_shop_app.data.repositories.BalanceTransactionEntityRepository;
+import com.example.my_book_shop_app.dto.BalanceTransactionDto;
 import org.slf4j.LoggerFactory;
 
 import com.example.my_book_shop_app.exceptions.NoUserFoundException;
@@ -20,6 +22,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -29,6 +32,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Controller
@@ -117,6 +121,13 @@ public class AuthUserController {
         model.addAttribute("authStatus", "authorized");
         model.addAttribute("curUsr", bookstoreUserDetailsService.getUserDtoById(userRegister.getCurrentUser().getId()));
         return "profile";
+    }
+
+    @GetMapping("/transactions")
+    public ResponseEntity<List<BalanceTransactionDto>> getTransactions(
+            @RequestParam(defaultValue = "0") int offset, @RequestParam(defaultValue = "10") int limit) {
+        Page<BalanceTransactionDto> transactions = bookstoreUserRegister.getBalanceTransactionDtos(offset, limit);
+        return ResponseEntity.ok(transactions.getContent());
     }
 
     @PostMapping("/login")
@@ -212,9 +223,14 @@ public class AuthUserController {
             redirectAttributes.addFlashAttribute("passwordError", "Passwords do not match");
             return "redirect:/profile";
         }
-        bookstoreUserRegister.updateProfile(name, email, phone, password);
+        bookstoreUserRegister.updateProfile(name, email, phone, password, passwordReply);
         redirectAttributes.addFlashAttribute("profileUpdateSuccess", "Profile updated successfully");
         return "redirect:/profile";
+    }
+
+    @GetMapping("/confirm-update")
+    public String confirmUpdate(@RequestParam("token") String token, RedirectAttributes redirectAttributes) {
+        return bookstoreUserRegister.confirmProfileUpdate(token, redirectAttributes);
     }
 
     @PostMapping("/topup")

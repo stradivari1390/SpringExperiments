@@ -59,4 +59,11 @@ public class EmailService {
             ex.printStackTrace();
         }
     }
+
+    public void sendConfirmationEmail(String to, String token) {
+        String subject = "Confirm Profile Update";
+        String messageText = "To confirm your profile update, please click the following link: "
+                + "http://localhost:8080/confirm-update?token=" + token;
+        sendEmail(to, subject, messageText);
+    }
 }

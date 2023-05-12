@@ -103,31 +103,22 @@
                                 <table class="table table_noMargin">
                                     <thead>
                                     <tr>
-                                        <th th:text="#{profile.date_time}">Дата и время
+                                        <th th:text="#{profile.date_time}">Date and time
                                         </th>
-                                        <th th:text="#{profile.total}">Сумма
+                                        <th th:text="#{profile.total}">Sum
                                         </th>
-                                        <th th:text="#{profile.description}">Описание
+                                        <th th:text="#{profile.description}">Description
                                         </th>
                                     </tr>
                                     </thead>
                                     <tbody>
-                                    <tr>
-                                        <td>15 мая 2017 10:03
-                                        </td>
-                                        <td><span class="Transactions_textSuccess">
-                            <strong>+500 р.
-                            </strong></span>
-                                        </td>
-                                        <td th:text="#{profile.balance_topup}">Пополнение счета
-                                        </td>
-                                    </tr>
                                     </tbody>
                                 </table>
                             </div>
-                            <div class="Transactions-footer Transactions-footer_center"><a
-                                    class="btn btn_primary Transactions-get" href="#" data-transactionoffset="10"
-                                    data-transactionlimit="10" data-transactionsort="asc" th:text="#{menu.show_more}">Показать еще</a>
+                            <div class="Transactions-footer Transactions-footer_center">
+                                <a class="btn btn_primary Transactions-get" href="#" data-transactionoffset="10"
+                                   data-transactionlimit="10" data-transactionsort="asc" th:text="#{menu.show_more}">Show more</a>
+                                <a class="btn btn_primary Transactions-less" href="#" style="display:none" th:text="#{menu.show_less}">Show less</a>
                             </div>
                         </div>
                     </div>
