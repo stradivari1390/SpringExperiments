@@ -6,10 +6,7 @@ import com.example.my_book_shop_app.data.repositories.BookReviewEntityRepository
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.openqa.selenium.Alert;
-import org.openqa.selenium.By;
-import org.openqa.selenium.JavascriptExecutor;
-import org.openqa.selenium.WebElement;
+import org.openqa.selenium.*;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -17,6 +14,7 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.TestPropertySource;
 
 import java.time.Duration;
 import java.util.List;
@@ -25,6 +23,7 @@ import java.util.regex.Pattern;
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
+@TestPropertySource("/application-test.properties")
 class MainPageSeleniumTests {
 
     private static ChromeDriver driver;
@@ -40,7 +39,7 @@ class MainPageSeleniumTests {
         ChromeOptions options = new ChromeOptions();
         options.addArguments("--remote-allow-origins=*");
         driver = new ChromeDriver(options);
-        driver.manage().timeouts().pageLoadTimeout(Duration.ofSeconds(2));
+        driver.manage().timeouts().pageLoadTimeout(Duration.ofSeconds(10));
     }
 
     @AfterAll
@@ -53,7 +52,7 @@ class MainPageSeleniumTests {
         MainPage mainPage = new MainPage(driver);
         mainPage.callPage();
 
-        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(2));
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(3));
         wait.until(ExpectedConditions.textToBePresentInElementLocated(By.tagName("body"), "BOOKSHOP"));
 
         assertTrue(driver.getPageSource().contains("BOOKSHOP"));
@@ -64,7 +63,7 @@ class MainPageSeleniumTests {
         MainPage mainPage = new MainPage(driver);
         mainPage.callPage();
 
-        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(2));
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(3));
 
         wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector(".Header-searchLink svg")));
         driver.findElement(By.cssSelector(".Header-searchLink svg")).click();
@@ -84,7 +83,7 @@ class MainPageSeleniumTests {
     void siteWalkthroughTest() {
         driver.get("http://localhost:8080/");
 
-        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(3));
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
 
         // Go to Genres
         WebElement link = driver.findElement(By.xpath("/html/body/header/div[2]/div/nav/ul/li[2]/a"));
@@ -210,10 +209,24 @@ class MainPageSeleniumTests {
         js.executeScript("arguments[0].click();", link);
         wait.until(ExpectedConditions.urlContains("/books/recent"));
 
-        // Click on a book
-        link = driver.findElement(By.xpath("/html/body/div[1]/div/main/div/div[2]/div[1]/div[1]/div[1]/a"));
+        // Enter a from date (15.02.2023)
+        WebElement fromDate = driver.findElement(By.xpath("/html/body/div[1]/div/main/div/div[1]/form/div[1]/input"));
+        fromDate.sendKeys("15.02.2023");
+
+        // Enter a to date (15.04.2023)
+        WebElement toDate = driver.findElement(By.xpath("/html/body/div[1]/div/main/div/div[1]/form/div[2]/input"));
+        toDate.sendKeys("15.04.2023");
+
+        fromDate.click();
+
+        // click More
+        link = driver.findElement(By.xpath("/html/body/div[1]/div/main/div/div[2]/div[2]/a"));
         js.executeScript("arguments[0].click();", link);
-        wait.until(ExpectedConditions.urlContains("/books/886bd009-7230-4949-87af-ce805675ed07"));
+
+        // Click on a book
+        link = driver.findElement(By.xpath("/html/body/div[1]/div/main/div/div[2]/div[1]/div[1]/a"));
+        js.executeScript("arguments[0].click();", link);
+        wait.until(ExpectedConditions.urlContains("/books/de342b36-b5ed-4fa9-95d4-86a73ded6e8a"));
 
         // Write a review
         driver.findElement(By.id("review-text")).sendKeys("Lalala");
