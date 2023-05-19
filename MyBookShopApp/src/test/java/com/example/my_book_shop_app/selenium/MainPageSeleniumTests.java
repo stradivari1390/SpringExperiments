@@ -224,7 +224,7 @@ class MainPageSeleniumTests {
         js.executeScript("arguments[0].click();", link);
 
         // Click on a book
-        link = driver.findElement(By.xpath("/html/body/div[1]/div/main/div/div[2]/div[1]/div[1]/a"));
+        link = driver.findElement(By.xpath("/html/body/div[1]/div/main/div/div[2]/div[1]/div[1]/a/img"));
         js.executeScript("arguments[0].click();", link);
         wait.until(ExpectedConditions.urlContains("/books/de342b36-b5ed-4fa9-95d4-86a73ded6e8a"));
 

@@ -18,7 +18,7 @@ public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
         String requestURI = request.getRequestURI();
         if (requestURI.equals("/my") || requestURI.equals("/archived") || requestURI.equals("/profile")) {
             response.sendRedirect("/signin");
-        } else {
+        } else if (requestURI.equals("/rateBookReview") || requestURI.equals("/rateBook")) {
             response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized");
         }
     }
