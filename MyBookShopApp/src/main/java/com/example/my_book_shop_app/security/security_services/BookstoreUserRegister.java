@@ -46,6 +46,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.time.Instant;
@@ -217,6 +218,7 @@ public class BookstoreUserRegister {
         }
     }
 
+    @Transactional
     public String confirmProfileUpdate(String token, RedirectAttributes redirectAttributes) {
         ConfirmationEmailToken emailToken = confirmationEmailTokenRepository.findByToken(token);
 
@@ -247,6 +249,7 @@ public class BookstoreUserRegister {
         return "redirect:/profile";
     }
 
+    @Transactional
     public void updateProfile(String name, String email, String phone, String password, String passwordReply) {
         if (!password.equals(passwordReply)) {
             throw new IllegalArgumentException("Passwords do not match");
@@ -309,36 +312,38 @@ public class BookstoreUserRegister {
         return redirectUrl;
     }
 
+    @Transactional
     public void executePayPalPayment(HttpServletRequest request) {
-            String paymentId = request.getParameter("paymentId");
-            String payerId = request.getParameter("PayerID");
+        String paymentId = request.getParameter("paymentId");
+        String payerId = request.getParameter("PayerID");
 
-            Payment payment = new Payment();
-            payment.setId(paymentId);
+        Payment payment = new Payment();
+        payment.setId(paymentId);
 
-            PaymentExecution paymentExecute = new PaymentExecution();
-            paymentExecute.setPayerId(payerId);
+        PaymentExecution paymentExecute = new PaymentExecution();
+        paymentExecute.setPayerId(payerId);
 
-            try {
-                Payment createdPayment = payment.execute(apiContext, paymentExecute);
+        try {
+            Payment createdPayment = payment.execute(apiContext, paymentExecute);
 
-                String sum = createdPayment.getTransactions().get(0).getAmount().getTotal();
-                String hash = createdPayment.getPayer().getPayerInfo().getPayerId();
+            String sum = createdPayment.getTransactions().get(0).getAmount().getTotal();
+            String hash = createdPayment.getPayer().getPayerInfo().getPayerId();
 
-                UserEntity currentUser = getCurrentUser();
-                currentUser.setHash(hash);
-                userEntityRepository.save(currentUser);
+            UserEntity currentUser = getCurrentUser();
+            currentUser.setHash(hash);
+            userEntityRepository.save(currentUser);
 
-                Map<String, String> payload = new HashMap<>();
-                payload.put("sum", sum);
-                payload.put("hash", hash);
-                processPayment(payload);
+            Map<String, String> payload = new HashMap<>();
+            payload.put("sum", sum);
+            payload.put("hash", hash);
+            processPayment(payload);
 
-            } catch (PayPalRESTException e) {
-                log.error(e.getMessage());
-            }
+        } catch (PayPalRESTException e) {
+            log.error(e.getMessage());
         }
+    }
 
+    @Transactional
     public String processPayment(Map<String, String> payload) {
         String hash = payload.get("hash");
         double sum = Double.parseDouble(payload.get("sum"));
@@ -366,7 +371,7 @@ public class BookstoreUserRegister {
         BalanceTransactionDto dto = new BalanceTransactionDto();
         dto.setId(entity.getId());
         dto.setUserId(entity.getUserId());
-        dto.setTime(entity.getTime().toInstant(ZoneId.systemDefault().getRules().getOffset(entity.getTime())).toEpochMilli());
+        dto.setTime(entity.getTime().atZone(ZoneId.systemDefault()).toInstant().toEpochMilli());
         dto.setValue(entity.getValue());
         dto.setBookId(entity.getBookId());
         dto.setDescription(entity.getDescription());

@@ -5,6 +5,7 @@ import com.example.my_book_shop_app.exceptions.EmailAuthorizationException;
 import com.example.my_book_shop_app.security.security_dto.ContactConfirmationPayload;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.mail.MailAuthenticationException;
 import org.springframework.mail.SimpleMailMessage;
@@ -13,6 +14,12 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class EmailService {
+
+    @Value("${app.base-url}")
+    private String baseUrl;
+
+    @Value("${spring.mail.username}")
+    private String emailFrom;
 
     BookstoreUserDetailsService bookstoreUserDetailsService;
     UserEntityRepository userEntityRepository;
@@ -38,7 +45,7 @@ public class EmailService {
 
     private void sendEmail(String to, String subject, String messageText) {
         SimpleMailMessage message = new SimpleMailMessage();
-        message.setFrom("book_shop_test@mail.ru");
+        message.setFrom(emailFrom);
         message.setTo(to);
         message.setSubject(subject);
         message.setText(messageText);
@@ -52,7 +59,7 @@ public class EmailService {
     public void sendPasswordResetEmail(String to, String token) {
         String subject = "Password Reset";
         String messageText = "To reset your password, please click the following link: "
-                + "http://localhost:8080/reset-password?token=" + token;
+                + baseUrl + "/reset-password?token=" + token;
         try {
             sendEmail(to, subject, messageText);
         } catch (Exception ex) {
@@ -63,7 +70,7 @@ public class EmailService {
     public void sendConfirmationEmail(String to, String token) {
         String subject = "Confirm Profile Update";
         String messageText = "To confirm your profile update, please click the following link: "
-                + "http://localhost:8080/confirm-update?token=" + token;
+                + baseUrl + "/confirm-update?token=" + token;
         sendEmail(to, subject, messageText);
     }
 }
