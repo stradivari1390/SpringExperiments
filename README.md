@@ -2,12 +2,12 @@
 MyBookShopApp is a Spring Boot web application for a book store.  
 *(Localized en, ru)*
 
-**It is under construction at this moment.**
-
 Directory Structure
-The Java part of the project is organized as follows:
+The Java main part of the project is organized as follows:
 ```
 com.example.my_book_shop_app
+├── annotations
+├── aspects
 ├── config
 ├── controllers
 ├── data
@@ -32,6 +32,7 @@ com.example.my_book_shop_app
 │   ├── security_controller
 │   ├── security_dto
 │   └── security_services
+├── selenium
 ├── services
 └── util
 ```
@@ -156,9 +157,11 @@ to be continued
 ## Usage
 Once the application is running, you can access the web interface at http://localhost:8080/. The Application allows you to browse books by author, genre, tags and search for books. You will be able to add books to your cart, view your cart, and checkout.
 
-<img src="MyBookShopApp\src\main\resources\book_shop_1.jpg" alt="gui_1" width="600"/>
-<img src="MyBookShopApp\src\main\resources\book_shop_2.jpg" alt="gui_2" width="600"/>
-<img src="MyBookShopApp\src\main\resources\book_shop_3.jpg" alt="gui_3" width="600"/>
+<img src="MyBookShopApp\src\main\resources\readme-images\book_shop_1.png" alt="gui_1" width="600"/>
+<img src="MyBookShopApp\src\main\resources\readme-images\book_shop_2.png" alt="gui_2" width="600"/>
+<img src="MyBookShopApp\src\main\resources\readme-images\book_shop_3.png" alt="gui_3" width="600"/>
+<img src="MyBookShopApp\src\main\resources\readme-images\book_shop_4.png" alt="gui_4" width="600"/>
+<img src="MyBookShopApp\src\main\resources\readme-images\book_shop_5.png" alt="gui_5" width="600"/>
 
 ## Implementations list
 ### Pages
