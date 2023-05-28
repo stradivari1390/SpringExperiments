@@ -34,6 +34,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.slf4j.LoggerFactory;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -72,6 +73,11 @@ public class BookstoreUserRegister {
     private final APIContext apiContext = new APIContext("AYKIRLX7gctbC0MHf4mWOFiBvHNOMp6laYgtzebaeWupUXJQJd8UH70KERxA6kwq8poBoobpfZ-mzz22",
             "EI_YBne00EsEk3PSzBUJwB_waBDAq042GJ9T0_128870A14j8rs9nOU-5SuXnpKCG9u34ONfv_n5Mzmw",
             "sandbox");
+    @Value("${payment.returnUrl}")
+    private String returnUrl;
+
+    @Value("${payment.cancelUrl}")
+    private String cancelUrl;
     private final EmailService emailService;
     private final ConfirmationEmailTokenRepository confirmationEmailTokenRepository;
 
@@ -291,8 +297,8 @@ public class BookstoreUserRegister {
         payment.setTransactions(List.of(transaction));
 
         RedirectUrls redirectUrls = new RedirectUrls();
-        redirectUrls.setReturnUrl("http://localhost:8080/execute-payment");
-        redirectUrls.setCancelUrl("http://localhost:8080/cancel-payment");
+        redirectUrls.setReturnUrl(returnUrl);
+        redirectUrls.setCancelUrl(cancelUrl);
         payment.setRedirectUrls(redirectUrls);
 
         Payment createdPayment = new Payment();

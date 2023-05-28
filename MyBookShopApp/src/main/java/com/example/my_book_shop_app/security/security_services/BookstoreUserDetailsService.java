@@ -19,6 +19,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 
 import java.time.LocalDateTime;
@@ -65,6 +66,7 @@ public class BookstoreUserDetailsService implements UserDetailsService {
         return user;
     }
 
+    @Transactional
     public String createSmsOrEmailCode(String contact) {
         String code = String.format("%06d", random.nextInt(1_000_000));
         UserContactEntity contactEntity = userContactEntityRepository.findByContact(contact).orElse(null);
@@ -96,6 +98,7 @@ public class BookstoreUserDetailsService implements UserDetailsService {
                 .orElseThrow(() -> new InvalidResetTokenException("Invalid reset token: " + token));
     }
 
+    @Transactional
     public void resetPassword(String password, String token, Model model) {
         PasswordResetToken resetToken = passwordResetTokenRepository.findByToken(token)
                 .orElseThrow(() -> new InvalidResetTokenException("Invalid reset token: " + token));
