@@ -43,6 +43,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     try {
                         username = jwtTokenUtil.getUsernameFromToken(token);
                     } catch (ExpiredJwtException e) {
+                        cookie = new Cookie("token", null);
+                        cookie.setMaxAge(0);
+                        cookie.setPath("/");
+                        httpServletResponse.addCookie(cookie);
                         httpServletResponse.sendRedirect("/signin");
                         return;
                     }

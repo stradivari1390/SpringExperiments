@@ -3,12 +3,12 @@ package com.example.my_book_shop_app.security;
 import com.example.my_book_shop_app.data.model.enums.ContactType;
 import com.example.my_book_shop_app.data.model.user.UserContactEntity;
 import com.example.my_book_shop_app.data.model.user.UserEntity;
-import com.example.my_book_shop_app.data.repositories.BookRepository;
 import com.example.my_book_shop_app.data.repositories.UserContactEntityRepository;
 import com.example.my_book_shop_app.data.repositories.UserEntityRepository;
 import com.example.my_book_shop_app.dto.UserDto;
 import com.example.my_book_shop_app.exceptions.NoUserFoundException;
 import com.example.my_book_shop_app.security.security_services.BookstoreUserDetailsService;
+import com.example.my_book_shop_app.security.security_services.EmailService;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,7 +25,10 @@ import static org.junit.jupiter.api.Assertions.*;
 class BookstoreUserDetailsServiceTests {
 
     @Autowired
-    private BookstoreUserDetailsService userDetailsService;
+    private BookstoreUserDetailsService bookstoreUserDetailsService;
+
+    @Autowired
+    private EmailService emailService;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
@@ -44,7 +47,7 @@ class BookstoreUserDetailsServiceTests {
         Mockito.when(userEntityRepository.findUserByUsername(userEntity.getUsername()))
                 .thenReturn(Optional.of(userEntity));
 
-        UserDetails userDetails = userDetailsService.loadUserByUsername(userEntity.getUsername());
+        UserDetails userDetails = bookstoreUserDetailsService.loadUserByUsername(userEntity.getUsername());
 
         assertEquals(userEntity.getUsername(), userDetails.getUsername());
         assertTrue(passwordEncoder.matches("testpassword", userDetails.getPassword()));
@@ -56,7 +59,7 @@ class BookstoreUserDetailsServiceTests {
         Mockito.when(userEntityRepository.findUserByUsername(nonExistingUsername))
                 .thenReturn(Optional.empty());
 
-        assertThrows(NoUserFoundException.class, () -> userDetailsService.loadUserByUsername(nonExistingUsername));
+        assertThrows(NoUserFoundException.class, () -> bookstoreUserDetailsService.loadUserByUsername(nonExistingUsername));
     }
 
     @Test
@@ -68,7 +71,7 @@ class BookstoreUserDetailsServiceTests {
         Mockito.when(userEntityRepository.findUserDtoById(userId))
                 .thenReturn(Optional.of(userDto));
 
-        UserDto fetchedUserDto = userDetailsService.getUserDtoById(userId);
+        UserDto fetchedUserDto = bookstoreUserDetailsService.getUserDtoById(userId);
 
         assertEquals(userDto.getId(), fetchedUserDto.getId());
         assertEquals(userDto.getUsername(), fetchedUserDto.getUsername());
@@ -80,7 +83,7 @@ class BookstoreUserDetailsServiceTests {
         Mockito.when(userEntityRepository.findUserDtoById(invalidUserId))
                 .thenReturn(Optional.empty());
 
-        assertThrows(NoUserFoundException.class, () -> userDetailsService.getUserDtoById(invalidUserId));
+        assertThrows(NoUserFoundException.class, () -> bookstoreUserDetailsService.getUserDtoById(invalidUserId));
     }
 
     @Test
@@ -89,7 +92,7 @@ class BookstoreUserDetailsServiceTests {
         Mockito.when(userContactEntityRepository.findByContact(newContact))
                 .thenReturn(Optional.empty());
 
-        String code = userDetailsService.createSmsOrEmailCode(newContact);
+        String code = emailService.createSmsOrEmailCode(newContact);
 
         assertNotNull(code);
         assertEquals(6, code.length());
@@ -106,7 +109,7 @@ class BookstoreUserDetailsServiceTests {
         Mockito.when(userContactEntityRepository.findByContact(existingContact))
                 .thenReturn(Optional.of(contactEntity));
 
-        String code = userDetailsService.createSmsOrEmailCode(existingContact);
+        String code = emailService.createSmsOrEmailCode(existingContact);
 
         assertNotNull(code);
         assertEquals(6, code.length());

@@ -1,7 +1,7 @@
 package com.example.my_book_shop_app.controllers;
 
 import com.example.my_book_shop_app.data.model.user.UserEntity;
-import com.example.my_book_shop_app.security.security_services.BookstoreUserRegister;
+import com.example.my_book_shop_app.security.security_services.AuthenticationService;
 import com.example.my_book_shop_app.services.CartService;
 import jakarta.servlet.http.Cookie;
 import org.junit.jupiter.api.Test;
@@ -27,7 +27,7 @@ class CartControllerTests {
     private CartService cartService;
 
     @MockBean
-    private BookstoreUserRegister bookstoreUserRegister;
+    private AuthenticationService authenticationService;
 
     @Autowired
     public CartControllerTests(MockMvc mockMvc) {
@@ -38,7 +38,7 @@ class CartControllerTests {
     void addBookToCartForAuthenticatedUser() throws Exception {
         String slug = "test-slug";
         String status = "CART";
-        when(bookstoreUserRegister.getCurrentUser()).thenReturn(new UserEntity());
+        when(authenticationService.getCurrentUser()).thenReturn(new UserEntity());
 
         mockMvc.perform(post("/changeBookStatus/{slug}", slug)
                         .param("status", status)
@@ -66,7 +66,7 @@ class CartControllerTests {
     void addBookToPostponedForAuthenticatedUser() throws Exception {
         String slug = "test-slug";
         String status = "KEPT";
-        when(bookstoreUserRegister.getCurrentUser()).thenReturn(new UserEntity());
+        when(authenticationService.getCurrentUser()).thenReturn(new UserEntity());
 
         mockMvc.perform(post("/changeBookStatus/{slug}", slug)
                         .param("status", status)
@@ -94,7 +94,7 @@ class CartControllerTests {
     void addBookToArchivedForAuthenticatedUser() throws Exception {
         String slug = "test-slug";
         String status = "ARCHIVED";
-        when(bookstoreUserRegister.getCurrentUser()).thenReturn(new UserEntity());
+        when(authenticationService.getCurrentUser()).thenReturn(new UserEntity());
 
         mockMvc.perform(post("/changeBookStatus/{slug}", slug)
                         .param("status", status)
@@ -110,7 +110,7 @@ class CartControllerTests {
         String slug = "test-slug";
         UserEntity userEntity = new UserEntity();
         userEntity.setId(1L);
-        when(bookstoreUserRegister.getCurrentUser()).thenReturn(userEntity);
+        when(authenticationService.getCurrentUser()).thenReturn(userEntity);
         String cartContents = "test-slug";
         mockMvc.perform(post("/changeBookStatus/cart/remove/{slug}", slug)
                         .cookie(new Cookie("cartContents", cartContents))
@@ -126,7 +126,7 @@ class CartControllerTests {
         String slug = "test-slug";
         UserEntity userEntity = new UserEntity();
         userEntity.setId(1L);
-        when(bookstoreUserRegister.getCurrentUser()).thenReturn(userEntity);
+        when(authenticationService.getCurrentUser()).thenReturn(userEntity);
         String postponedContents = "test-slug";
         mockMvc.perform(post("/changeBookStatus/postponed/remove/{slug}", slug)
                         .cookie(new Cookie("postponedContents", postponedContents))
@@ -142,7 +142,7 @@ class CartControllerTests {
         String slug = "test-slug";
         UserEntity userEntity = new UserEntity();
         userEntity.setId(1L);
-        when(bookstoreUserRegister.getCurrentUser()).thenReturn(userEntity);
+        when(authenticationService.getCurrentUser()).thenReturn(userEntity);
         mockMvc.perform(post("/changeBookStatus/archived/remove/{slug}", slug)
                         .with(user("user").password("password")))
                 .andExpect(status().is2xxSuccessful());

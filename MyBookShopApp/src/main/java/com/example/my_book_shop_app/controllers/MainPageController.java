@@ -1,11 +1,11 @@
 package com.example.my_book_shop_app.controllers;
 
+import com.example.my_book_shop_app.security.security_services.AuthenticationService;
 import com.example.my_book_shop_app.security.security_services.BookstoreUserDetailsService;
-import com.example.my_book_shop_app.security.security_services.BookstoreUserRegister;
 import com.example.my_book_shop_app.services.BookService;
 import com.example.my_book_shop_app.dto.BookDto;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -16,19 +16,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Controller
+@RequiredArgsConstructor
 public class MainPageController {
 
     private final BookService bookService;
-    private final BookstoreUserRegister bookstoreUserRegister;
+    private final AuthenticationService authenticationService;
     private final BookstoreUserDetailsService bookstoreUserDetailsService;
-
-    @Autowired
-    public MainPageController(BookService bookService, BookstoreUserRegister bookstoreUserRegister,
-                              BookstoreUserDetailsService bookstoreUserDetailsService) {
-        this.bookService = bookService;
-        this.bookstoreUserRegister = bookstoreUserRegister;
-        this.bookstoreUserDetailsService = bookstoreUserDetailsService;
-    }
 
     @ModelAttribute("query")
     public String query() {
@@ -46,8 +39,8 @@ public class MainPageController {
         if (authentication != null && authentication.isAuthenticated()) {
             model.addAttribute("authStatus", "authorized");
             model.addAttribute("recommendedBooks",
-                    bookService.getPageOfRecommendedBooks(bookstoreUserRegister.getCurrentUser().getId(), offset, limit).getContent());
-            model.addAttribute("curUsr", bookstoreUserDetailsService.getUserDtoById(bookstoreUserRegister.getCurrentUser().getId()));
+                    bookService.getPageOfRecommendedBooks(authenticationService.getCurrentUser().getId(), offset, limit).getContent());
+            model.addAttribute("curUsr", bookstoreUserDetailsService.getUserDtoById(authenticationService.getCurrentUser().getId()));
         } else {
             model.addAttribute("authStatus", "unauthorized");
         }

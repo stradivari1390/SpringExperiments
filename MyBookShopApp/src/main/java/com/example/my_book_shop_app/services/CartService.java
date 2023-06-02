@@ -1,17 +1,17 @@
 package com.example.my_book_shop_app.services;
 
 import com.example.my_book_shop_app.data.model.book.links.Book2UserEntity;
-import com.example.my_book_shop_app.data.model.payments.BalanceTransactionEntity;
 import com.example.my_book_shop_app.data.repositories.*;
 import com.example.my_book_shop_app.dto.BookDto;
 import com.example.my_book_shop_app.dto.UserDto;
-import com.example.my_book_shop_app.security.security_services.BookstoreUserRegister;
+import com.example.my_book_shop_app.security.security_services.AuthenticationService;
 
+import com.example.my_book_shop_app.security.security_services.PaymentService;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -25,31 +25,15 @@ import java.util.Collections;
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class CartService {
 
     private final BookRepository bookRepository;
     private final BookService bookService;
     private final Book2UserEntityRepository book2UserEntityRepository;
-    private final BookstoreUserRegister bookstoreUserRegister;
     private final Book2UserTypeEntityRepository book2UserTypeEntityRepository;
-    private final TransactionService transactionService;
-    private final BalanceTransactionEntityRepository balanceTransactionRepository;
-
-    @Autowired
-    public CartService(BookRepository bookRepository, BookService bookService,
-                       Book2UserEntityRepository book2UserEntityRepository,
-                       BookstoreUserRegister bookstoreUserRegister,
-                       Book2UserTypeEntityRepository book2UserTypeEntityRepository,
-                       TransactionService transactionService,
-                       BalanceTransactionEntityRepository balanceTransactionRepository) {
-        this.bookRepository = bookRepository;
-        this.bookService = bookService;
-        this.book2UserEntityRepository = book2UserEntityRepository;
-        this.bookstoreUserRegister = bookstoreUserRegister;
-        this.book2UserTypeEntityRepository = book2UserTypeEntityRepository;
-        this.transactionService = transactionService;
-        this.balanceTransactionRepository = balanceTransactionRepository;
-    }
+    private final PaymentService paymentService;
+    private final AuthenticationService authenticationService;
 
     public Page<BookDto> getPageOfCartBooks(Long userId, Integer offset, Integer limit) {
         Pageable nextPage = PageRequest.of(offset, limit);
@@ -69,7 +53,7 @@ public class CartService {
     public void addToCart(String slug, String cartContents, String postponedContents,
                           HttpServletResponse response, Authentication authentication) {
         if (authentication != null && authentication.isAuthenticated()) {
-            changeBook2UserRelation(bookstoreUserRegister.getCurrentUser().getId(), slug, "in_cart");
+            changeBook2UserRelation(authenticationService.getCurrentUser().getId(), slug, "in_cart");
         }
         addSlugToCookie("cartContents", cartContents, slug, response);
         if (postponedContents != null) {
@@ -80,7 +64,7 @@ public class CartService {
     public void addAllToCart(String cartContents, String postponedContents,
                              HttpServletResponse response, Authentication authentication) {
         if (authentication != null && authentication.isAuthenticated()) {
-            Long userId = bookstoreUserRegister.getCurrentUser().getId();
+            Long userId = authenticationService.getCurrentUser().getId();
             List<BookDto> postponedBooks = bookRepository
                     .findAllBooksDtoByUserIdAndRelation(userId, "postponed");
             postponedBooks.forEach(b -> changeBook2UserRelation(userId, b.getSlug(), "in_cart"));
@@ -103,7 +87,7 @@ public class CartService {
     public void addToPostponed(String slug, String cartContents, String postponedContents,
                                HttpServletResponse response, Authentication authentication) {
         if (authentication != null && authentication.isAuthenticated()) {
-            changeBook2UserRelation(bookstoreUserRegister.getCurrentUser().getId(), slug, "postponed");
+            changeBook2UserRelation(authenticationService.getCurrentUser().getId(), slug, "postponed");
         }
         addSlugToCookie("postponedContents", postponedContents, slug, response);
         if (cartContents != null) {
@@ -112,7 +96,7 @@ public class CartService {
     }
 
     public void addToArchived(String slug) {
-        Long userId = bookstoreUserRegister.getCurrentUser().getId();
+        Long userId = authenticationService.getCurrentUser().getId();
         changeBook2UserRelation(userId, slug, "archived");
     }
 
@@ -166,7 +150,7 @@ public class CartService {
 
     public void putCookieBooksToDB(String cookieValue, String user2BookRelationName) {
         getBookDtoListByCookie(cookieValue)
-                .forEach(b -> changeBook2UserRelation(bookstoreUserRegister.getCurrentUser().getId(), b.getSlug(), user2BookRelationName));
+                .forEach(b -> changeBook2UserRelation(authenticationService.getCurrentUser().getId(), b.getSlug(), user2BookRelationName));
     }
 
     public Double getTotalPrice(String cookieContents) {
@@ -208,18 +192,10 @@ public class CartService {
         if (!hasSufficientBalance(userDto, totalCost)) {
             return false;
         }
-
-        List<BalanceTransactionEntity> transactions = new ArrayList<>();
-
         userDto.getCartBooks().forEach(b -> {
-            BalanceTransactionEntity transaction =
-                    transactionService.createTransaction(userDto.getId(), -b.getPrice(), "Purchase: " + b.getTitle());
-            transactions.add(transaction);
+            paymentService.createInternalPurchaseTransaction(userDto.getId(), -b.getPrice(), "Purchase: " + b.getTitle());
             changeBook2UserRelation(userDto.getId(), b.getSlug(), "purchased");
         });
-
-        balanceTransactionRepository.saveAll(transactions);
-
         return true;
     }
 }

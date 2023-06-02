@@ -1,15 +1,15 @@
 package com.example.my_book_shop_app.controllers;
 
 import com.example.my_book_shop_app.dto.BooksPageDto;
+import com.example.my_book_shop_app.security.security_services.AuthenticationService;
 import com.example.my_book_shop_app.security.security_services.BookstoreUserDetailsService;
-import com.example.my_book_shop_app.security.security_services.BookstoreUserRegister;
 import com.example.my_book_shop_app.services.SearchingService;
 
 import jakarta.validation.ConstraintViolationException;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Size;
+import lombok.RequiredArgsConstructor;
 import org.hibernate.validator.constraints.Length;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
@@ -26,20 +26,12 @@ import java.util.stream.Collectors;
 
 @Controller
 @Validated
+@RequiredArgsConstructor
 public class SearchController {
 
     private final SearchingService searchingService;
     private final BookstoreUserDetailsService bookstoreUserDetailsService;
-    private final BookstoreUserRegister bookstoreUserRegister;
-
-    @Autowired
-    public SearchController(SearchingService searchingService,
-                            BookstoreUserDetailsService bookstoreUserDetailsService,
-                            BookstoreUserRegister bookstoreUserRegister) {
-        this.searchingService = searchingService;
-        this.bookstoreUserDetailsService = bookstoreUserDetailsService;
-        this.bookstoreUserRegister = bookstoreUserRegister;
-    }
+    private final AuthenticationService authenticationService;
 
     @GetMapping(value = {"/search"})
     public String getSearchResults(@NotEmpty(message = "Query must not be empty") @Size(min = 3, message = "query is too short") @RequestParam(name = "query") String query,
@@ -48,7 +40,7 @@ public class SearchController {
                                    Model model, Authentication authentication) {
         if (authentication != null && authentication.isAuthenticated()) {
             model.addAttribute("authStatus", "authorized");
-            model.addAttribute("curUsr", bookstoreUserDetailsService.getUserDtoById(bookstoreUserRegister.getCurrentUser().getId()));
+            model.addAttribute("curUsr", bookstoreUserDetailsService.getUserDtoById(authenticationService.getCurrentUser().getId()));
         } else {
             model.addAttribute("authStatus", "unauthorized");
         }

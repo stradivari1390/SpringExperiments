@@ -35,7 +35,7 @@ class MainPageSeleniumTests {
         SpringApplication.run(MyBookShopAppApplication.class);
 
         System.setProperty("webdriver.chrome.driver",
-                "C:/Users/stradivari1390/Documents/GitHub/SpringExperiments/MyBookShopApp/src/test/resources/chromedriver112/chromedriver.exe");
+                "C:/Users/stradivari1390/Downloads//chromedriver.exe");
         ChromeOptions options = new ChromeOptions();
         options.addArguments("--remote-allow-origins=*");
         driver = new ChromeDriver(options);

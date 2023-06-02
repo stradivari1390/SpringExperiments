@@ -1,46 +1,60 @@
 package com.example.my_book_shop_app.security.security_services;
 
-import com.example.my_book_shop_app.data.repositories.UserEntityRepository;
+import com.example.my_book_shop_app.data.model.enums.ContactType;
+import com.example.my_book_shop_app.data.model.user.UserContactEntity;
+import com.example.my_book_shop_app.data.repositories.UserContactEntityRepository;
 import com.example.my_book_shop_app.exceptions.EmailAuthorizationException;
 import com.example.my_book_shop_app.security.security_dto.ContactConfirmationPayload;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.mail.MailAuthenticationException;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDateTime;
+import java.util.Random;
 
 @Service
+@RequiredArgsConstructor
 public class EmailService {
 
     @Value("${app.base-url}")
     private String baseUrl;
-
     @Value("${spring.mail.username}")
     private String emailFrom;
-
-    BookstoreUserDetailsService bookstoreUserDetailsService;
-    UserEntityRepository userEntityRepository;
+    private final Random random = new Random();
+    private final UserContactEntityRepository userContactEntityRepository;
     private final JavaMailSender javaMailSender;
 
-    @Autowired
-    public EmailService(@Lazy BookstoreUserDetailsService bookstoreUserDetailsService,
-                        UserEntityRepository userEntityRepository,
-                        JavaMailSender javaMailSender) {
-        this.bookstoreUserDetailsService = bookstoreUserDetailsService;
-        this.userEntityRepository = userEntityRepository;
-        this.javaMailSender = javaMailSender;
-    }
-
+    @Transactional
     public void handleEmailSend(ContactConfirmationPayload payload) {
         String email = payload.getContact();
-        String code = bookstoreUserDetailsService.createSmsOrEmailCode(email);
+        String code = createSmsOrEmailCode(email);
         String subject = "Verification Code";
         String message = "Your verification code is: " + code;
 
         sendEmail(email, subject, message);
+    }
+
+    @Transactional
+    public String createSmsOrEmailCode(String contact) {
+        String code = String.format("%06d", random.nextInt(1_000_000));
+        UserContactEntity contactEntity = userContactEntityRepository.findByContact(contact).orElse(null);
+        if(contactEntity == null) {
+            contactEntity = new UserContactEntity();
+            contactEntity.setUserId(-1L * Math.abs(contact.hashCode()));
+            contactEntity.setContact(contact);
+            contactEntity.setType(contact.contains("@") ? ContactType.EMAIL : ContactType.PHONE);
+            contactEntity.setApproved((short) 0);
+        }
+        contactEntity.setCode(code);
+        contactEntity.setCodeTime(LocalDateTime.now());
+        contactEntity.setCodeTrails(0);
+        userContactEntityRepository.save(contactEntity);
+        return code;
     }
 
     private void sendEmail(String to, String subject, String messageText) {

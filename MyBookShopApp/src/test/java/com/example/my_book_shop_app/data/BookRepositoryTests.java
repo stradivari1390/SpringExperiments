@@ -89,8 +89,8 @@ class BookRepositoryTests {
 
     @Test
     void getPageOfRecentBooksDto() {
-        LocalDate fromDate = LocalDate.now().minusMonths(1);
-        LocalDate toDate = LocalDate.now();
+        LocalDate fromDate = LocalDate.of(2023,2,15);
+        LocalDate toDate = LocalDate.of(2023,4,15);
         Page<BookDto> recentBooks = bookRepository.getPageOfRecentBooksDto(PageRequest.of(0, 10), fromDate, toDate);
 
         assertThat(recentBooks).isNotEmpty();

@@ -1,13 +1,13 @@
 package com.example.my_book_shop_app.controllers;
 
 import com.example.my_book_shop_app.dto.UserDto;
+import com.example.my_book_shop_app.security.security_services.AuthenticationService;
 import com.example.my_book_shop_app.security.security_services.BookstoreUserDetailsService;
-import com.example.my_book_shop_app.security.security_services.BookstoreUserRegister;
 import com.example.my_book_shop_app.services.CartService;
 
 import jakarta.servlet.http.HttpServletResponse;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -17,19 +17,12 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import java.util.Collections;
 
 @Controller
+@RequiredArgsConstructor
 public class CartController {
 
     private final CartService cartService;
-    private final BookstoreUserRegister bookstoreUserRegister;
+    private final AuthenticationService authenticationService;
     private final BookstoreUserDetailsService bookstoreUserDetailsService;
-
-    @Autowired
-    public CartController(CartService cartService, BookstoreUserRegister bookstoreUserRegister,
-                          BookstoreUserDetailsService bookstoreUserDetailsService) {
-        this.cartService = cartService;
-        this.bookstoreUserRegister = bookstoreUserRegister;
-        this.bookstoreUserDetailsService = bookstoreUserDetailsService;
-    }
 
     @PostMapping("/changeBookStatus/{slug}")
     public String handleChangeBookStatus(@RequestParam("status") String status,
@@ -56,7 +49,7 @@ public class CartController {
     public String handleCartRequest(@CookieValue(value = "cartContents", required = false) String cartContents,
                                     Model model, Authentication authentication) {
         if (authentication != null && authentication.isAuthenticated()) {
-            UserDto userDto = bookstoreUserDetailsService.getUserDtoById(bookstoreUserRegister.getCurrentUser().getId());
+            UserDto userDto = bookstoreUserDetailsService.getUserDtoById(authenticationService.getCurrentUser().getId());
             model.addAttribute("authStatus", "authorized");
             model.addAttribute("curUsr", userDto);
             model.addAttribute("totalPrice", cartService.getTotalPrice(userDto));
@@ -81,7 +74,7 @@ public class CartController {
                                                   @CookieValue(name = "cartContents", required = false) String cartContents,
                                                   HttpServletResponse response, Model model, Authentication authentication) {
         if (authentication != null && authentication.isAuthenticated()) {
-            cartService.removeBook2UserRelation(bookstoreUserRegister.getCurrentUser().getId(), slug);
+            cartService.removeBook2UserRelation(authenticationService.getCurrentUser().getId(), slug);
         }
         if (cartContents != null && !cartContents.equals("")) {
             cartService.removeSlugFromCookie(slug, cartContents, "cartContents", response);
@@ -94,7 +87,7 @@ public class CartController {
                                          Model model, Authentication authentication) {
         if (authentication != null && authentication.isAuthenticated()) {
             model.addAttribute("authStatus", "authorized");
-            model.addAttribute("curUsr", bookstoreUserDetailsService.getUserDtoById(bookstoreUserRegister.getCurrentUser().getId()));
+            model.addAttribute("curUsr", bookstoreUserDetailsService.getUserDtoById(authenticationService.getCurrentUser().getId()));
         } else {
             model.addAttribute("authStatus", "unauthorized");
             if (postponedContents != null && !postponedContents.equals("")) {
@@ -112,7 +105,7 @@ public class CartController {
                                                        @CookieValue(name = "postponedContents", required = false) String postponedContents,
                                                        HttpServletResponse response, Model model, Authentication authentication) {
         if (authentication != null && authentication.isAuthenticated()) {
-            cartService.removeBook2UserRelation(bookstoreUserRegister.getCurrentUser().getId(), slug);
+            cartService.removeBook2UserRelation(authenticationService.getCurrentUser().getId(), slug);
         }
         if (postponedContents != null && !postponedContents.equals("")) {
             cartService.removeSlugFromCookie(slug, postponedContents, "postponedContents", response);
@@ -124,7 +117,7 @@ public class CartController {
     public String handleArchivedRequest(Model model, Authentication authentication) {
         if (authentication != null && authentication.isAuthenticated()) {
             model.addAttribute("authStatus", "authorized");
-            model.addAttribute("curUsr", bookstoreUserDetailsService.getUserDtoById(bookstoreUserRegister.getCurrentUser().getId()));
+            model.addAttribute("curUsr", bookstoreUserDetailsService.getUserDtoById(authenticationService.getCurrentUser().getId()));
         } else {
             model.addAttribute("authStatus", "unauthorized");
         }
@@ -135,7 +128,7 @@ public class CartController {
     public String handleRemoveBookFromArchivedRequest(@PathVariable("slug") String slug,
                                                       Model model, Authentication authentication) {
         if (authentication != null && authentication.isAuthenticated()) {
-            cartService.changeBook2UserRelation(bookstoreUserRegister.getCurrentUser().getId(), slug, "purchased");
+            cartService.changeBook2UserRelation(authenticationService.getCurrentUser().getId(), slug, "purchased");
         }
         return handleArchivedRequest(model, authentication);
     }
@@ -143,7 +136,7 @@ public class CartController {
     @GetMapping("/buy")
     public String handleBuyRequest(Authentication authentication, RedirectAttributes redirectAttributes) {
         if (authentication != null && authentication.isAuthenticated()) {
-            UserDto userDto = bookstoreUserDetailsService.getUserDtoById(bookstoreUserRegister.getCurrentUser().getId());
+            UserDto userDto = bookstoreUserDetailsService.getUserDtoById(authenticationService.getCurrentUser().getId());
             boolean success = cartService.buy(userDto);
             if (success) {
                 redirectAttributes.addFlashAttribute("message", "Purchase successful!");

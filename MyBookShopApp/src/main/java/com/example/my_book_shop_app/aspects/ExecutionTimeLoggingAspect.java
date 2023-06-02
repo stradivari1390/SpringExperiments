@@ -18,7 +18,7 @@ public class ExecutionTimeLoggingAspect {
     public void controllersPackage() {
     }
 
-    @Pointcut("within(com.example.my_book_shop_app.security.security_controller.AuthUserController)")
+    @Pointcut("within(com.example.my_book_shop_app.security.security_controller.AuthController)")
     public void authUserController() {
     }
 
